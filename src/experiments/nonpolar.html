@@ -122,7 +122,7 @@
 
         <!-- 2D Interactive Lab Desk (Precision layout mapping coordinates) -->
         <div class="relative w-full h-[380px] bg-gradient-to-b from-[#09101d] to-[#04060b] border border-white/5 rounded-2xl shadow-inner overflow-x-auto overflow-y-hidden select-none">
-            <div class="workspace-area relative min-w-[700px] w-full h-full" id="workspace">
+            <div class="workspace-area relative min-w-[450px] max-w-[450px] mx-auto w-full h-full" id="workspace">
             <!-- Grid Lines back-layer -->
             <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
 
@@ -133,15 +133,15 @@
                         <polygon points="0 0, 8 4, 0 8" fill="rgba(0, 210, 255, 0.6)" />
                     </marker>
                 </defs>
-                <line x1="370" y1="130" x2="580" y2="130" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
-                <line x1="370" y1="155" x2="580" y2="155" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
-                <line x1="370" y1="180" x2="580" y2="180" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
-                <line x1="370" y1="205" x2="580" y2="205" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
-                <line x1="370" y1="230" x2="580" y2="230" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
+                <line x1="120" y1="130" x2="330" y2="130" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
+                <line x1="120" y1="155" x2="330" y2="155" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
+                <line x1="120" y1="180" x2="330" y2="180" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
+                <line x1="120" y1="205" x2="330" y2="205" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
+                <line x1="120" y1="230" x2="330" y2="230" stroke="rgba(0, 210, 255, 0.6)" stroke-width="2" class="ext-line" marker-end="url(#arrowHeadExt)" />
             </svg>
 
-            <!-- Capacitor (left: 350px, top: 120px, width: 250px) -->
-            <div class="component capacitor charged absolute w-[250px] h-[120px] flex justify-between z-20" id="capacitorObj" style="left: 350px; top: 120px; direction: ltr;">
+            <!-- Capacitor (left: 100px, top: 120px, width: 250px) -->
+            <div class="component capacitor charged absolute w-[250px] h-[120px] flex justify-between z-20" id="capacitorObj" style="left: 100px; top: 120px; direction: ltr;">
                 <!-- Positive Plate (Left) -->
                 <div class="plate plate-left w-[18px] h-[120px] bg-gradient-to-b from-slate-300 via-slate-500 to-slate-700 rounded-md relative shadow-lg">
                     <div class="charge-container left-charges absolute inset-0 w-full flex flex-col items-center">
@@ -164,8 +164,8 @@
                 </div>
             </div>
 
-            <!-- Dielectric Slab (width: 140px, height: 120px, left: 425px, top: -20px initial) -->
-            <div class="component dielectric absolute w-[140px] h-[120px] bg-gradient-to-br from-slate-900/90 to-slate-950/95 border-2 border-slate-600 rounded-md shadow-2xl flex justify-center items-center overflow-hidden z-30 cursor-grab active:cursor-grabbing hover:border-slate-500" id="dielectricObj" style="left: 425px; top: -20px;">
+            <!-- Dielectric Slab (width: 140px, height: 120px, left: 175px, top: -20px initial) -->
+            <div class="component dielectric absolute w-[140px] h-[120px] bg-gradient-to-br from-slate-900/90 to-slate-950/95 border-2 border-slate-600 rounded-md shadow-2xl flex justify-center items-center overflow-hidden z-30 cursor-grab active:cursor-grabbing hover:border-slate-500" id="dielectricObj" style="left: 175px; top: -20px;">
                 <!-- Internal opposing induced electric field vectors -->
                 <svg class="internal-field absolute inset-0 w-full h-full pointer-events-none z-20 opacity-0 transition-opacity duration-300" id="intField">
                     <defs>
@@ -211,8 +211,8 @@
             <!-- Concept Layer -->
             <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[40]" id="conceptLayer">
                 <g id="concept-text" style="opacity: 0; transition: opacity 0.5s;">
-                    <rect x="220" y="32" width="540" height="24" fill="#0f172a" rx="4" />
-                    <text x="490" y="48" fill="#22d3ee" font-size="14" font-weight="bold" font-family="Tajawal" text-anchor="middle">المجال المحصل يقل حسب العلاقة (E_net = E_ext - E_ind) وتصطف الجزيئات باتجاه المجال المؤثر</text>
+                    <rect x="25" y="32" width="400" height="24" fill="#0f172a" rx="4" />
+                    <text x="225" y="48" fill="#22d3ee" font-size="10" font-weight="bold" font-family="Tajawal" text-anchor="middle">المجال المحصل يقل حسب العلاقة (E_net = E_ext - E_ind) وتصطف الجزيئات باتجاه المجال المؤثر</text>
                 </g>
             </svg>
             </div>
@@ -279,7 +279,7 @@
             isDragging = true;
             startX = e.clientX || e.touches[0].clientX;
             startY = e.clientY || e.touches[0].clientY;
-            startLeft = parseFloat(dielectric.style.left || 425);
+            startLeft = parseFloat(dielectric.style.left || 175);
             startTop = parseFloat(dielectric.style.top || -20);
             dielectric.style.cursor = 'grabbing';
         }
@@ -301,7 +301,7 @@
 
             
             if (newLeft < 10) newLeft = 10;
-            if (newLeft > 800) newLeft = 800;
+            if (newLeft > 300) newLeft = 300;
             if (newTop < -30) newTop = -30;
             if (newTop > 250) newTop = 250;
 
@@ -319,8 +319,8 @@
 
         
         setInterval(() => {
-            let capRect = { left: 350, right: 600, top: 120, bottom: 240 };
-            let dLeft = parseFloat(dielectric.style.left || 425);
+            let capRect = { left: 100, right: 350, top: 120, bottom: 240 };
+            let dLeft = parseFloat(dielectric.style.left || 175);
             let dTop = parseFloat(dielectric.style.top || -20);
             let dRect = { left: dLeft, right: dLeft + 140, top: dTop, bottom: dTop + 120 };
 
@@ -355,8 +355,8 @@
 
         
         function renderLoop() {
-            let capRect = { left: 350, right: 600, top: 120, bottom: 240 };
-            let dLeft = parseFloat(dielectric.style.left || 425);
+            let capRect = { left: 100, right: 350, top: 120, bottom: 240 };
+            let dLeft = parseFloat(dielectric.style.left || 175);
             let dTop = parseFloat(dielectric.style.top || -20);
             let dRect = { left: dLeft, right: dLeft + 140, top: dTop, bottom: dTop + 120 };
 
