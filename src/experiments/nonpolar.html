@@ -186,27 +186,6 @@
                 </div>
             </div>
         
-            <!-- HUD -->
-            <div id="math-hud" class="absolute bg-slate-900/90 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-md z-50 pointer-events-none transition-all duration-500 opacity-0 transform -translate-y-4" style="direction: ltr; min-width: 220px; left: 20px; top: 80px;">
-                <div class="text-emerald-400 font-bold mb-1 border-b border-slate-700 pb-1 text-right text-base" style="font-family: 'Tajawal', sans-serif;">قراءات المجال الكهربائي</div>
-                <div class="text-white font-mono text-xs space-y-2 mt-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-slate-400 text-[10px]">E_ext = </span> <span id="hud-e-ext" class="font-bold text-cyan-400 text-sm">500 V/m</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-slate-400 text-[10px]">E_ind = </span> <span id="hud-e-ind" class="font-bold text-red-400 text-sm">0 V/m</span>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-slate-700 pt-1 mt-1">
-                        <span class="text-slate-400 text-[10px]">E_net = E_ext - E_ind</span> <span id="hud-e-net" class="font-bold text-emerald-400 text-sm">500 V/m</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-slate-400 text-[10px]">ΔV = E_net × d</span> <span id="hud-v" class="font-bold text-yellow-400 text-sm">10.0 V</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-slate-400 text-[10px]">C_k = Q / ΔV</span> <span id="hud-c" class="font-bold text-green-400 text-sm">2.00 pF</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- Concept Layer -->
             <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[40]" id="conceptLayer">
@@ -218,8 +197,30 @@
             </div>
         </div>
         
+        <!-- HUD (Moved below workspace to prevent overlapping on mobile) -->
+        <div id="math-hud" class="w-full max-w-sm mx-auto bg-slate-900/90 border border-slate-700 p-4 rounded-xl shadow-2xl backdrop-blur-md pointer-events-none transition-all duration-500 opacity-0 transform -translate-y-4 my-6" style="direction: ltr;">
+            <div class="text-emerald-400 font-bold mb-3 border-b border-slate-700 pb-2 text-right text-base" style="font-family: 'Tajawal', sans-serif;">قراءات المجال الكهربائي</div>
+            <div class="text-white font-mono text-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-xs">E_ext = </span> <span id="hud-e-ext" class="font-bold text-cyan-400 text-base">500 V/m</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-xs">E_ind = </span> <span id="hud-e-ind" class="font-bold text-red-400 text-base">0 V/m</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-700 pt-2 mt-2">
+                    <span class="text-slate-400 text-xs">E_net = E_ext - E_ind</span> <span id="hud-e-net" class="font-bold text-emerald-400 text-base">500 V/m</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-xs">ΔV = E_net × d</span> <span id="hud-v" class="font-bold text-yellow-400 text-base">10.0 V</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-slate-400 text-xs">C_k = Q / ΔV</span> <span id="hud-c" class="font-bold text-green-400 text-base">2.00 pF</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Reset Button -->
-        <button class="btn-reset py-3 px-8 mx-auto bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-extrabold rounded-full shadow-lg shadow-red-500/20 transition-all duration-300 transform active:scale-95 mb-4" id="resetBtn" onclick="resetNonpolar()">إعادة تشغيل المحاكاة 🔄</button>
+        <button class="btn-reset py-3 px-8 mx-auto bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-extrabold rounded-full shadow-lg shadow-red-500/20 transition-all duration-300 transform active:scale-95 mb-4 block" id="resetBtn" onclick="resetNonpolar()">إعادة تشغيل المحاكاة 🔄</button>
 
         <!-- Footer -->
         <div class="footer-elite text-center text-[10px] text-slate-600 border-t border-white/5 pt-4 flex items-center justify-between">
