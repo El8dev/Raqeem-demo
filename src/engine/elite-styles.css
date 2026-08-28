@@ -1,0 +1,205 @@
+/* Elite Physics Engine - Shared Styles */
+
+body {
+    background-color: #07090e;
+    background-image: 
+        linear-gradient(to right, rgba(0, 210, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 210, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    color: #e2e8f0;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.conclusion-text, .conclusion-panel {
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.glass-panel {
+    background: rgba(17, 24, 35, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.tilt-container {
+    transform-style: preserve-3d;
+    transform: rotateX(10deg) rotateY(0deg);
+    transition: transform 0.1s;
+}
+
+/* Base Component Styles for Drag & Drop */
+.component, .elite-component {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    z-index: 10;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+}
+
+.component:active, .elite-component:active {
+    cursor: grabbing;
+}
+
+/* Drop Zones (Guided Templates) */
+.drop-zone {
+    position: absolute;
+    border: 2px dashed rgba(0, 210, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(0, 210, 255, 0.05);
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.drop-zone.highlight {
+    border-color: rgba(0, 210, 255, 0.8);
+    background: rgba(0, 210, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+    animation: pulse-drop 1.5s infinite;
+}
+
+@keyframes pulse-drop {
+    0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.9); border-color: rgba(0, 210, 255, 1); }
+    100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); }
+}
+
+.drop-zone.active {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Wires Layer */
+.wires-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.wire-path {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke 0.3s, filter 0.3s;
+}
+
+/* Terminal Nodes */
+.terminal-node {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0, 210, 255, 0.4);
+    border: 2px solid #00d2ff;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    box-shadow: 0 0 5px #00d2ff;
+    touch-action: none;
+}
+
+.terminal-node.connected {
+    background: #2ecc71;
+    border-color: #fff;
+    box-shadow: 0 0 8px #2ecc71;
+    cursor: default;
+}
+
+.terminal-node:hover, .terminal-node.hovered {
+    background: rgba(0, 210, 255, 1);
+    transform: translate(-50%, -50%) scale(1.3);
+    box-shadow: 0 0 10px #00d2ff;
+}
+
+.terminal-node.target-glow {
+    animation: pulseGlow 1.2s infinite;
+    z-index: 30;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); }
+    50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: translate(-50%, -50%) scale(1.5); }
+    100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.workspace-area {
+    width: 100%;
+    height: 600px;
+    background: radial-gradient(circle at center, #111e32 0%, #05080f 100%);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(0, 210, 255, 0.15);
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+}
+
+.user-wire {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: stroke 0.2s, filter 0.2s;
+}
+
+.user-wire:hover {
+    stroke: #ef4444 !important;
+    filter: drop-shadow(0 0 6px #ef4444) !important;
+}
+
+.wire-delete-btn {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    transition: transform 0.2s;
+    z-index: 50;
+    border: 1px solid white;
+}
+
+.wire-delete-btn:hover {
+    transform: scale(1.3);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 1);
+}
+
+/* SVG Native Wire Engine Styles */
+.raqeem-svg-wires {
+    overflow: visible;
+}
+
+.wire-flowing {
+    stroke-dasharray: 8 6;
+    animation: wireCurrentFlow 0.8s linear infinite;
+}
+
+@keyframes wireCurrentFlow {
+    from { stroke-dashoffset: 28; }
+    to { stroke-dashoffset: 0; }
+}
+
+.ghost-wire {
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px #38bdf8);
+}
+
+.wire-delete-badge {
+    pointer-events: auto;
+}
+
+.wire-delete-badge:hover circle {
+    fill: #dc2626;
+    r: 12px;
+}
+

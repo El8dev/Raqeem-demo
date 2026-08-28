@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ربط المتسعات على التوازي | مختبر الفيزياء الافتراضي</title>
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <script src="../libs/gsap.min.js"></script>
+    <script src="../libs/Draggable.min.js"></script>
+    <script src="../engine/svg-wire-engine.js"></script>
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <script>
+        window.tailwind = window.tailwind || {}; window.tailwind.config = {
+            theme: { extend: { colors: { cyber: { off: '#07090e', on: '#0f131a', panel: '#111823', border: 'rgba(0, 210, 255, 0.2)', gold: '#ffe082', orange: '#ff9f43', cyan: '#00d2ff', green: '#2ecc71', red: '#ef4444', blue: '#3b82f6' } }, fontFamily: { ar: ['Tajawal', 'sans-serif'], en: ['Outfit', 'sans-serif'] } } }
+        }
+    </script>
+    <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };</script>
+    <script id="MathJax-script" async src="../libs/mathjax/tex-chtml.js"></script>
+    <style>
+        :root { --bg-color: #080c14; --panel-bg: #111823; --accent-blue: #3b82f6; --accent-orange: #ff9f43; --text-color: #e2e8f0; --success-green: #2ecc71; --neon-red: #ef4444; --neon-yellow: #facc15; }
+        .workspace-area { width: 900px; height: 600px; background: radial-gradient(circle at center, #111e32 0%, #05080f 100%); border-radius: 20px; position: relative; overflow: hidden; border: 2px solid rgba(0, 210, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.85); }
+        .component { position: absolute; z-index: 10; user-select: none; cursor: grab; }
+        .component:active { cursor: grabbing; }
+        .drop-zone { position: absolute; border: 2px dashed transparent; border-radius: 8px; background: transparent; z-index: 1; transition: all 0.3s; }
+        .drop-zone.highlight { border-color: rgba(0, 210, 255, 0.8); background: rgba(0, 210, 255, 0.15); box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); animation: pulse-drop 1.5s infinite; }
+        @keyframes pulse-drop { 0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } 50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.9); border-color: rgba(0, 210, 255, 1); } 100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } }
+        .drop-zone.active { opacity: 0; pointer-events: none; }
+        svg.wires-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+        .terminal-node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: rgba(0, 210, 255, 0.4); border: 2px solid #00d2ff; transform: translate(-50%, -50%); cursor: crosshair; z-index: 20; display: none; transition: transform 0.2s, background 0.2s; }
+        #workspace .component.placed .terminal-node, #workspace .elite-component.placed .terminal-node { display: block; }
+        .terminal-node:hover, .terminal-node.hovered { background: rgba(0, 210, 255, 1); transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 10px #00d2ff; }
+        .terminal-node.connected { background: #2ecc71; border-color: #fff; box-shadow: 0 0 8px #2ecc71; cursor: default; }
+        .user-wire { transition: filter 0.3s, stroke 0.3s; }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } 50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: translate(-50%, -50%) scale(1.5); } 100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } }
+        .terminal-node.target-glow { animation: pulseGlow 1.2s infinite; z-index: 30; }
+    </style>
+    <!-- Elite Engine Assets -->
+    <link rel="stylesheet" href="../engine/elite-styles.css">
+    <script src="../engine/elite-components.js"></script>
+    <script src="../engine/elite-engine.js"></script>
+</head>
+<body class="bg-[#07090e] font-ar text-slate-200 min-h-screen p-4 md:p-8 flex flex-col items-center justify-start relative overflow-x-hidden">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,210,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,210,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
+
+    <header class="w-full max-w-[950px] flex justify-between items-center mb-6 z-10">
+        <div class="elite-logo-container group select-none cursor-pointer flex items-center gap-3 bg-black/40 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md shadow-lg" onclick="window.location.reload();">
+            <div class="relative w-8 h-8 elite-logo-card transition-all duration-500 ease-out" style="transform-style: preserve-3d;">
+                <div class="absolute inset-0 bg-cyan-500/10 rounded-xl blur-lg"></div>
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_6px_rgba(0,210,255,0.4)]">
+                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#00d2ff" stroke-width="5" stroke-linejoin="round" />
+                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(11, 17, 28, 0.9)" stroke="#ffe082" stroke-width="3" stroke-linejoin="round" />
+                    <path d="M40,36 H60 M40,49 H55 M40,62 H60 M40,36 V62" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="flex flex-col text-right font-bold">
+                <span class="text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-extrabold uppercase" style="font-family: 'Outfit', sans-serif;">ELITE</span>
+                <span class="text-[8px] text-cyan-400/80 tracking-widest font-ar">الفريق البرمجي</span>
+            </div>
+        </div>
+
+        <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400">ربط المتسعات على التوازي</h1>
+
+        <a href="../index.html?showMenu=true" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 bg-black/60 border border-white/5 hover:border-cyan-400/40 text-slate-300 hover:text-white backdrop-blur-md shadow-lg shadow-black/40" id="back-btn">
+            <i class="fa-solid fa-chevron-right text-cyan-400"></i> <span>القائمة الرئيسية</span>
+        </a>
+    </header>
+
+    <div class="w-full max-w-[950px] bg-gradient-to-r from-slate-900 via-cyber-panel to-slate-900 text-cyber-orange py-4 px-6 rounded-2xl mb-6 font-bold text-sm md:text-base border border-cyber-orange/20 shadow-xl text-center shadow-black/30 transition-all duration-500 ease-in-out" id="stepBanner">
+        الخطوة 1: قم بسحب القطع الأربعة من صندوق العناصر بالأسفل ووضعها في أماكنها المحددة لتجميع الدائرة.
+    </div>
+
+    <main class="w-full max-w-[950px] bg-slate-950/80 border border-white/5 rounded-[28px] p-6 shadow-2xl backdrop-blur-md flex flex-col gap-6 relative z-10">
+        <div class="text-xs font-bold text-slate-400/80 flex items-center gap-2 px-2 -mb-2">
+            <i class="fa-solid fa-screwdriver-wrench text-cyan-400"></i> أدوات التجربة التفاعلية:
+        </div>
+
+        <!-- Interactive Tools Top Bar -->
+        <div class="grid grid-cols-4 gap-3 bg-black/40 border border-white/5 p-4 rounded-2xl">
+            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">🔋</div>
+                <div class="text-[10px] md:text-xs font-bold text-slate-200">بطارية</div>
+            </div>
+            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">🔌</div>
+                <div class="text-[10px] md:text-xs font-bold text-slate-200">مفتاح (K)</div>
+            </div>
+            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-white shadow">||</div>
+                <div class="text-[10px] md:text-xs font-bold text-slate-200">متسعتان (C1, C2)</div>
+            </div>
+            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
+                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">⚡</div>
+                <div class="text-[10px] md:text-xs font-bold text-slate-200">أسلاك توصيل</div>
+            </div>
+        </div>
+
+        <div class="w-full overflow-x-auto rounded-2xl">
+            <div class="workspace-area relative mx-auto" id="workspace">
+                <div class="absolute bottom-0 left-0 w-full h-[160px] border-t-2 border-dashed border-cyan-500/40 bg-slate-900/60 backdrop-blur-md rounded-b-[20px] pointer-events-none z-0">
+                    <div class="absolute -top-3.5 right-6 bg-slate-950/90 border border-cyan-500/40 px-3 py-0.5 rounded-full text-cyan-400 font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-lg shadow-cyan-500/10"><i class="fa-solid fa-toolbox text-[11px]"></i> صندوق الأدوات (Toolbox)</div>
+                </div>
+                <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+
+                <svg style="position: absolute; width: 0; height: 0;">
+                  <defs>
+                    <linearGradient id="brass" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#ffe082" />
+                      <stop offset="40%" stop-color="#d97706" />
+                      <stop offset="100%" stop-color="#78350f" />
+                    </linearGradient>
+                    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#5c4033" />
+                      <stop offset="50%" stop-color="#3d2b1f" />
+                      <stop offset="100%" stop-color="#261c13" />
+                    </linearGradient>
+                    <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#ea580c" />
+                      <stop offset="50%" stop-color="#f97316" />
+                      <stop offset="100%" stop-color="#c2410c" />
+                    </linearGradient>
+                    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#e2e8f0" />
+                      <stop offset="50%" stop-color="#94a3b8" />
+                      <stop offset="100%" stop-color="#475569" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                <svg class="wires-layer" id="wiresLayer">
+                    <defs>
+                        <filter id="glowOrange" filterUnits="userSpaceOnUse" x="-100" y="-100" width="1200" height="1200">
+                          <feGaussianBlur stdDeviation="3" result="blur" />
+                          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                    </defs>
+                </svg>
+
+                <!-- Drop Zones -->
+                <div class="drop-zone" id="zone-battery" style="left: 100px; top: 180px; width: 70px; height: 60px;"></div>
+                <div class="drop-zone" id="zone-switchK" style="left: 100px; top: 320px; width: 80px; height: 100px;"></div>
+                <div class="drop-zone" id="zone-c1" style="left: 350px; top: 150px; width: 140px; height: 130px;"></div>
+                <div class="drop-zone" id="zone-c2" style="left: 600px; top: 150px; width: 140px; height: 130px;"></div>
+
+                <!-- Components on shelf -->
+                <div id="elite-components-container"></div>
+                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="left: 450px; top: 450px; width: 140px; height: 130px;">
+                    <div class="relative w-full h-full overflow-visible">
+                        <div id="c1-bottom-plate" class="absolute bottom-[20px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                        <div id="c1-top-plate" class="absolute top-[10px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                        
+                        <div id="c1-pos-charges" class="absolute top-[23px] left-[20px] w-[100px] flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+                        <div id="c1-neg-charges" class="absolute bottom-[33px] left-[20px] w-[100px] flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
+                        <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
+                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                    </div>
+                </div>
+
+                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="left: 650px; top: 450px; width: 140px; height: 130px;">
+                    <div class="relative w-full h-full overflow-visible">
+                        <div id="c2-bottom-plate" class="absolute bottom-[20px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                        <div id="c2-top-plate" class="absolute top-[10px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                        
+                        <div id="c2-pos-charges" class="absolute top-[23px] left-[20px] w-[100px] flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+                        <div id="c2-neg-charges" class="absolute bottom-[33px] left-[20px] w-[100px] flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
+                        <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
+                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                    </div>
+                </div>
+
+                <!-- Top Telemetry Ribbon HUD -->
+                <div id="math-hud" class="absolute top-2.5 left-1/2 bg-slate-950/95 border border-cyan-500/40 px-4 py-1.5 rounded-2xl shadow-2xl backdrop-blur-xl z-30 pointer-events-none transition-all duration-500 opacity-0 flex items-center gap-3 whitespace-nowrap select-none" style="direction: rtl; transform: translate(-50%, -12px);">
+                    <!-- Title Badge -->
+                    <div class="flex items-center gap-2 font-bold text-cyan-400 pl-3 border-l border-slate-700/80 text-xs md:text-sm whitespace-nowrap" style="font-family: 'Tajawal', sans-serif;">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span>قوانين التوازي</span>
+                    </div>
+
+                    <!-- Metrics Group -->
+                    <div class="flex items-center gap-2 font-mono text-xs whitespace-nowrap" style="direction: ltr;">
+                        <!-- Inputs Chip -->
+                        <div class="bg-slate-900/90 border border-slate-800 px-2.5 py-1 rounded-lg text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
+                            <span class="text-slate-400 text-[11px]">C₁:</span><span id="hud-c1" class="font-bold text-slate-100">0.00</span>
+                            <span class="text-slate-600">|</span>
+                            <span class="text-slate-400 text-[11px]">C₂:</span><span id="hud-c2" class="font-bold text-slate-100">0.00</span>
+                            <span class="text-[10px] text-slate-400">pF</span>
+                            <span id="hud-vbat" class="hidden">0.00</span>
+                        </div>
+
+                        <!-- C_eq Chip -->
+                        <div class="bg-slate-900/90 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+                            <span class="text-emerald-500/80 text-[11px] font-sans font-semibold">C_eq:</span>
+                            <span id="hud-c" class="font-bold text-emerald-300">0.00 pF</span>
+                        </div>
+
+                        <!-- V_tot Chip -->
+                        <div class="bg-slate-900/90 border border-amber-500/30 px-2.5 py-1 rounded-lg text-amber-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+                            <span class="text-amber-500/80 text-[11px] font-sans font-semibold">V_tot:</span>
+                            <span id="hud-v" class="font-bold text-amber-300">0.00 V</span>
+                        </div>
+
+                        <!-- Q_tot Chip -->
+                        <div class="bg-slate-900/90 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-cyan-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
+                            <span class="text-cyan-500/80 text-[11px] font-sans font-semibold">Q_tot:</span>
+                            <span id="hud-q" class="font-bold text-cyan-300">0.00 pC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Concept Layer -->
+                <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[15]" id="conceptLayer">
+                    <g id="area-vis" style="opacity: 0; transition: opacity 0.5s;">
+                        <rect id="area-box" x="340" y="140" width="410" height="150" rx="8" fill="rgba(6, 182, 212, 0.05)" stroke="#06b6d4" stroke-width="2" stroke-dasharray="8 6" />
+                        <path id="top-bridge" d="M 480 165 L 610 165" stroke="#06b6d4" stroke-width="3" stroke-dasharray="5 5" />
+                        <path id="bottom-bridge" d="M 480 265 L 610 265" stroke="#06b6d4" stroke-width="3" stroke-dasharray="5 5" />
+                        <text id="area-text" x="545" y="130" fill="#22d3ee" font-size="14" font-weight="bold" font-family="Tajawal" text-anchor="middle">المساحة السطحية المتقابلة تزداد (A = A₁ + A₂) ➔ السعة تزداد</text>
+                    </g>
+                    <!-- E-field groups for both capacitors -->
+                    <g id="e-field-lines-c1" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
+                    <g id="e-field-lines-c2" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
+                </svg>
+                
+            </div>
+        </div>
+    
+        <div class="conclusion-panel bg-emerald-500/[0.04] border border-emerald-500/20 rounded-2xl p-5 shadow-lg shadow-emerald-500/5 hidden transition-all duration-500 ease-in-out" id="conclusion">
+            <div class="conclusion-title text-base font-bold text-emerald-400 flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-circle-check"></i> استنتاج ربط المتسعات على التوازي:
+            </div>
+            <div class="conclusion-text text-sm text-slate-300 leading-relaxed text-justify">
+                <strong>1. تساوي فرق الجهد للمجموعة المربوطة على التوازي:</strong> يكون فرق الجهد عبر كل متسعة متساوياً ويساوي فرق الجهد الكلي للمصدر ($V_{total} = V_1 = V_2$).<br><br>
+                <strong>2. تجزؤ الشحنة الكلية:</strong> الشحنة الكلية للمجموعة تساوي مجموع الشحنات المخزونة في كل متسعة مربوطة على التوازي ($Q_{total} = Q_1 + Q_2$). تتوزع الشحنة طردياً مع السعة ($Q = C \cdot V$).<br><br>
+                <strong>3. زيادة السعة المكافئة للمجموعة:</strong> السعة المكافئة لربط التوازي تكون أكبر من أكبر سعة فردية في المجموعة ($C_{eq} = C_1 + C_2$)، وذلك بسبب زيادة المساحة السطحية المتقابلة للألواح المشتركة للمجموعة.
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-2">
+            <button class="btn-auto-wire py-3 px-8 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold rounded-full shadow-lg shadow-cyan-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2" id="autoConnectBtn" onclick="autoConnectCircuit()">
+                <i class="fa-solid fa-bolt"></i> <span>توصيل تلقائي</span>
+            </button>
+            <button class="btn-reset py-3 px-8 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-extrabold rounded-full shadow-lg shadow-red-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2" id="resetBtn" onclick="resetLab()">
+                <i class="fa-solid fa-rotate-right"></i> <span>إعادة تعيين الدائرة</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const EPSILON_0 = 8.854;
+        let V_bat = 10.0;
+        let A1 = 200; let A2 = 200;
+        let k1 = 1.0; let k2 = 1.0;
+        let insertionPercent1 = 0; let insertionPercent2 = 0;
+        let isSwitchClosed = false;
+        let trappedCharge = null;
+        let visualWidth1 = 80; let visualWidth2 = 80;
+
+        function autoConnectCircuit() {
+            const unplaced = document.querySelectorAll('.elite-component:not(.placed)');
+            if (unplaced.length > 0) {
+                const banner = document.getElementById('stepBanner');
+                if (banner) {
+                    banner.innerText = 'يرجى سحب القطع الأربعة من صندوق الأدوات إلى أماكنها المحددة أولاً قبل التوصيل!';
+                    banner.style.color = 'var(--neon-yellow)';
+                    gsap.fromTo(banner, { scale: 1.04 }, { scale: 1, duration: 0.3 });
+                }
+                return;
+            }
+
+            if (!window.engine || !window.engine.wireEngine) return;
+
+            window.engine.wireEngine.clearWires();
+
+            const pairs = [
+                ['bat-pos', 'c1-top'],
+                ['c1-top', 'c2-top'],
+                ['bat-neg', 'sw-1'],
+                ['sw-k', 'c1-bottom'],
+                ['c1-bottom', 'c2-bottom']
+            ];
+
+            pairs.forEach(([srcId, tgtId]) => {
+                const srcEl = document.getElementById(srcId);
+                const tgtEl = document.getElementById(tgtId);
+                if (srcEl && tgtEl) {
+                    window.engine.wireEngine.connect(srcEl, tgtEl);
+                }
+            });
+        }
+
+        function resetLab() {
+            // Reset Circuit State
+            window.isCircuitComplete = false;
+            isSwitchClosed = false;
+            trappedCharge = null;
+
+            if (window.engine) {
+                window.engine.reset();
+            }
+
+            // Reset UI Elements
+            document.querySelectorAll('.connected').forEach(el => el.classList.remove('connected'));
+            document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('stepBanner').innerText = 'الخطوة 1: قم بسحب القطع الأربعة من صندوق العناصر بالأسفل ووضعها في أماكنها المحددة لتجميع الدائرة.';
+            document.getElementById('stepBanner').style.color = 'var(--cyber-orange)';
+            
+            document.getElementById('math-hud').classList.add('hidden');
+            document.getElementById('math-hud').style.opacity = 0;
+            document.getElementById('conclusion').classList.add('hidden');
+            document.getElementById('conclusion').classList.remove('opacity-100');
+            const areaVis = document.getElementById('area-vis');
+            if (areaVis) areaVis.style.opacity = 0;
+            
+            const switchArm = document.getElementById('sw-arm');
+            if (switchArm) gsap.to(switchArm, { rotation: -30, duration: 0.25 });
+
+            // Reset Components to Toolbox Positions
+            gsap.to('#bat', { left: 100, top: 480, duration: 0.4 });
+            gsap.to('#sw', { left: 250, top: 460, duration: 0.4 });
+            gsap.to('#comp-c1', { left: 450, top: 450, duration: 0.4 });
+            gsap.to('#comp-c2', { left: 650, top: 450, duration: 0.4 });
+        }
+
+        
+        // Generate Elite Components
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('elite-components-container');
+            container.innerHTML += EliteComponents.getBattery('bat', 100, 480, 'zone-battery');
+            container.innerHTML += EliteComponents.getSwitch('sw', 250, 460, 'zone-switchK', true);
+            
+            // Attach switch click handler
+            const swEl = document.getElementById('sw');
+            if (swEl) swEl.addEventListener('click', handleSwitchClick);
+            
+            // Re-bind battery click handler
+            const batEl = document.getElementById('bat');
+            if (batEl) batEl.addEventListener('click', cycleBatteryVolt);
+            
+            window.isCircuitComplete = false;
+            
+            const engine = new EliteEngine({
+                workspaceId: 'workspace',
+                expectedPairs: [
+                    'bat-pos-c1-top',
+                    'c1-top-c2-top',
+                    'bat-neg-sw-1',
+                    'sw-k-c1-bottom',
+                    'c1-bottom-c2-bottom'
+                ],
+                onCircuitComplete: (connections) => {
+                    if (connections.size === 5) {
+                        window.isCircuitComplete = true;
+                        const stepBanner = document.getElementById('stepBanner');
+                        if (stepBanner) {
+                            stepBanner.innerText = 'اكتمل الربط! انقر على المفتاح لغلق الدائرة.';
+                            stepBanner.style.color = 'var(--success-green)';
+                        }
+                    } else {
+                        window.isCircuitComplete = false;
+                        if (typeof handleSwitchClick === 'function') handleSwitchClick(true);
+                    }
+                },
+                onComponentPlaced: (placed, total) => {
+                    if (placed === 4) {
+                        const stepBanner = document.getElementById('stepBanner');
+                        if (stepBanner) {
+                            stepBanner.innerText = 'الخطوة 2: تم وضع القطع. ارسم الأسلاك بين النقاط (الدوائر المضيئة) لإكمال الدائرة.';
+                            stepBanner.style.color = 'var(--cyber-orange)';
+                        }
+                    }
+                }
+            });
+            engine.totalComponents = 4;
+            engine.setupTerminals();
+            window.engine = engine;
+
+            requestAnimationFrame(renderMolecules);
+        });
+
+        const voltages = [5, 10, 15, 20];
+        let voltIdx = 1;
+        function cycleBatteryVolt() {
+            voltIdx = (voltIdx + 1) % voltages.length;
+            V_bat = voltages[voltIdx];
+            document.querySelector('#bat text:last-child').textContent = V_bat + "V CELL";
+            createSpark(135, 200);
+        }
+
+        function handleSwitchClick(eventOrForce) {
+            const isForceOpen = eventOrForce === true;
+            if (!window.isCircuitComplete && !isForceOpen) return;
+            if (isForceOpen && !isSwitchClosed) return;
+            
+            isSwitchClosed = isForceOpen ? false : !isSwitchClosed;
+            const switchArm = document.getElementById('sw-arm');
+
+            if (isSwitchClosed) {
+                gsap.to(switchArm, { rotation: 0, duration: 0.25 });
+                createSpark(112, 370);
+                document.getElementById('stepBanner').innerText = "الدائرة مغلقة والبطارية متصلة! يتساوى فرق جهد المتسعتين مع جهد المصدر: V₁ = V₂ = V_total";
+                document.getElementById('stepBanner').style.color = 'var(--success-green)';
+                document.getElementById('conclusion').classList.remove('hidden');
+                setTimeout(() => document.getElementById('conclusion').classList.add('opacity-100'), 50);
+                
+                // Show HUD and Vis
+                const hud = document.getElementById('math-hud');
+                hud.classList.remove('hidden');
+                setTimeout(() => { hud.style.opacity = 1; hud.style.transform = 'translate(-50%, 0)'; }, 50);
+                document.getElementById('area-vis').style.opacity = 1;
+                
+            } else {
+                gsap.to(switchArm, { rotation: -30, duration: 0.25 });
+                document.getElementById('stepBanner').innerText = "المفتاح مفتوح. المجموعة معزولة. تظل الشحنة الكلية ثابتة.";
+                document.getElementById('stepBanner').style.color = "var(--accent-orange)";
+                if (trappedCharge > 5 && (k1 > 1.2 || k2 > 1.2)) document.getElementById('conclusion').classList.remove('hidden');
+                
+                // Hide HUD and Vis
+                const hud = document.getElementById('math-hud');
+                hud.style.opacity = 0;
+                hud.style.transform = 'translate(-50%, -12px)';
+                setTimeout(() => { hud.classList.add('hidden'); }, 500);
+                const areaVis = document.getElementById('area-vis');
+                if (areaVis) areaVis.style.opacity = 0;
+            }
+        }
+
+        function renderMolecules() {
+            const C1 = (EPSILON_0 * 1.0 * A1) / 500;
+            const C2 = (EPSILON_0 * 1.0 * A2) / 500;
+            const C_eq = C1 + C2;
+
+            let Q1=0, Q2=0, V1=0, V2=0, Q_total=0;
+            if (window.isCircuitComplete) {
+                if (isSwitchClosed) {
+                    V1 = V_bat; V2 = V_bat;
+                    Q1 = C1 * V1; Q2 = C2 * V2;
+                    Q_total = Q1 + Q2;
+                    trappedCharge = Q_total;
+                } else {
+                    if (trappedCharge !== null) {
+                        Q_total = trappedCharge;
+                        let V_tot = Q_total / C_eq;
+                        V1 = V_tot; V2 = V_tot;
+                        Q1 = C1 * V1; Q2 = C2 * V2;
+                    }
+                }
+            }
+
+            const op1 = Math.min(1, Q1/10); const op2 = Math.min(1, Q2/10);
+            document.getElementById('c1-pos-charges').style.opacity = op1; document.getElementById('c1-neg-charges').style.opacity = op1;
+            document.getElementById('c2-pos-charges').style.opacity = op2; document.getElementById('c2-neg-charges').style.opacity = op2;
+            
+            // Position concept SVG using actual rendered positions
+            if (window.isCircuitComplete) {
+                const ws = document.getElementById('workspace');
+                const c1 = document.getElementById('comp-c1');
+                const c2 = document.getElementById('comp-c2');
+                if (ws && c1 && c2) {
+                    const wr = ws.getBoundingClientRect();
+                    const r1 = c1.getBoundingClientRect();
+                    const r2 = c2.getBoundingClientRect();
+                    // Positions relative to workspace
+                    const x1 = r1.left - wr.left;
+                    const y1 = r1.top - wr.top;
+                    const x2 = r2.left - wr.left;
+                    const y2 = r2.top - wr.top;
+                    const w1 = r1.width;
+                    const h1 = r1.height;
+                    const w2 = r2.width;
+
+                    // Bounding box around both capacitors
+                    document.getElementById('area-box').setAttribute('x', x1 - 10);
+                    document.getElementById('area-box').setAttribute('y', y1 - 10);
+                    document.getElementById('area-box').setAttribute('width', (x2 + w2) - x1 + 20);
+                    document.getElementById('area-box').setAttribute('height', h1 + 20);
+
+                    // Bridge lines between the two top plates and two bottom plates
+                    document.getElementById('top-bridge').setAttribute('d', `M ${x1 + w1} ${y1 + 16} L ${x2} ${y2 + 16}`);
+                    document.getElementById('bottom-bridge').setAttribute('d', `M ${x1 + w1} ${y1 + h1 - 26} L ${x2} ${y2 + h1 - 26}`);
+
+                    // Text label centered below
+                    const textEl = document.getElementById('area-text');
+                    if (textEl) {
+                        textEl.setAttribute('x', (x1 + x2 + w2) / 2);
+                        textEl.setAttribute('y', y1 + h1 + 30);
+                    }
+
+                    // E-field animation
+                    const eFieldC1 = document.getElementById('e-field-lines-c1');
+                    const eFieldC2 = document.getElementById('e-field-lines-c2');
+                    
+                    if (eFieldC1 && eFieldC2) {
+                        eFieldC1.innerHTML = '';
+                        eFieldC2.innerHTML = '';
+                        
+                        if (isSwitchClosed) {
+                            window.eFieldTime = (window.eFieldTime || 0) + 0.05;
+                            const numLines = 6;
+                            
+                            function buildFieldLines(cx, cW, cTopY, cBotY) {
+                                let linesHTML = '';
+                                const distanceY = cBotY - cTopY;
+                                for (let i = 0; i <= numLines; i++) {
+                                    const ratio = i / numLines;
+                                    const lx = cx + (cW * ratio);
+                                    
+                                    const centerDist = ratio - 0.5;
+                                    const bulgeFactor = distanceY * 0.15;
+                                    const curveAmount = (Math.pow(centerDist * 2, 3)) * bulgeFactor;
+                                    
+                                    const controlX = lx + curveAmount;
+                                    const controlY = (cTopY + cBotY) / 2;
+                                    const waveOffset = Math.sin(window.eFieldTime + i) * 1.5;
+                                    const finalControlX = controlX + waveOffset;
+                                    
+                                    linesHTML += `<path d="M ${lx} ${cTopY} Q ${finalControlX} ${controlY} ${lx} ${cBotY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />`;
+                                    linesHTML += `<polygon points="${lx-4},${cBotY-8} ${lx+4},${cBotY-8} ${lx},${cBotY}" fill="#3b82f6" opacity="0.8" />`;
+                                }
+                                return linesHTML;
+                            }
+                            
+                            eFieldC1.innerHTML = buildFieldLines(x1 + 10, 100, y1 + 22, y1 + h1 - 22);
+                            eFieldC2.innerHTML = buildFieldLines(x2 + 10, 100, y2 + 22, y2 + h1 - 22);
+                        }
+                    }
+                }
+            }
+
+            // Update HUD
+            document.getElementById('hud-c1').innerText = C1.toFixed(2);
+            document.getElementById('hud-c2').innerText = C2.toFixed(2);
+            document.getElementById('hud-vbat').innerText = V_bat.toFixed(2);
+            document.getElementById('hud-v').innerText = (isSwitchClosed || trappedCharge !== null) ? V1.toFixed(2) + " V" : "0.00 V";
+            document.getElementById('hud-q').innerText = (isSwitchClosed || trappedCharge !== null) ? Q_total.toFixed(2) + " pC" : "0.00 pC";
+            document.getElementById('hud-c').innerText = C_eq.toFixed(2) + " pF";
+
+            requestAnimationFrame(renderMolecules);
+        }
+
+        function createSpark(x, y) {
+            const workspace = document.getElementById('workspace');
+            for (let i = 0; i < 6; i++) {
+                const spark = document.createElement('div');
+                spark.style.position = 'absolute'; spark.style.left = x + 'px'; spark.style.top = y + 'px';
+                spark.style.width = '3px'; spark.style.height = '3px'; spark.style.borderRadius = '50%';
+                spark.style.backgroundColor = '#ffd700'; spark.style.boxShadow = '0 0 4px #ff9f03, 0 0 8px #ffffff';
+                spark.style.zIndex = '50'; workspace.appendChild(spark);
+                const angle = Math.random() * Math.PI * 2; const dist = Math.random() * 20 + 10;
+                gsap.to(spark, { x: Math.cos(angle)*dist, y: Math.sin(angle)*dist, opacity: 0, duration: 0.4, onComplete: ()=>spark.remove() });
+            }
+        }
+    </script>
+</body>
+</html>

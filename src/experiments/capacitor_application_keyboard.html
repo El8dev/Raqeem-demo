@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق المتسعة: لوحة مفاتيح الحاسوب | مختبر رقيم</title>
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-dark': '#020617',
+                        'cyber-card': '#0f172a',
+                        'cyber-blue': '#3b82f6',
+                        'cyber-cyan': '#22d3ee',
+                        'cyber-purple': '#a855f7',
+                        'cyber-red': '#ef4444',
+                        'cyber-green': '#10b981'
+                    },
+                    fontFamily: {
+                        ar: ['Tajawal', 'sans-serif'],
+                        en: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .workspace-grid {
+            background-color: #020617;
+            background-image: 
+                linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: center center;
+            border: 2px solid rgba(34, 211, 238, 0.2);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 0 30px rgba(34,211,238,0.05);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.6); }
+
+        .cyber-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .cyber-button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .cyber-button:hover::after {
+            left: 100%;
+        }
+
+        /* Keyboard Key Interactive */
+        .keyboard-key {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        /* Dashboard Bars */
+        .dash-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #1e293b;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .dash-bar-fill {
+            height: 100%;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Connecting beam animation */
+        @keyframes beamFlow {
+            from { stroke-dashoffset: 15; }
+            to { stroke-dashoffset: 0; }
+        }
+        .magnify-beam {
+            stroke-dasharray: 10 5;
+            animation: beamFlow 1s linear infinite;
+        }
+
+        /* HTML Keyboard Keys */
+        .kbd-key {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(to bottom, #475569, #1e293b);
+            border-radius: 4px;
+            border: 1px solid #0f172a;
+            border-bottom-width: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            color: #cbd5e1;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            transition: all 0.1s;
+            user-select: none;
+        }
+        .kbd-key.active {
+            background: linear-gradient(to bottom, #2dd4bf, #0f766e);
+            border-bottom-width: 1px;
+            transform: translateY(2px);
+            color: #ffffff;
+            box-shadow: 0 0px 2px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative pb-10">
+
+    <!-- Header -->
+    <header class="py-4 px-6 glass-panel border-b border-slate-800 flex flex-wrap md:flex-nowrap items-center justify-between sticky top-0 z-50 mb-6 gap-4">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyber-blue/10 to-cyber-purple/10 pointer-events-none"></div>
+        <div class="flex items-center gap-4 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyber-cyan to-cyber-green p-0.5 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                <div class="w-full h-full bg-cyber-dark rounded-[10px] flex items-center justify-center cursor-pointer hover:bg-slate-900 transition" onclick="window.location.reload();">
+                    <i class="fa-solid fa-keyboard text-cyber-green text-xl"></i>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">لوحة المفاتيح (الكيبورد)</h1>
+                <p class="text-sm text-cyber-cyan tracking-wide font-medium">تطبيق عملي: تغير السعة الكهربائية بدلاً من التلامس</p>
+            </div>
+        </div>
+        <div class="relative z-10">
+            <a href="../index.html?showMenu=true" class="cyber-button px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-600 shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-chevron-right text-cyber-cyan"></i> القائمة الرئيسية
+            </a>
+        </div>
+    </header>
+
+    <!-- Guided Instructions Banner -->
+    <div class="w-full max-w-[1500px] mx-auto bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 py-3 px-6 rounded-xl mb-6 text-sm font-bold flex items-center justify-between shadow-lg z-10">
+        <div class="flex items-center gap-4 text-emerald-400">
+            <span class="w-8 h-8 rounded-full bg-emerald-400/20 border border-emerald-400 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                <i class="fa-solid fa-info"></i>
+            </span>
+            <span class="text-base tracking-wide text-white">
+                اضغط على مفتاح الحاسوب لمشاهدة كيف تقل المسافة بين صفيحتي المتسعة، وكيف يؤدي ذلك لزيادة السعة فوراً لإرسال الإشارة.
+            </span>
+        </div>
+        <div class="hidden md:flex items-center gap-2 text-slate-400 text-xs font-normal">
+            <i class="fa-solid fa-lightbulb text-amber-400"></i> السادس العلمي - الفصل الأول
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 w-full max-w-[1500px] mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+
+        <!-- 1. Interactive Workspace (Left - 8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-6 lg:order-2">
+            
+            <div class="w-full workspace-grid relative rounded-2xl h-[550px] overflow-x-auto overflow-y-hidden">
+                <div class="relative min-w-[850px] w-full h-full flex items-center justify-start p-4">
+                
+                <!-- 1. REALISTIC KEYBOARD HTML (Left side) -->
+                <div class="absolute left-[20px] top-[140px] z-20 drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)] w-[280px]">
+                    <div dir="ltr" class="flex flex-col gap-1.5 p-3 bg-slate-800 rounded-xl border-4 border-slate-900 shadow-2xl w-full" style="transform: perspective(800px) rotateX(30deg) rotateZ(-5deg) skewX(5deg);">
+                                                <!-- Row 1 -->
+                        <div class="flex justify-center gap-1.5">
+                            <div class="kbd-key" data-key="Q">Q</div>
+                            <div class="kbd-key" data-key="W">W</div>
+                            <div class="kbd-key" data-key="E">E</div>
+                            <div class="kbd-key" data-key="R">R</div>
+                            <div class="kbd-key" data-key="T">T</div>
+                            <div class="kbd-key" data-key="I">I</div>
+                            <div class="kbd-key" data-key="O">O</div>
+                        </div>
+                        <!-- Row 2 -->
+                        <div class="flex justify-center gap-1.5 pl-2">
+                            <div class="kbd-key" data-key="A">A</div>
+                            <div class="kbd-key" data-key="S">S</div>
+                            <div class="kbd-key" data-key="D">D</div>
+                            <div class="kbd-key" data-key="F">F</div>
+                            <div class="kbd-key" data-key="G">G</div>
+                            <div class="kbd-key" data-key="H">H</div>
+                            <div class="kbd-key" data-key="J">J</div>
+                            <div class="kbd-key" data-key="L">L</div>
+                        </div>
+                        <!-- Row 3 -->
+                        <div class="flex justify-center gap-1.5 pl-6">
+                            <div class="kbd-key" data-key="Z">Z</div>
+                            <div class="kbd-key" data-key="C">C</div>
+                            <div class="kbd-key" data-key="V">V</div>
+                            <div class="kbd-key" data-key="B">B</div>
+                            <div class="kbd-key" data-key="N">N</div>
+                            <div class="kbd-key" data-key="M">M</div>
+                        </div>
+                        <!-- Row 4 -->
+                        <div class="flex justify-center gap-1.5 mt-1">
+                            <div class="kbd-key" style="width: 150px" data-key="SPACE">SPACE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. CONNECTION BEAMS -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none z-10">
+                    <path d="M 130 250 C 250 250, 300 250, 420 250" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="4 4" opacity="0.3"/>
+                    <path d="M 130 250 C 250 250, 300 250, 420 250" fill="none" stroke="#22d3ee" stroke-width="2" class="magnify-beam" id="active-beam" opacity="1"/>
+                    <circle cx="130" cy="250" r="4" fill="#22d3ee"/>
+                    <circle cx="420" cy="250" r="4" fill="#22d3ee"/>
+                </svg>
+
+                <!-- 3. MAGNIFIED MECHANISM PANEL (Right side) -->
+                <div class="absolute left-[380px] top-[20px] right-[20px] bottom-[20px] glass-panel border-cyber-cyan/30 rounded-2xl p-6 flex flex-col z-20 shadow-[0_0_40px_rgba(34,211,238,0.1)]">
+                    
+                    <h2 class="text-cyber-cyan font-bold text-lg border-b border-cyber-cyan/20 pb-2 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-microscope"></i> التركيب الداخلي للمفتاح (متسعة متغيرة)
+                    </h2>
+
+                    <div class="flex-1 w-full flex gap-4">
+                        
+                        <!-- 3A. The SVG Cross Section Animation -->
+                        <div class="w-2/3 h-full relative bg-cyber-dark/80 rounded-xl border border-slate-800 flex items-center justify-center p-4">
+                            
+                            <svg width="100%" height="100%" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">
+                                <defs>
+                                    <linearGradient id="capTop" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#475569" />
+                                        <stop offset="100%" stop-color="#1e293b" />
+                                    </linearGradient>
+                                    <linearGradient id="pcbGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#065f46" />
+                                        <stop offset="100%" stop-color="#064e3b" />
+                                    </linearGradient>
+                                    <linearGradient id="plateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#94a3b8" />
+                                        <stop offset="100%" stop-color="#475569" />
+                                    </linearGradient>
+                                    <pattern id="diagonalHatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                                        <line x1="0" y1="0" x2="0" y2="10" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
+                                    </pattern>
+                                    <filter id="pcbGlow">
+                                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+
+                                <!-- Guides/Measurements -->
+                                <g id="measurement-guide" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 3">
+                                    <line x1="60" y1="185" x2="80" y2="185" />
+                                    <line x1="60" y1="300" x2="80" y2="300" />
+                                    <line x1="70" y1="185" x2="70" y2="300" />
+                                    <path d="M 65 190 L 70 185 L 75 190 M 65 295 L 70 300 L 75 295" fill="none" stroke-dasharray="0" />
+                                </g>
+                                <text x="50" y="245" fill="#3b82f6" font-size="16" font-family="Outfit" font-weight="bold" transform="rotate(-90 50 245)">Distance (d)</text>
+
+                                <!-- The Entire Moving Assembly -->
+                                <g id="moving-assembly">
+                                    <!-- Keycap (الغطاء) -->
+                                    <path d="M 100 50 L 240 50 L 260 140 L 80 140 Z" fill="url(#capTop)" stroke="#0f172a" stroke-width="3"/>
+                                    <path d="M 110 50 L 80 140" stroke="#0f172a" stroke-width="2" opacity="0.5"/>
+                                    <path d="M 230 50 L 260 140" stroke="#0f172a" stroke-width="2" opacity="0.5"/>
+                                    <text id="magnified-key-text" x="170" y="110" fill="#ffffff" font-size="36" font-family="Outfit" font-weight="black" text-anchor="middle">B</text>
+                                    
+                                    <!-- Stem connecting keycap to plate -->
+                                    <rect x="155" y="140" width="30" height="30" fill="#334155" />
+                                    
+                                    <!-- Top Movable Plate (الصفيحة العلوية المتحركة) -->
+                                    <rect x="100" y="170" width="140" height="15" rx="3" fill="url(#plateGrad)" stroke="#64748b" stroke-width="2"/>
+                                    <text x="250" y="183" fill="#cbd5e1" font-size="12" font-family="Tajawal">صفيحة علوية (متحركة)</text>
+                                    
+                                    <!-- Negative Charges on Top Plate -->
+                                    <g id="top-charges" fill="#22d3ee" font-size="16" font-family="Outfit" font-weight="bold">
+                                        <text x="110" y="184">-</text>
+                                        <text x="135" y="184">-</text>
+                                        <text x="160" y="184">-</text>
+                                        <text x="185" y="184">-</text>
+                                        <text x="210" y="184">-</text>
+                                    </g>
+                                </g>
+
+                                <!-- Flexible Dielectric (المادة العازلة المرنة) -->
+                                <!-- We will animate the height and y-position of this block -->
+                                <g id="dielectric-group">
+                                    <rect id="dielectric-block" x="120" y="185" width="100" height="115" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4" rx="5"/>
+                                    <!-- Diagonal hatching to represent springiness -->
+                                    <rect id="dielectric-pattern" x="120" y="185" width="100" height="115" fill="url(#diagonalHatch)" rx="5"/>
+                                    <text x="230" y="245" fill="#f59e0b" font-size="12" font-family="Tajawal">عازل مرن (زنبرك)</text>
+                                </g>
+
+                                <!-- Fixed Bottom Plate (الصفيحة السفلية الثابتة) -->
+                                <rect x="100" y="300" width="140" height="15" rx="3" fill="url(#plateGrad)" stroke="#64748b" stroke-width="2"/>
+                                <text x="250" y="313" fill="#cbd5e1" font-size="12" font-family="Tajawal">صفيحة سفلية (ثابتة)</text>
+                                
+                                <!-- Positive Charges on Bottom Plate -->
+                                <g id="bottom-charges" fill="#ef4444" font-size="16" font-family="Outfit" font-weight="bold">
+                                    <text x="110" y="314">+</text>
+                                    <text x="135" y="314">+</text>
+                                    <text x="160" y="314">+</text>
+                                    <text x="185" y="314">+</text>
+                                    <text x="210" y="314">+</text>
+                                </g>
+
+                                <!-- Electric Field Lines (Between plates) -->
+                                <g id="e-field-lines" stroke="#ffffff" stroke-width="2" stroke-dasharray="3 3" opacity="0.3">
+                                    <line x1="120" y1="185" x2="120" y2="300" class="field-line-dynamic" />
+                                    <line x1="170" y1="185" x2="170" y2="300" class="field-line-dynamic" />
+                                    <line x1="220" y1="185" x2="220" y2="300" class="field-line-dynamic" />
+                                </g>
+
+                                <!-- PCB Base (لوحة الدوائر) -->
+                                <path d="M 60 315 L 280 315 L 300 345 L 40 345 Z" fill="url(#pcbGrad)" stroke="#047857" stroke-width="2"/>
+                                <!-- Circuit Traces -->
+                                <path d="M 80 325 L 120 325 L 140 335 L 200 335" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+                                <circle cx="200" cy="335" r="3" fill="#10b981"/>
+                                <circle cx="80" cy="325" r="3" fill="#10b981"/>
+                                <text x="290" y="335" fill="#a7f3d0" font-size="14" font-family="Outfit" font-weight="bold">PCB Controller</text>
+                                
+                                <!-- Signal Pulse on PCB (Hidden initially) -->
+                                <path id="pcb-signal" d="M 140 315 L 140 335 L 200 335" fill="none" stroke="#34d399" stroke-width="4" filter="url(#pcbGlow)" opacity="0"/>
+                                
+                            </svg>
+
+                            <!-- Absolute positioned labels inside the cross-section box -->
+                            <div id="pcb-alert" class="absolute bottom-4 left-4 bg-emerald-900/80 border border-emerald-400 px-3 py-1 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.5)] opacity-0 transform translate-y-4 transition-all duration-300">
+                                <span class="text-emerald-400 font-bold font-en text-xs flex items-center gap-2">
+                                    <i class="fa-solid fa-microchip"></i> Signal Detected: [B]
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!-- 3B. Dynamic Real-time Dashboard -->
+                        <div class="w-1/3 flex flex-col gap-4">
+                            
+                            <!-- Equation Card -->
+                            <div class="bg-black/60 border border-slate-700 rounded-xl p-4 shadow-[inset_0_0_15px_rgba(0,0,0,0.8)]">
+                                <span class="text-xs text-slate-400 font-bold mb-2 block">المعادلة الفيزيائية:</span>
+                                <div class="text-center font-en text-xl text-white tracking-widest font-black border-b border-slate-700 pb-2 mb-2">
+                                    C = <span class="text-amber-400">ε₀A</span> / <span class="text-blue-400">d</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 leading-tight">بثبوت المساحة والعازل، تتناسب السعة <span class="text-cyber-cyan">(C)</span> عكسياً مع البعد <span class="text-blue-400">(d)</span>.</p>
+                            </div>
+
+                            <!-- Distance (d) Gauge -->
+                            <div class="bg-black/60 border border-blue-900/50 rounded-xl p-4">
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-xs text-blue-400 font-bold">المسافة (d)</span>
+                                    <span id="dist-value" class="text-lg font-black text-blue-300 font-en">100%</span>
+                                </div>
+                                <div class="dash-bar-container">
+                                    <div id="dist-bar" class="dash-bar-fill bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" style="width: 100%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Capacitance (C) Gauge -->
+                            <div class="bg-black/60 border border-cyan-900/50 rounded-xl p-4">
+                                <div class="flex justify-between items-end mb-2">
+                                    <span class="text-xs text-cyber-cyan font-bold">السعة (C)</span>
+                                    <span id="cap-value" class="text-lg font-black text-cyber-cyan font-en">10%</span>
+                                </div>
+                                <div class="dash-bar-container">
+                                    <div id="cap-bar" class="dash-bar-fill bg-cyber-cyan shadow-[0_0_10px_rgba(34,211,238,0.8)]" style="width: 10%"></div>
+                                </div>
+                            </div>
+                            <!-- Removed Press Button since user interacts with keyboard now -->
+
+                        </div>
+
+                    </div>
+                </div>
+
+                </div>
+            </div>
+
+            <!-- Manual Press Button Below the Workspace -->
+            <div class="w-full flex justify-center mt-2 z-20">
+                <button id="btn-press" class="cyber-button px-12 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 flex items-center justify-center gap-3 transition-all">
+                    <i class="fa-solid fa-hand-pointer text-2xl"></i> محاكاة ضغط مفتاح
+                </button>
+            </div>
+
+        </div>
+
+        <!-- 2. Scientific Explanations Panel (Right - 4 cols) -->
+        <aside class="lg:col-span-4 flex flex-col gap-6 lg:order-1">
+            <div class="glass-panel rounded-2xl border border-slate-800 p-6 flex flex-col gap-4 shadow-2xl h-full">
+                <h2 class="text-xl font-bold text-cyber-green mb-2 border-b border-slate-700 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i> الشرح العلمي
+                </h2>
+                
+                <div class="space-y-4 overflow-y-auto pr-2 custom-scrollbar" style="max-height: 550px;">
+                    
+                    <p class="text-sm text-slate-300 leading-relaxed text-justify">
+                        يعمل مفتاح الكيبورد بالاعتماد على مبدأ <strong class="text-white">تغير السعة الكهربائية</strong> للمتسعة بدلاً من التلامس المعدني المباشر، مما يقلل التلف الميكانيكي.
+                    </p>
+
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                        <h3 class="font-bold text-cyber-cyan mb-2 text-md"><i class="fa-solid fa-1"></i> حالة السكون (الوضع الطبيعي)</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed text-justify">
+                            يتكون المفتاح من صفيحتين بينهما عازل مرن. في الوضع الطبيعي، تكون المسافة (d) كبيرة، مما يجعل السعة الكهربائية منخفضة. تعتبر الدائرة أن الزر غير مضغوط.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700 border-l-4 border-l-amber-500">
+                        <h3 class="font-bold text-amber-400 mb-2 text-md"><i class="fa-solid fa-2"></i> فعل الضغط (الكتابة)</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed text-justify">
+                            عند الضغط، تتحرك الصفيحة العلوية للأسفل وتضغط العازل المرن، <strong class="text-white">لتقل المسافة (d)</strong> بين الصفيحتين.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700 border-l-4 border-l-cyber-cyan">
+                        <h3 class="font-bold text-cyber-cyan mb-2 text-md"><i class="fa-solid fa-3"></i> التغير الفيزيائي وتسجيل الإشارة</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed text-justify">
+                            بسبب العلاقة العكسية، النقصان في المسافة (d) يؤدي إلى <strong class="text-white">زيادة كبيرة في السعة (C)</strong>.
+                            ترصد لوحة الدوائر (PCB) هذا الارتفاع المفاجئ وترسل إشارة كهربائية للحاسوب لتسجيل الحرف.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                        <h3 class="font-bold text-emerald-400 mb-2 text-md"><i class="fa-solid fa-4"></i> العودة للوضع الطبيعي</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed text-justify">
+                            بمجرد رفع إصبعك، يعمل العازل المرن كزنبرك لدفع الصفيحة العلوية للأعلى، لتزداد (d) وتقل السعة (C) استعداداً للضغطة التالية.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            let audioCtx = null;
+            const playKeyboardSound = () => {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } catch(e) {}
+            };
+            const htmlKeys = document.querySelectorAll('.kbd-key');
+            const magnifiedKeyText = document.getElementById('magnified-key-text');
+            
+            // Cross-section elements
+            const movingAssembly = document.getElementById('moving-assembly');
+            const dielectricBlock = document.getElementById('dielectric-block');
+            const dielectricPattern = document.getElementById('dielectric-pattern');
+            const fieldLines = document.querySelectorAll('.field-line-dynamic');
+            const measurementGuide = document.getElementById('measurement-guide');
+            
+            // PCB elements
+            const pcbSignal = document.getElementById('pcb-signal');
+            const pcbAlert = document.getElementById('pcb-alert');
+            
+            // Dashboard elements
+            const distValue = document.getElementById('dist-value');
+            const distBar = document.getElementById('dist-bar');
+            const capValue = document.getElementById('cap-value');
+            const capBar = document.getElementById('cap-bar');
+            const activeBeam = document.getElementById('active-beam');
+
+            let isPressed = false;
+
+            const pressDown = (keyChar) => {
+                if (isPressed) return;
+                isPressed = true;
+
+                playKeyboardSound();
+
+                // Update text in magnified view
+                if(keyChar) {
+                    magnifiedKeyText.textContent = keyChar;
+                    pcbAlert.innerHTML = `<span class="text-emerald-400 font-bold font-en text-xs flex items-center gap-2"><i class="fa-solid fa-microchip"></i> Signal Detected: [${keyChar}]</span>`;
+                }
+
+                // 2. Cross section moving assembly drops down by 60px
+                gsap.to(movingAssembly, { y: 60, duration: 0.15, ease: "power2.out" });
+                
+                // 3. Compress Dielectric
+                gsap.to([dielectricBlock, dielectricPattern], { 
+                    y: 60, 
+                    height: 55, // original was 115, so 115 - 60 = 55
+                    duration: 0.15, 
+                    ease: "power2.out" 
+                });
+
+                // 4. Compress Field Lines & Measurement Guide
+                gsap.to(fieldLines, { attr: { y1: 245 }, duration: 0.15, ease: "power2.out" });
+                gsap.to(measurementGuide, { y: 60, scaleY: 0.48, transformOrigin: "bottom", duration: 0.15, ease: "power2.out" });
+
+                // 5. Update Dashboard (d goes down, C goes up)
+                gsap.to({ dist: 100, cap: 10 }, {
+                    dist: 30,
+                    cap: 90,
+                    duration: 0.15,
+                    ease: "power2.out",
+                    onUpdate: function() {
+                        const d = Math.round(this.targets()[0].dist);
+                        const c = Math.round(this.targets()[0].cap);
+                        distValue.innerText = d + '%';
+                        distBar.style.width = d + '%';
+                        capValue.innerText = c + '%';
+                        capBar.style.width = c + '%';
+                    }
+                });
+
+                // 6. PCB Detects signal (Pulse animation)
+                gsap.to(pcbSignal, { opacity: 1, duration: 0.1, delay: 0.1 });
+                gsap.to(pcbSignal, { strokeDashoffset: -100, strokeDasharray: "20 100", duration: 0.4, ease: "linear" });
+                if (activeBeam) activeBeam.style.animationDuration = '0.2s';
+                
+                // Show Alert UI
+                pcbAlert.classList.remove('opacity-0', 'translate-y-4');
+                pcbAlert.classList.add('opacity-100', 'translate-y-0');
+            };
+
+            const releaseUp = () => {
+                if (!isPressed) return;
+                isPressed = false;
+
+                // 2. Cross section assembly bounces up
+                gsap.to(movingAssembly, { y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+                
+                // 3. Decompress Dielectric (acts as spring)
+                gsap.to([dielectricBlock, dielectricPattern], { 
+                    y: 0, 
+                    height: 115,
+                    duration: 0.5, 
+                    ease: "elastic.out(1, 0.4)" 
+                });
+
+                // 4. Decompress Field Lines & Measurement
+                gsap.to(fieldLines, { attr: { y1: 185 }, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+                gsap.to(measurementGuide, { y: 0, scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+
+                // 5. Update Dashboard
+                gsap.to({ dist: 30, cap: 90 }, {
+                    dist: 100,
+                    cap: 10,
+                    duration: 0.5,
+                    ease: "elastic.out(1, 0.4)",
+                    onUpdate: function() {
+                        const d = Math.round(this.targets()[0].dist);
+                        const c = Math.round(this.targets()[0].cap);
+                        distValue.innerText = d + '%';
+                        distBar.style.width = d + '%';
+                        capValue.innerText = c + '%';
+                        capBar.style.width = c + '%';
+                    }
+                });
+
+                // 6. Reset PCB
+                gsap.to(pcbSignal, { opacity: 0, duration: 0.2 });
+                gsap.set(pcbSignal, { strokeDashoffset: 0, strokeDasharray: "none", delay: 0.2 });
+                if (activeBeam) activeBeam.style.animationDuration = '1s';
+
+                // Hide Alert UI
+                pcbAlert.classList.add('opacity-0', 'translate-y-4');
+                pcbAlert.classList.remove('opacity-100', 'translate-y-0');
+            };
+
+            // Global Keyboard Listeners
+            document.addEventListener('keydown', (e) => {
+                if(e.repeat) return; // Prevent hold repeating
+                const key = e.key.toUpperCase();
+                
+                // Find HTML key if it exists
+                let targetKey = Array.from(htmlKeys).find(k => k.dataset.key === key);
+                if(key === ' ' && !targetKey) targetKey = Array.from(htmlKeys).find(k => k.dataset.key === 'SPACE');
+                
+                if (targetKey) {
+                    targetKey.classList.add('active');
+                }
+                
+                // Allow any alphabet or space
+                if(/^[A-Z]$/.test(key) || key === ' ') {
+                    pressDown(key === ' ' ? 'SPACE' : key);
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                const key = e.key.toUpperCase();
+                let targetKey = Array.from(htmlKeys).find(k => k.dataset.key === key);
+                if(key === ' ' && !targetKey) targetKey = Array.from(htmlKeys).find(k => k.dataset.key === 'SPACE');
+                
+                if (targetKey) {
+                    targetKey.classList.remove('active');
+                }
+                
+                if(/^[A-Z]$/.test(key) || key === ' ') {
+                    releaseUp();
+                }
+            });
+
+            // HTML Keys Mouse/Touch events
+            htmlKeys.forEach(keyEl => {
+                const triggerDown = (e) => {
+                    e.preventDefault();
+                    keyEl.classList.add('active');
+                    pressDown(keyEl.dataset.key);
+                };
+                const triggerUp = (e) => {
+                    e.preventDefault();
+                    keyEl.classList.remove('active');
+                    releaseUp();
+                };
+                
+                keyEl.addEventListener('mousedown', triggerDown);
+                keyEl.addEventListener('touchstart', triggerDown);
+                
+                keyEl.addEventListener('mouseup', triggerUp);
+                keyEl.addEventListener('touchend', triggerUp);
+                
+                keyEl.addEventListener('mouseleave', () => {
+                    if (keyEl.classList.contains('active')) triggerUp({preventDefault: ()=>{}});
+                });
+            });
+
+            // External Manual Button Events
+            const btnPress = document.getElementById('btn-press');
+            if(btnPress) {
+                const triggerExtDown = (e) => {
+                    e.preventDefault();
+                    // Target the SPACE key as a default representation
+                    const spaceKey = Array.from(htmlKeys).find(k => k.dataset.key === 'SPACE');
+                    if(spaceKey) spaceKey.classList.add('active');
+                    pressDown('SPACE');
+                };
+                const triggerExtUp = (e) => {
+                    e.preventDefault();
+                    const spaceKey = Array.from(htmlKeys).find(k => k.dataset.key === 'SPACE');
+                    if(spaceKey) spaceKey.classList.remove('active');
+                    releaseUp();
+                };
+                
+                btnPress.addEventListener('mousedown', triggerExtDown);
+                btnPress.addEventListener('touchstart', triggerExtDown);
+                btnPress.addEventListener('mouseup', triggerExtUp);
+                btnPress.addEventListener('touchend', triggerExtUp);
+                btnPress.addEventListener('mouseleave', () => {
+                    if (isPressed) triggerExtUp({preventDefault: ()=>{}});
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+/* --- Elite Space Physics Portal Design System --- */
+:root {
+    --bg-deep: #030508;
+    --bg-dark: #080c14;
+    --neon-cyan: #00f0ff;
+    --neon-blue: #0066ff;
+    --neon-purple: #8b5cf6;
+    --text-silver: #e2e8f0;
+    --glass-bg: rgba(8, 12, 22, 0.42);
+    --glass-border: rgba(0, 240, 255, 0.08);
+    --glass-glow: rgba(0, 240, 255, 0.05);
+    
+    --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-deep);
+    color: #ffffff;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* --- Typography Helpers --- */
+.font-ar {
+    font-family: 'IBM Plex Arabic', 'Tajawal', sans-serif;
+}
+.font-cairo {
+    font-family: 'Cairo', sans-serif;
+}
+.font-en {
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* --- Deep Space Parallax Backgrounds --- */
+.stars-bg-1, .stars-bg-2, .nebula-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: repeat;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Starfields using radial gradient dots */
+.stars-bg-1 {
+    background-image: 
+        radial-gradient(1px 1px at 25px 75px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 150px 50px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 300px 250px, #fff, transparent),
+        radial-gradient(2px 2px at 450px 100px, rgba(0,240,255,0.7), transparent),
+        radial-gradient(1px 1px at 700px 350px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 850px 150px, rgba(139,92,246,0.6), transparent),
+        radial-gradient(1px 1px at 950px 450px, #fff, transparent);
+    background-size: 1000px 600px;
+    opacity: 0.35;
+}
+
+.stars-bg-2 {
+    background-image: 
+        radial-gradient(1.5px 1.5px at 50px 200px, #fff, transparent),
+        radial-gradient(1px 1px at 250px 400px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(2px 2px at 550px 300px, rgba(0,240,255,0.5), transparent),
+        radial-gradient(1px 1px at 600px 10px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 800px 500px, rgba(139,92,246,0.5), transparent),
+        radial-gradient(2px 2px at 980px 280px, #fff, transparent);
+    background-size: 800px 800px;
+    opacity: 0.25;
+}
+
+/* Soft colored gaseous nebulae */
+.nebula-bg {
+    background: 
+        radial-gradient(circle at 15% 25%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(0, 240, 255, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 50% 50%, rgba(8, 12, 22, 0) 0%, var(--bg-deep) 85%);
+    mix-blend-mode: screen;
+    opacity: 0.7;
+}
+
+/* Star Dust Canvas */
+#particles-canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* --- Einstein Container & Floating Elements --- */
+#einstein-container {
+    perspective: 1000px;
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.einstein-wrapper {
+    position: relative;
+    transform-style: preserve-3d;
+    will-change: transform;
+    animation: float-slow 8s ease-in-out infinite;
+}
+
+/* Floating Physics Equation Element */
+.floating-eq {
+    position: absolute;
+    color: rgba(0, 240, 255, 0.85);
+    font-family: 'Outfit', 'Courier New', monospace;
+    font-weight: 600;
+    pointer-events: none;
+    text-shadow: 
+        0 0 6px rgba(0, 240, 255, 0.5), 
+        0 0 15px rgba(0, 240, 255, 0.2);
+    white-space: nowrap;
+    z-index: 10;
+    user-select: none;
+}
+
+/* --- Floating Keyframe Animations --- */
+@keyframes float-slow {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-12px) rotate(1deg);
+    }
+}
+
+/* --- Glowing CTA Buttons --- */
+.cta-glowing-btn {
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    background-size: 200% 100%;
+    background-position: right center;
+    box-shadow: 
+        0 8px 25px rgba(0, 240, 255, 0.15),
+        0 0 0 1px rgba(0, 240, 255, 0.1) inset;
+    transition: var(--transition-smooth);
+}
+
+.cta-glowing-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.5s, transform 0.5s;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cta-glowing-btn:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.cta-glowing-btn:hover {
+    border-color: rgba(0, 240, 255, 0.65);
+    box-shadow: 
+        0 15px 35px rgba(0, 240, 255, 0.35),
+        0 0 15px rgba(139, 92, 246, 0.25),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+/* --- Glassmorphic UI Card --- */
+.glass-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(25px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(170%) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+    transition: border-color 0.8s, box-shadow 0.8s;
+    will-change: transform, opacity;
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 240, 255, 0.35) !important;
+    box-shadow: 
+        0 35px 70px -15px rgba(0, 0, 0, 0.95),
+        0 0 50px rgba(0, 240, 255, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Input Fields styling */
+.input-wrapper input {
+    background: rgba(6, 9, 15, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: var(--transition-fast);
+}
+
+.input-wrapper input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+}
+
+.input-wrapper input:focus + i {
+    color: var(--neon-cyan);
+}
+
+/* Staggered Splash Loader letters spacing */
+.elite-assembly .letter {
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+/* --- Accordion Chapters Menu --- */
+.chapter-item {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: var(--transition-smooth);
+    box-shadow: inset 0 0 0 1px transparent;
+}
+
+.chapter-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(0, 240, 255, 0.35);
+    box-shadow: 
+        0 8px 25px -5px rgba(0, 240, 255, 0.15),
+        inset 0 0 15px rgba(0, 240, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.chapter-item.active {
+    border-color: rgba(0, 240, 255, 0.25);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+.chapter-item.active .arrow-icon {
+    transform: rotate(180deg);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.chapter-item.active .chapter-submenu {
+    max-height: 1000px;
+}
+
+/* Customize Scrollbars inside glassmenu */
+.chapters-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chapters-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.chapters-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+}
+
+.chapters-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.35);
+}
+
+/* Toast Alerts Design Override */
+.toast {
+    position: relative;
+    background: rgba(6, 9, 15, 0.95);
+    border: 1.5px solid var(--neon-cyan);
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.85), 
+        0 0 25px rgba(0, 240, 255, 0.2);
+    opacity: 0;
+    transform: translateY(20px) translateX(-50%);
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+}
+
+.toast i {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+/* --- Alignment Rules for LTR/English Switch --- */
+html[lang="en"] .hud-btn {
+    left: 24px;
+    right: auto;
+}
+
+html[lang="en"] .input-wrapper i {
+    left: 20px;
+    right: auto;
+}
+
+html[lang="en"] .input-wrapper input {
+    padding-left: 52px;
+    padding-right: 24px;
+    text-align: left;
+}
+
+html[lang="en"] .input-group {
+    text-align: left;
+}
+
+/* --- Full Responsive Grid Breakpoints --- */
+@media (max-width: 1023px) {
+    .content-wrapper {
+        min-height: auto;
+        padding-top: 80px;
+    }
+    
+    #einstein-container {
+        height: 280px;
+        order: 2; /* Einstein displays below titles/form on mobile */
+    }
+    
+    #portal-container {
+        order: 1;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .welcome-title {
+        font-size: 2.75rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 639px) {
+    .welcome-title {
+        font-size: 2.2rem;
+    }
+    
+    #einstein-container {
+        height: 240px;
+    }
+    
+    .einstein-wrapper {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .glass-card {
+        padding: 20px;
+        border-radius: 24px;
+    }
+}

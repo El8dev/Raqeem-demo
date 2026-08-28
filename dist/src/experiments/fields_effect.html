@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مختبر الفيزياء | حركة الجسيمات المشحونة - قوة لورنتز</title>
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07090e;
+            --panel: #111823;
+            --border: rgba(0, 210, 255, 0.18);
+            --cyan: #00d2ff;
+            --orange: #ff9f43;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --green: #2ecc71;
+            --gold: #ffe082;
+            --purple: #a855f7;
+            --text: #e2e8f0;
+        }
+
+        html, body { user-select: none; -webkit-user-select: none;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── FLOATING MENU TOGGLE ── */
+        .drawer-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(10, 16, 26, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cyan);
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .drawer-toggle:hover {
+            background: rgba(0, 210, 255, 0.12);
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0, 210, 255, 0.2);
+        }
+
+        /* ── SLIDE-OUT DRAWER ── */
+        .drawer {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 300px;
+            z-index: 10000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #080c14;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drawer-close:hover {
+            background: rgba(239, 68, 68, 0.22);
+        }
+
+        .drawer-chapter {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .drawer-chapter-header {
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(0, 210, 255, 0.05);
+            transition: background 0.2s;
+        }
+
+        .drawer-chapter-header:hover {
+            background: rgba(0, 210, 255, 0.08);
+        }
+
+        .drawer-chapter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .drawer-chapter-label i {
+            color: var(--cyan);
+            font-size: 1rem;
+        }
+
+        .drawer-chapter-arrow {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            transition: transform 0.3s;
+        }
+
+        .drawer-submenu {
+            max-height: 1000px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+            transition: max-height 0.4s ease-in-out;
+        }
+
+        .drawer-submenu.collapsed {
+            max-height: 0;
+        }
+
+        .drawer-submenu a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            color: var(--cyan);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            transition: all 0.2s;
+        }
+
+        .drawer-submenu a:last-child {
+            border-bottom: none;
+        }
+
+        .drawer-submenu a:hover {
+            background: rgba(0, 210, 255, 0.1);
+            color: #fff;
+            padding-right: 22px;
+        }
+
+        .drawer-submenu a.current {
+            background: rgba(0, 210, 255, 0.08);
+            color: #fff;
+            font-weight: 700;
+            border-right: 3px solid var(--cyan);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .app {
+            display: flex;
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── MAIN CANVAS AREA ── */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* Top Bar */
+        .topbar {
+            flex-shrink: 0;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px 0 80px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--cyan);
+            text-shadow: 0 0 12px rgba(0, 210, 255, 0.5);
+            white-space: nowrap;
+        }
+
+        .logo-badge {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 5px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .logo-badge .lg {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .logo-badge .sm {
+            font-size: 0.55rem;
+            color: var(--cyan);
+        }
+
+        /* Mode badge */
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .mode-badge.idle    { background: rgba(255,255,255,0.04); color: #64748b; border: 1px solid rgba(255,255,255,0.06); }
+        .mode-badge.electric{ background: rgba(255,159,67,0.15); color: var(--orange); border: 1px solid rgba(255,159,67,0.3); }
+        .mode-badge.magnetic{ background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
+        .mode-badge.lorentz { background: rgba(168,85,247,0.15); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+
+        /* Canvas Wrap */
+        .canvas-wrap {
+            flex: 1;
+            padding: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+        }
+
+        #vacuum-chamber {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(16, 32, 54, 0.82) 0%, rgba(7, 10, 18, 0.96) 100%);
+            border-radius: 14px;
+            border: 1.5px solid rgba(0, 210, 255, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes pulse-filament {
+            0%, 100% { opacity: 0.65; box-shadow: 0 0 8px #ff7675; }
+            50% { opacity: 0.95; box-shadow: 0 0 16px #ff7675; }
+        }
+
+        .chamber-label {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(0, 210, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-family: 'Outfit', sans-serif;
+            pointer-events: none;
+        }
+
+        /* Status Bar */
+        .statusbar {
+            flex-shrink: 0;
+            height: 48px;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        #status-msg {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--orange);
+            text-shadow: 0 0 8px rgba(255, 159, 67, 0.3);
+            transition: color 0.3s;
+            text-align: center;
+        }
+
+        /* Electric plates */
+        .plate {
+            position: absolute;
+            height: 13px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .plate-pos {
+            top: 14%;
+            background: linear-gradient(90deg, rgba(239,68,68,0.75), rgba(239,68,68,0.4));
+            border: 1.5px solid rgba(239,68,68,0.7);
+            box-shadow: 0 0 16px rgba(239,68,68,0.4), inset 0 0 6px rgba(239,68,68,0.2);
+        }
+
+        .plate-neg {
+            bottom: 14%;
+            background: linear-gradient(90deg, rgba(59,130,246,0.75), rgba(59,130,246,0.4));
+            border: 1.5px solid rgba(59,130,246,0.7);
+            box-shadow: 0 0 16px rgba(59,130,246,0.4), inset 0 0 6px rgba(59,130,246,0.2);
+        }
+
+        /* Inactive/uncharged plates style for magnetic mode */
+        .plate.inactive {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: none !important;
+            opacity: 0.35 !important;
+        }
+
+        .plate.inactive .plate-tag {
+            color: rgba(255, 255, 255, 0.25) !important;
+            text-shadow: none !important;
+        }
+
+        .plate-tag {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            font-weight: 900;
+            line-height: 1;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .plate-pos .plate-tag { color: #fca5a5; }
+        .plate-neg .plate-tag { color: #93c5fd; }
+
+        /* Injector */
+        .injector {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 58px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .injector-body { user-select: none; -webkit-user-select: none;
+            width: 46px;
+            height: 76px;
+            background: linear-gradient(160deg, #1e293b, #0a101a);
+            border: 1.5px solid rgba(0, 210, 255, 0.35);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,210,255,0.1), inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .injector-nozzle {
+            width: 16px;
+            height: 30px;
+            background: linear-gradient(to right, #1e293b, #0f172a);
+            border: 1.5px solid rgba(0, 210, 255, 0.3);
+            border-left: none;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .injector-label-tag {
+            position: absolute;
+            bottom: -26px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.58rem;
+            font-weight: 700;
+            color: rgba(0,210,255,0.45);
+            white-space: nowrap;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ── TOOLBOX ── */
+        .toolbox {
+            width: 268px;
+            min-width: 268px;
+            background: var(--panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 16px 13px;
+            gap: 9px;
+            z-index: 50;
+            overflow-y: auto;
+        }
+
+        .toolbox::-webkit-scrollbar { width: 4px; }
+        .toolbox::-webkit-scrollbar-track { background: transparent; }
+        .toolbox::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.15); border-radius: 2px; }
+
+        .toolbox-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--cyan);
+            text-shadow: 0 0 12px rgba(0, 210, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            padding-bottom: 11px;
+            line-height: 1.5;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            padding: 4px 0 1px;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 3px 0;
+        }
+
+        /* Mode Buttons */
+        .mode-btn {
+            width: 100%;
+            padding: 11px 10px;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
+            color: #94a3b8;
+            transition: all 0.22s;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .mode-btn.active-electric {
+            background: rgba(255,159,67,0.13);
+            color: var(--orange);
+            border-color: rgba(255,159,67,0.45);
+            box-shadow: 0 0 18px rgba(255,159,67,0.18);
+        }
+
+        .mode-btn.active-magnetic {
+            background: rgba(59,130,246,0.13);
+            color: #93c5fd;
+            border-color: rgba(59,130,246,0.45);
+            box-shadow: 0 0 18px rgba(59,130,246,0.2);
+        }
+
+        .mode-btn.active-lorentz {
+            background: rgba(168,85,247,0.13);
+            color: #d8b4fe;
+            border-color: rgba(168,85,247,0.45);
+            box-shadow: 0 0 18px rgba(168,85,247,0.2);
+        }
+
+        /* Action Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-fire {
+            background: linear-gradient(135deg, rgba(0,210,255,0.18), rgba(0,210,255,0.06));
+            color: var(--cyan);
+            border: 1px solid rgba(0,210,255,0.4);
+            box-shadow: 0 0 14px rgba(0,210,255,0.12);
+        }
+
+        .btn-fire:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(0,210,255,0.3), rgba(0,210,255,0.12));
+            box-shadow: 0 0 26px rgba(0,210,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-fire:disabled {
+            opacity: 0.38;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: rgba(239,68,68,0.1);
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+
+        .btn-reset:hover {
+            background: rgba(239,68,68,0.22);
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.77rem;
+            line-height: 1.8;
+            color: #94a3b8;
+        }
+
+        .info-card .card-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(0,210,255,0.7);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .info-card p {
+            color: #cbd5e1;
+            margin-bottom: 3px;
+        }
+
+        .formula-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 7px 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-top: 7px;
+        }
+
+        /* Scrollbar global */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.2); border-radius: 3px; }
+
+        /* CSS Animations */
+        @keyframes field-drift {
+            0%   { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 30; }
+        }
+
+        @keyframes x-pulse {
+            0%, 100% { opacity: 0.32; }
+            50%       { opacity: 0.62; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating Menu Toggle -->
+    <button id="menu-toggle-btn" class="drawer-toggle" title="فتح القائمة">
+        <i class="fa-solid fa-bars" style="font-size:1.25rem;"></i>
+    </button>
+
+    <!-- Overlay -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+
+    <!-- Slide-Out Drawer -->
+    <div id="side-drawer" class="drawer">
+        <button id="drawer-close-btn" class="drawer-close">
+            <i class="fa-solid fa-xmark"></i> إغلاق القائمة
+        </button>
+        <a href="../index.html?showMenu=true"
+            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 20px; padding: 10px; border-radius: 10px; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); color: #00d2ff; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s;"
+            onmouseover="this.style.background='rgba(0, 210, 255, 0.18)'"
+            onmouseout="this.style.background='rgba(0, 210, 255, 0.08)'">
+            <i class="fa-solid fa-house"></i> القائمة الرئيسية
+        </a>
+        <div class="drawer-chapter">
+            <div class="drawer-chapter-header" id="ch-header">
+                <span class="drawer-chapter-label">
+                    <i class="fa-solid fa-magnet"></i>
+                    <span>الفصل الثاني: الحث الكهرومغناطيسي</span>
+                </span>
+                <i class="fa-solid fa-chevron-down drawer-chapter-arrow" id="ch-arrow"></i>
+            </div>
+            <div class="drawer-submenu" id="ch-submenu">
+                <a href="induction.html">
+                    <i class="fa-solid fa-ring"></i>
+                    <span>نشاط فراداي المنهجي</span>
+                </a>
+                <a href="induction_coils.html">
+                    <i class="fa-solid fa-magnet"></i>
+                    <span>نشاط الحث الكهرومغناطيسي</span>
+                </a>
+                <a href="fields_effect.html" class="current">
+                    <i class="fa-solid fa-atom"></i>
+                    <span>حركة الجسيمات المشحونة</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app">
+
+        <!-- ════ MAIN ════ -->
+        <div class="main">
+
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div class="page-title">حركة الجسيمات المشحونة في المجالات</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <a href="../index.html?showMenu=true" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 210, 255, 0.06); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 10px; color: var(--cyan); font-size: 0.8rem; font-weight: 700; padding: 7px 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 210, 255, 0.15)'" onmouseout="this.style.background='rgba(0, 210, 255, 0.06)'">
+                        <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i> التجارب الرئيسية
+                    </a>
+                    <span id="mode-badge" class="mode-badge idle">
+                        <i class="fa-solid fa-circle-dot"></i> اختر وضعاً
+                    </span>
+                    <div class="logo-badge">
+                        <span class="lg">Raqeem Labs</span>
+                        <span class="sm">مختبرات رقيم الافتراضية</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-wrap">
+                <div id="vacuum-chamber">
+                    <span class="chamber-label">منطقة المجال</span>
+
+                    <!-- Electric Plates (for electric/magnetic/lorentz modes) -->
+                    <div class="plate plate-pos" id="plate-pos">
+                        <span class="plate-tag">+</span>
+                    </div>
+                    <div class="plate plate-neg" id="plate-neg">
+                        <span class="plate-tag">-</span>
+                    </div>
+
+                    <!-- Main SVG layer -->
+                    <svg id="field-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;">
+                        <defs>
+                            <radialGradient id="crt-glow" cx="50%" cy="50%" r="70%">
+                                <stop offset="0%" stop-color="rgba(16, 32, 54, 0.82)" />
+                                <stop offset="100%" stop-color="rgba(7, 10, 18, 0.96)" />
+                            </radialGradient>
+                            <linearGradient id="e-field-glow" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
+                                <stop offset="100%" stop-color="rgba(59, 130, 246, 0.18)" />
+                            </linearGradient>
+                            <radialGradient id="b-field-glow" cx="50%" cy="50%" r="60%">
+                                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.22)" />
+                                <stop offset="100%" stop-color="rgba(7, 10, 18, 0)" />
+                            </radialGradient>
+                            <marker id="arrow-e" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                                <path d="M0,0 L8,4 L0,8 Z" fill="rgba(255,159,67,0.7)"/>
+                            </marker>
+                        </defs>
+                        <!-- CRT Glass Envelope -->
+                        <path id="crt-glass-envelope" fill="url(#crt-glow)" stroke="rgba(0, 210, 255, 0.28)" stroke-width="2.5" style="filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.12));" />
+                        
+                        <!-- Fluorescent Phosphor Screen -->
+                        <line id="fluorescent-screen" stroke="rgba(46, 204, 113, 0.65)" stroke-width="5.5" stroke-linecap="round" style="filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.8));" />
+                        
+                        <g id="field-halos"></g>
+                        <g id="e-lines"></g>
+                        <g id="b-symbols"></g>
+                        <g id="p-trail"></g>
+                        <g id="screen-impacts"></g> <!-- Persistent Phosphor Impact Spots -->
+                        <g id="p-group" style="display:none;">
+                            <circle id="p-glow"   r="18" fill="rgba(255,159,67,0.12)" cx="0" cy="0"/>
+                            <circle id="p-circle" r="11" fill="#ff9f43" cx="0" cy="0"
+                                stroke="rgba(255,200,110,0.85)" stroke-width="2"
+                                style="filter:drop-shadow(0 0 9px rgba(255,159,67,0.95))"/>
+                            <text id="p-label" x="0" y="4" text-anchor="middle"
+                                font-family="Outfit,sans-serif" font-size="10" font-weight="700" fill="#fff">+q</text>
+                        </g>
+                        <g id="f-arrows" style="display:none;"></g>
+                    </svg>
+
+                    <!-- Particle Injector (Beam Emitter) -->
+                    <div class="injector">
+                        <div class="injector-body">
+                            <!-- Cathode Filament Glow -->
+                            <div class="filament-glow" style="display:none;"></div>
+                            
+                            <svg width="24" height="24" viewBox="0 0 28 28" style="position:relative;z-index:2;">
+                                <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(0,210,255,0.4)" stroke-width="1.5"/>
+                                <circle cx="14" cy="14" r="5" fill="#00d2ff" style="filter:drop-shadow(0 0 4px #00d2ff);"/>
+                            </svg>
+                            <span class="injector-label-tag">مطلق الشحنة</span>
+                        </div>
+                        <div class="injector-nozzle"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="statusbar">
+                <div id="status-msg">اختر وضع المجال ثم اضغط "إطلاق الشحنة"</div>
+            </div>
+        </div>
+
+        <!-- ════ TOOLBOX ════ -->
+        <div class="toolbox">
+
+            <div class="toolbox-title">
+                لوحة التحكم
+                <br><span style="font-size:0.68rem;color:#64748b;font-weight:500;">قوة لورنتز</span>
+            </div>
+
+            <div class="section-label">اختر وضع المجال</div>
+
+            <button class="mode-btn" id="btn-electric" onclick="setMode('electric')">
+                <i class="fa-solid fa-bolt" style="margin-left:6px;color:#ff9f43;"></i>
+                تأثير المجال الكهربائي فقط
+            </button>
+
+            <button class="mode-btn" id="btn-magnetic" onclick="setMode('magnetic')">
+                <i class="fa-solid fa-circle-dot" style="margin-left:6px;color:#93c5fd;"></i>
+                تأثير المجال المغناطيسي فقط
+            </button>
+
+            <button class="mode-btn" id="btn-lorentz" onclick="setMode('lorentz')">
+                <i class="fa-solid fa-infinity" style="margin-left:6px;color:#d8b4fe;"></i>
+                تأثير المجالين معاً (قوة لورنتز)
+            </button>
+
+            <div class="divider"></div>
+            <div class="section-label">الإجراءات</div>
+
+            <button class="btn btn-fire" id="btn-fire" onclick="fireParticle()" disabled>
+                <i class="fa-solid fa-play" style="margin-left:6px;"></i>
+                إطلاق الشحنة
+            </button>
+
+            <button class="btn btn-reset" onclick="resetExperiment()">
+                <i class="fa-solid fa-rotate-right" style="margin-left:6px;"></i>
+                إعادة تعيين
+            </button>
+
+            <div class="divider"></div>
+            <div class="section-label">معلومات الفيزياء</div>
+
+            <!-- Idle card -->
+            <div class="info-card" id="card-idle">
+                <div class="card-title">تعليمات التجربة</div>
+                <p>1. اختر وضع المجال من الأعلى.</p>
+                <p>2. اضغط "إطلاق الشحنة" لإطلاق جسيم (+q).</p>
+                <p>3. راقب كيف تؤثر المجالات على مسار الجسيم.</p>
+                <p>4. أعد التعيين للتجربة مجدداً.</p>
+            </div>
+
+            <!-- Electric card -->
+            <div class="info-card" id="card-electric" style="display:none;">
+                <div class="card-title">المجال الكهربائي (E)</div>
+                <p>الصفيحة العليا: موجبة (+)</p>
+                <p>الصفيحة السفلى: سالبة (-)</p>
+                <p>اتجاه E: من + الى - (للاسفل)</p>
+                <p>على (+q): قوة للاسفل</p>
+                <div class="formula-box">F&#8337; = qE  (للاسفل)</div>
+            </div>
+
+            <!-- Magnetic card -->
+            <div class="info-card" id="card-magnetic" style="display:none;">
+                <div class="card-title">المجال المغناطيسي (B)</div>
+                <p>اتجاه B: داخل الشاشة (X)</p>
+                <p>الجسيم (+q) يتحرك يميناً</p>
+                <p>بقاعدة اليد اليمنى: ينحرف للأعلى في مسار دائري</p>
+                <div class="formula-box">FB = q(v x B)  (للأعلى)</div>
+            </div>
+
+            <!-- Lorentz card -->
+            <div class="info-card" id="card-lorentz" style="display:none;">
+                <div class="card-title">قوة لورنتز الكاملة</div>
+                <p>المجالان E و B معاً</p>
+                <p>Fe (للأسفل) = Fb (للأعلى)</p>
+                <p>التوازن: مسار مستقيم!</p>
+                <div class="formula-box">F = q(E + v x B) = 0</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // ════════════════════════════════════════════
+        //  STATE
+        // ════════════════════════════════════════════
+        let currentMode = null;
+        let isRunning = false;
+        let hasImpacted = false;
+        let animFrame = null;
+        let px = 0, py = 0, vx = 0, vy = 0;
+        let angle = 0;
+        let trailPts = [];
+
+        const chamber    = document.getElementById('vacuum-chamber');
+        const eLines     = document.getElementById('e-lines');
+        const bSymbols   = document.getElementById('b-symbols');
+        const pTrail     = document.getElementById('p-trail');
+        const pGroup     = document.getElementById('p-group');
+        const pCircle    = document.getElementById('p-circle');
+        const pGlow      = document.getElementById('p-glow');
+        const pLabel     = document.getElementById('p-label');
+        const fArrows    = document.getElementById('f-arrows');
+        const platePos   = document.getElementById('plate-pos');
+        const plateNeg   = document.getElementById('plate-neg');
+        const statusMsg  = document.getElementById('status-msg');
+        const modeBadge  = document.getElementById('mode-badge');
+        const btnFire    = document.getElementById('btn-fire');
+        const btnReset   = document.querySelector('.btn-reset');
+
+        // ════════════════════════════════════════════
+        //  EXPOSE TO GLOBAL (For existing inline onclicks)
+        // ════════════════════════════════════════════
+        window.setMode = setMode;
+        window.fireParticle = fireParticle;
+        window.resetExperiment = resetExperiment;
+
+        // ════════════════════════════════════════════
+        //  UTILITY
+        // ════════════════════════════════════════════
+        function dims() {
+            const r = chamber.getBoundingClientRect();
+            return { w: r.width, h: r.height };
+        }
+
+        function setStatus(msg, color) {
+            statusMsg.textContent = msg;
+            statusMsg.style.color = color || 'var(--orange)';
+        }
+
+        function ns(tag) {
+            return document.createElementNS('http://www.w3.org/2000/svg', tag);
+        }
+
+        function setAttr(el, attrs) {
+            for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+        }
+
+        // ════════════════════════════════════════════
+        //  MODE SELECTION
+        // ════════════════════════════════════════════
+        function setMode(mode) {
+            if (isRunning) return;
+            currentMode = mode;
+
+            document.querySelectorAll('.mode-btn').forEach(b => b.className = 'mode-btn');
+            ['card-idle','card-electric','card-magnetic','card-lorentz'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            clearAll();
+
+            if (mode === 'electric') {
+                document.getElementById('btn-electric').classList.add('active-electric');
+                document.getElementById('card-electric').style.display = 'block';
+                modeBadge.className = 'mode-badge electric';
+                modeBadge.innerHTML = '<i class="fa-solid fa-bolt"></i> مجال كهربائي';
+                drawEField();
+                setStatus('المجال الكهربائي نشط — الصفيحة العليا (+)، السفلى (-)', 'var(--orange)');
+            } else if (mode === 'magnetic') {
+                document.getElementById('btn-magnetic').classList.add('active-magnetic');
+                document.getElementById('card-magnetic').style.display = 'block';
+                modeBadge.className = 'mode-badge magnetic';
+                modeBadge.innerHTML = '<i class="fa-solid fa-circle-dot"></i> مجال مغناطيسي';
+                drawBField();
+                setStatus('المجال المغناطيسي نشط (داخل الشاشة) — رموز X', '#93c5fd');
+            } else if (mode === 'lorentz') {
+                document.getElementById('btn-lorentz').classList.add('active-lorentz');
+                document.getElementById('card-lorentz').style.display = 'block';
+                modeBadge.className = 'mode-badge lorentz';
+                modeBadge.innerHTML = '<i class="fa-solid fa-infinity"></i> قوة لورنتز';
+                drawEField();
+                drawBField();
+                setStatus('المجالان E + B نشطان — توقع مساراً مستقيماً عند التوازن', '#d8b4fe');
+            }
+
+            btnFire.disabled = false;
+        }
+
+        // ════════════════════════════════════════════
+        //  CLEAR
+        // ════════════════════════════════════════════
+        function clearAll() {
+            eLines.innerHTML   = '';
+            bSymbols.innerHTML = '';
+            pTrail.innerHTML   = '';
+            fArrows.innerHTML  = '';
+            const halos = document.getElementById('field-halos');
+            if (halos) halos.innerHTML = '';
+            const impacts = document.getElementById('screen-impacts');
+            if (impacts) impacts.innerHTML = '';
+            fArrows.style.display = 'none';
+            pGroup.style.display  = 'none';
+            platePos.style.opacity = '0';
+            plateNeg.style.opacity = '0';
+            if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+            isRunning = false;
+        }
+
+        // ════════════════════════════════════════════
+        //  DRAW ELECTRIC FIELD
+        // ════════════════════════════════════════════
+        function drawEField() {
+            const { w, h } = dims();
+            const yTopNeck  = h * 0.35;
+            const yBotNeck  = h * 0.65;
+            const deflStart = w * 0.30;
+            const deflEnd   = w - 16;
+            
+            if (currentMode === 'lorentz') {
+                // Show only the bottom negative plate
+                platePos.style.opacity = '0';
+                plateNeg.classList.remove('inactive');
+                plateNeg.style.opacity = '1';
+                
+                plateNeg.style.left = `${deflStart}px`;
+                plateNeg.style.width = `${deflEnd - deflStart}px`;
+                plateNeg.style.top = `${yBotNeck + 2}px`;
+                plateNeg.style.bottom = 'auto';
+
+                // Draw Electric Field Halo in the bottom half
+                const halos = document.getElementById('field-halos');
+                if (halos) {
+                    const r = ns('rect');
+                    setAttr(r, {
+                        x: deflStart,
+                        y: h / 2,
+                        width: deflEnd - deflStart,
+                        height: yBotNeck - (h / 2),
+                        fill: 'url(#e-field-glow)',
+                        style: 'filter: blur(14px);'
+                    });
+                    halos.appendChild(r);
+                }
+
+                // E field lines drawn in the bottom half (pointing downwards)
+                const count = 8;
+                const topY  = (h / 2) + 10;
+                const botY  = yBotNeck - 3;
+                for (let i = 0; i < count; i++) {
+                    const x = deflStart + 15 + i * ((deflEnd - deflStart - 30) / (count - 1));
+
+                    const line = ns('line');
+                    setAttr(line, {
+                        x1: x, y1: topY, x2: x, y2: botY,
+                        stroke: 'rgba(255,159,67,0.35)',
+                        'stroke-width': '1.5',
+                        'stroke-dasharray': '5 5'
+                    });
+                    line.style.animation = `field-drift ${1.0 + (i % 3) * 0.25}s linear infinite`;
+                    eLines.appendChild(line);
+
+                    const midY = (topY + botY) / 2;
+                    const tri = ns('polygon');
+                    tri.setAttribute('points', `${x},${midY+5} ${x-3.5},${midY-2} ${x+3.5},${midY-2}`);
+                    tri.setAttribute('fill', 'rgba(255,159,67,0.7)');
+                    eLines.appendChild(tri);
+                }
+            } else {
+                // Electric mode: show both plates, full field
+                platePos.style.opacity = '1';
+                platePos.classList.remove('inactive');
+                plateNeg.style.opacity = '1';
+                plateNeg.classList.remove('inactive');
+                
+                platePos.style.left = `${deflStart}px`;
+                platePos.style.width = `${deflEnd - deflStart}px`;
+                platePos.style.top = `${yTopNeck - 12}px`;
+                platePos.style.bottom = 'auto';
+
+                plateNeg.style.left = `${deflStart}px`;
+                plateNeg.style.width = `${deflEnd - deflStart}px`;
+                plateNeg.style.top = `${yBotNeck + 2}px`;
+                plateNeg.style.bottom = 'auto';
+
+                // Draw Electric Field Halo completely between plates
+                const halos = document.getElementById('field-halos');
+                if (halos) {
+                    const r = ns('rect');
+                    setAttr(r, {
+                        x: deflStart,
+                        y: yTopNeck,
+                        width: deflEnd - deflStart,
+                        height: yBotNeck - yTopNeck,
+                        fill: 'url(#e-field-glow)',
+                        style: 'filter: blur(14px);'
+                    });
+                    halos.appendChild(r);
+                }
+
+                // E field lines fully between plates
+                const count = 8;
+                const topY  = yTopNeck + 3;
+                const botY  = yBotNeck - 3;
+                for (let i = 0; i < count; i++) {
+                    const x = deflStart + 15 + i * ((deflEnd - deflStart - 30) / (count - 1));
+
+                    const line = ns('line');
+                    setAttr(line, {
+                        x1: x, y1: topY, x2: x, y2: botY,
+                        stroke: 'rgba(255,159,67,0.35)',
+                        'stroke-width': '1.5',
+                        'stroke-dasharray': '5 5'
+                    });
+                    line.style.animation = `field-drift ${1.0 + (i % 3) * 0.25}s linear infinite`;
+                    eLines.appendChild(line);
+
+                    const midY = (topY + botY) / 2;
+                    const tri = ns('polygon');
+                    tri.setAttribute('points', `${x},${midY+5} ${x-3.5},${midY-2} ${x+3.5},${midY-2}`);
+                    tri.setAttribute('fill', 'rgba(255,159,67,0.7)');
+                    eLines.appendChild(tri);
+                }
+            }
+        }
+
+        // ════════════════════════════════════════════
+        //  DRAW MAGNETIC FIELD
+        // ════════════════════════════════════════════
+        function drawBField() {
+            const { w, h } = dims();
+            bSymbols.innerHTML = '';
+            
+            const deflStart = w * 0.30;
+            const deflEnd   = w - 16;
+            
+            let topBound, botBound, gy;
+            if (currentMode === 'lorentz') {
+                topBound  = h * 0.35;
+                botBound  = h / 2; // Only top half
+                gy = 24;
+            } else {
+                topBound  = 16;
+                botBound  = h - 16; // Full height
+                gy = 32;
+            }
+
+            if (currentMode === 'magnetic') {
+                platePos.style.opacity = '0';
+                plateNeg.style.opacity = '0';
+            }
+
+            // Draw Magnetic Field Halo
+            const halos = document.getElementById('field-halos');
+            if (halos) {
+                const r = ns('rect');
+                setAttr(r, {
+                    x: deflStart,
+                    y: topBound,
+                    width: deflEnd - deflStart,
+                    height: botBound - topBound,
+                    fill: 'url(#b-field-glow)',
+                    style: 'filter: blur(20px);'
+                });
+                halos.appendChild(r);
+            }
+            
+            const gx = 40;
+            
+            let count = 0;
+            for (let x = deflStart + 20; x < deflEnd - 15; x += gx) {
+                for (let y = topBound + 10; y < botBound - 5; y += gy) {
+                    const cx = x;
+                    const cy = y;
+                    const delay = count * 0.01;
+                    count++;
+                    const sz = 5.5;
+
+                    const g = ns('g');
+                    g.style.animation = `x-pulse 2.2s ease-in-out ${delay}s infinite`;
+
+                    const circ = ns('circle');
+                    setAttr(circ, { cx, cy, r: sz + 2.5, fill: 'none', stroke: 'rgba(59,130,246,0.12)', 'stroke-width': '0.9' });
+                    g.appendChild(circ);
+
+                    [[cx-sz, cy-sz, cx+sz, cy+sz], [cx+sz, cy-sz, cx-sz, cy+sz]].forEach(([x1_pt, y1_pt, x2_pt, y2_pt]) => {
+                        const l = ns('line');
+                        setAttr(l, { x1: x1_pt, y1: y1_pt, x2: x2_pt, y2: y2_pt, stroke: 'rgba(147,197,253,0.4)', 'stroke-width': '1.4', 'stroke-linecap': 'round' });
+                        g.appendChild(l);
+                    });
+
+                    bSymbols.appendChild(g);
+                }
+            }
+
+            const lbl = ns('text');
+            setAttr(lbl, {
+                x: deflEnd - 45, y: topBound + 24,
+                'font-size': '11', 'font-family': 'Outfit,sans-serif',
+                'font-weight': '700', fill: 'rgba(147,197,253,0.5)'
+            });
+            lbl.textContent = 'B (X)';
+            bSymbols.appendChild(lbl);
+        }
+
+        // ════════════════════════════════════════════
+        //  FIRE PARTICLE & ANIMATION
+        // ════════════════════════════════════════════
+        function fireParticle() {
+            if (isRunning || !currentMode) return;
+
+            isRunning = true;
+            btnFire.disabled = true;
+
+            if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+            pTrail.innerHTML  = '';
+            fArrows.innerHTML = '';
+            fArrows.style.display = 'block';
+
+            const { w, h } = dims();
+
+            // Strictly initialize globals
+            px = 62;
+            py = h / 2;
+            vx = 2.5;
+            vy = 0;
+            angle = 0;
+            trailPts = [];
+            hasImpacted = false;
+
+            pGroup.style.display = 'block';
+            moveParticle(px, py);
+
+            animFrame = requestAnimationFrame(animateStep);
+        }
+
+        function animateStep() {
+            if (!isRunning) return;
+
+            const { w, h } = dims();
+
+            // Geometry constraints
+            const deflStart = w * 0.30;
+            const deflEnd   = w - 16;
+            const x2        = w - 16;
+
+            let ax = 0;
+            let ay = 0;
+
+            if (currentMode === 'electric') {
+                if (px > deflStart && px <= deflEnd) {
+                    ay = 0.008; // Fe = qE (downwards towards negative plate)
+                }
+                vx += ax;
+                vy += ay;
+                px += vx;
+                py += vy;
+            } 
+            else if (currentMode === 'magnetic') {
+                if (px > deflStart && px <= deflEnd) {
+                    const omega = 0.008; // Cyclotron strength (qB/m)
+                    ax = omega * vy;
+                    ay = -omega * vx; // Fb = q(v x B) (upwards)
+                }
+                vx += ax;
+                vy += ay;
+                // Normalize velocity to keep speed exactly constant (v0 = 2.5)
+                const speed = Math.hypot(vx, vy);
+                vx = (vx / speed) * 2.5;
+                vy = (vy / speed) * 2.5;
+                px += vx;
+                py += vy;
+            } 
+            else if (currentMode === 'lorentz') {
+                if (px > deflStart && px <= deflEnd) {
+                    const omega = 0.008;
+                    const FE = 0.02; // Balances Fb (omega * vx = 0.008 * 2.5 = 0.02)
+                    ax = omega * vy;
+                    ay = FE - omega * vx; // Net force is 0 at launch speed
+                }
+                vx += ax;
+                vy += ay;
+                px += vx;
+                py += vy;
+            }
+
+            // CRITICAL DOM UPDATE: physically move the visual element
+            moveParticle(px, py);
+            drawForces(px, py);
+
+            // Render trail
+            trailPts.push({ x: px, y: py });
+            const maxTrail = 160;
+            if (trailPts.length > maxTrail) trailPts.shift();
+            renderTrail(trailPts);
+
+            // Educational status update on crossing screen threshold
+            if (px >= x2 && !hasImpacted) {
+                hasImpacted = true;
+                addImpactPoint(x2, py);
+                let msg = '';
+                let col = '';
+                if (currentMode === 'electric') {
+                    msg = 'انحرف الجسيم المشحون نحو الأسفل بمسار مكافئ (Parabolic) بتأثير القوة الكهربائية Fe = qE';
+                    col = 'var(--orange)';
+                } else if (currentMode === 'magnetic') {
+                    msg = 'انحرف الجسيم المشحون نحو الأعلى بمسار دائري (Circular) بتأثير القوة المغناطيسية Fb = q(v × B)';
+                    col = '#93c5fd';
+                } else if (currentMode === 'lorentz') {
+                    msg = 'تحرك الجسيم بخط مستقيم دون انحراف لتوازن القوتين الكهربائية والمغناطيسية (محصلة قوة لورنتز = 0)';
+                    col = '#d8b4fe';
+                }
+                setStatus(msg, col);
+            }
+
+            // Smooth exit: check if particle has flown completely outside screen boundaries
+            const isOutOfBounds = (px > w + 35) || (py < -35) || (py > h + 35) || (px < -35);
+
+            if (isOutOfBounds) {
+                isRunning = false;
+                pGroup.style.display = 'none';
+                fArrows.style.display = 'none';
+                btnFire.disabled = false;
+                if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+                return;
+            }
+
+            if (isRunning) {
+                animFrame = requestAnimationFrame(animateStep);
+            }
+        }
+
+        function moveParticle(x, y) {
+            pCircle.setAttribute('cx', x);
+            pCircle.setAttribute('cy', y);
+            pGlow.setAttribute('cx', x);
+            pGlow.setAttribute('cy', y);
+            pLabel.setAttribute('x', x);
+            pLabel.setAttribute('y', y + 4);
+        }
+
+        function addImpactPoint(x, y) {
+            const g = ns('g');
+            g.className = 'impact-dot';
+            
+            const glow = ns('circle');
+            setAttr(glow, { cx: x, cy: y, r: 16, fill: 'rgba(46, 204, 113, 0.35)', style: 'filter: blur(4px);' });
+            
+            const mid = ns('circle');
+            setAttr(mid, { cx: x, cy: y, r: 7, fill: '#2ecc71', style: 'filter: drop-shadow(0 0 5px #2ecc71);' });
+            
+            const core = ns('circle');
+            setAttr(core, { cx: x, cy: y, r: 2.5, fill: '#ffffff' });
+            
+            g.appendChild(glow);
+            g.appendChild(mid);
+            g.appendChild(core);
+            
+            const screenImpacts = document.getElementById('screen-impacts');
+            if (screenImpacts) screenImpacts.appendChild(g);
+        }
+
+        function drawCRTOutline() {
+            const { w, h } = dims();
+            const path = document.getElementById('crt-glass-envelope');
+            if (path) {
+                path.style.display = 'none'; // Hide the CRT envelope
+            }
+
+            const x2 = w - 16;
+            const screenLine = document.getElementById('fluorescent-screen');
+            if (screenLine) {
+                screenLine.setAttribute('x1', x2);
+                screenLine.setAttribute('y1', 12);
+                screenLine.setAttribute('x2', x2);
+                screenLine.setAttribute('y2', h - 12);
+            }
+
+            // Adjust injector position
+            const inj = document.querySelector('.injector');
+            if (inj) {
+                inj.style.left = '12px';
+            }
+        }
+
+        function renderTrail(pts) {
+            if (pts.length < 2) {
+                pTrail.innerHTML = '';
+                return;
+            }
+            let d = 'M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1);
+            for (let i = 1; i < pts.length; i++) {
+                d += ' L ' + pts[i].x.toFixed(1) + ' ' + pts[i].y.toFixed(1);
+            }
+            
+            const color = currentMode === 'electric' ? '#ff9f43'
+                        : currentMode === 'magnetic' ? '#93c5fd'
+                        : '#d8b4fe';
+
+            let trailPath = document.getElementById('active-trail-path');
+            if (!trailPath) {
+                pTrail.innerHTML = '';
+                trailPath = ns('path');
+                trailPath.id = 'active-trail-path';
+                trailPath.setAttribute('fill', 'none');
+                trailPath.setAttribute('stroke-linecap', 'round');
+                trailPath.setAttribute('stroke-linejoin', 'round');
+                pTrail.appendChild(trailPath);
+            }
+            trailPath.setAttribute('d', d);
+            trailPath.setAttribute('stroke', color);
+            trailPath.setAttribute('stroke-width', '2.6');
+            trailPath.setAttribute('opacity', '0.9');
+            trailPath.style.filter = 'drop-shadow(0 0 6px ' + color + ')';
+        }
+
+        // ════════════════════════════════════════════
+        //  FORCE ARROWS
+        // ════════════════════════════════════════════
+        function drawForces(px, py) {
+            fArrows.innerHTML = '';
+            const L = 34, hs = 7;
+
+            function arrow(x1, y1, x2, y2, color, lbl) {
+                const g = ns('g');
+
+                const ln = ns('line');
+                setAttr(ln, { x1, y1, x2, y2, stroke: color, 'stroke-width': '2.6', 'stroke-linecap': 'round' });
+                g.appendChild(ln);
+
+                // Head
+                const dx = x2-x1, dy = y2-y1, len = Math.hypot(dx,dy);
+                const ux = dx/len, uy = dy/len, nx = -uy, ny = ux;
+                const bx = x2 - ux*hs, by = y2 - uy*hs;
+                const poly = ns('polygon');
+                poly.setAttribute('points',
+                    `${x2},${y2} ${bx+nx*hs*0.5},${by+ny*hs*0.5} ${bx-nx*hs*0.5},${by-ny*hs*0.5}`);
+                poly.setAttribute('fill', color);
+                g.appendChild(poly);
+
+                // Label
+                const t = ns('text');
+                setAttr(t, {
+                    x: x2 + (dx >= 0 ? 7 : -7),
+                    y: y2 + (dy > 0 ? 14 : -8),
+                    'font-size': '10', 'font-family': 'Outfit,sans-serif',
+                    'font-weight': '700', fill: color,
+                    'text-anchor': dx < 0 ? 'end' : 'start'
+                });
+                t.textContent = lbl;
+                g.appendChild(t);
+                fArrows.appendChild(g);
+            }
+
+            const { w, h } = dims();
+            const deflStart = w * 0.30;
+            const deflEnd   = w - 16;
+
+            if (currentMode === 'electric') {
+                if (px > deflStart && px <= deflEnd) {
+                    arrow(px, py, px, py + L, 'rgba(255,159,67,0.9)', 'FE');
+                }
+            } else if (currentMode === 'magnetic') {
+                if (px > deflStart && px <= deflEnd) {
+                    const speed = Math.hypot(vx, vy);
+                    const fx = (vy / speed) * L;
+                    const fy = (-vx / speed) * L;
+                    arrow(px, py, px + fx, py + fy, 'rgba(147,197,253,0.9)', 'FB');
+                }
+            } else if (currentMode === 'lorentz') {
+                if (px > deflStart && px <= deflEnd) {
+                    const speed = Math.hypot(vx, vy);
+                    const fx = (vy / speed) * L;
+                    const fy = (-vx / speed) * L;
+                    // Draw both forces acting on the particle simultaneously
+                    arrow(px, py + 4, px, py + L + 4, 'rgba(255,159,67,0.9)', 'FE');
+                    arrow(px, py - 4, px + fx, py + fy - 4, 'rgba(147,197,253,0.9)', 'FB');
+                }
+            }
+        }
+
+        // ════════════════════════════════════════════
+        //  RESET
+        // ════════════════════════════════════════════
+        function resetExperiment() {
+            clearAll();
+            currentMode = null;
+            ['card-idle','card-electric','card-magnetic','card-lorentz'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById('card-idle').style.display = 'block';
+            document.querySelectorAll('.mode-btn').forEach(b => b.className = 'mode-btn');
+            modeBadge.className = 'mode-badge idle';
+            modeBadge.innerHTML = '<i class="fa-solid fa-circle-dot"></i> اختر وضعاً';
+            if(btnFire) btnFire.disabled = true;
+            setStatus('اختر وضع المجال ثم اضغط "إطلاق الشحنة"', 'var(--orange)');
+            drawCRTOutline();
+            
+            const { h } = dims();
+            moveParticle(62, h / 2);
+        }
+
+        // ════════════════════════════════════════════
+        //  DRAWER
+        // ════════════════════════════════════════════
+        const drawer        = document.getElementById('side-drawer');
+        const overlay       = document.getElementById('drawer-overlay');
+        const menuToggle    = document.getElementById('menu-toggle-btn');
+        const drawerClose   = document.getElementById('drawer-close-btn');
+        const chHeader      = document.getElementById('ch-header');
+        const chSubmenu     = document.getElementById('ch-submenu');
+        const chArrow       = document.getElementById('ch-arrow');
+
+        function openDrawer()  { drawer.classList.add('open'); overlay.classList.add('visible'); }
+        function closeDrawer() { drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+
+        if(menuToggle) menuToggle.addEventListener('click', openDrawer);
+        if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
+        if(overlay) overlay.addEventListener('click', closeDrawer);
+
+        if(chHeader) {
+            chHeader.addEventListener('click', () => {
+                const collapsed = chSubmenu.classList.toggle('collapsed');
+                chArrow.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        }
+
+        // ════════════════════════════════════════════
+        //  RESIZE & INITIALIZE
+        // ════════════════════════════════════════════
+        window.addEventListener('resize', () => {
+            drawCRTOutline();
+            if (!isRunning && currentMode) {
+                eLines.innerHTML = ''; bSymbols.innerHTML = '';
+                if (currentMode === 'electric' || currentMode === 'lorentz') drawEField();
+                if (currentMode === 'magnetic' || currentMode === 'lorentz') drawBField();
+            }
+        });
+
+        // Add explicit event listeners to buttons to enforce logic
+        if (btnFire) btnFire.addEventListener('click', fireParticle);
+        if (btnReset) btnReset.addEventListener('click', resetExperiment);
+
+        // Initial draw
+        setTimeout(drawCRTOutline, 60);
+    });
+    </script>
+    <script src="../js/global-drawer.js"></script>
+</body>
+</html>
