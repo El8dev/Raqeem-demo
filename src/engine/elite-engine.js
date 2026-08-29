@@ -80,19 +80,31 @@ class EliteEngine {
         if (!wrapper) {
             wrapper = document.createElement('div');
             wrapper.className = 'workspace-scaler-wrapper';
+            wrapper.style.position = 'relative';
+            wrapper.style.width = '100%';
             this.workspaceEl.parentNode.insertBefore(wrapper, this.workspaceEl);
             wrapper.appendChild(this.workspaceEl);
         }
 
         const baseWidth = parseFloat(this.workspaceEl.dataset.baseWidth) || 900;
-        const baseHeight = parseFloat(this.workspaceEl.dataset.baseHeight) || (this.workspaceEl.offsetHeight || 480);
+        const baseHeight = parseFloat(this.workspaceEl.dataset.baseHeight) || (this.workspaceEl.offsetHeight || 500);
 
         const updateScale = () => {
-            const containerWidth = wrapper.clientWidth;
+            const containerWidth = wrapper.clientWidth || (wrapper.parentElement ? wrapper.parentElement.clientWidth - 32 : window.innerWidth - 32);
             if (!containerWidth) return;
             const scale = Math.min(1.0, containerWidth / baseWidth);
+            
+            // Pure physical absolute positioning (ignoring RTL logic entirely)
+            const emptySpace = containerWidth - (baseWidth * scale);
+            const physicalLeft = emptySpace / 2;
+            
+            this.workspaceEl.style.position = 'absolute';
+            this.workspaceEl.style.right = 'auto'; // Disable RTL right-anchoring
+            this.workspaceEl.style.left = `${physicalLeft}px`;
+            this.workspaceEl.style.top = '0px';
+            this.workspaceEl.style.transformOrigin = 'top left';
             this.workspaceEl.style.transform = `scale(${scale})`;
-            this.workspaceEl.style.transformOrigin = 'top center';
+            
             wrapper.style.height = `${baseHeight * scale}px`;
             
             if (this.wireEngine) {
@@ -100,9 +112,22 @@ class EliteEngine {
             }
         };
 
+        // Run immediately and across all lifecycle events
+        updateScale();
+        requestAnimationFrame(updateScale);
         window.addEventListener('resize', updateScale, { passive: true });
-        window.addEventListener('orientationchange', () => setTimeout(updateScale, 150), { passive: true });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateScale, 50);
+            setTimeout(updateScale, 200);
+        }, { passive: true });
+        window.addEventListener('load', updateScale, { passive: true });
+        if (typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(() => updateScale());
+            ro.observe(wrapper);
+            if (wrapper.parentElement) ro.observe(wrapper.parentElement);
+        }
         setTimeout(updateScale, 50);
+        setTimeout(updateScale, 250);
         this.updateScale = updateScale;
     }
 
@@ -198,6 +223,35 @@ class EliteEngine {
         this.totalComponents++;
     }
 
+    snapComponent(comp, dropZone) {
+        if (!comp || !dropZone || comp.classList.contains("placed")) return;
+        const targetLeft = parseFloat(dropZone.style.left) || 0;
+        const targetTop = parseFloat(dropZone.style.top) || 0;
+        
+        gsap.to(comp, {
+            left: targetLeft,
+            top: targetTop,
+            duration: 0.35,
+            ease: "back.out(1.4)",
+            onUpdate: () => {
+                if (this.wireEngine) this.wireEngine.repositionWires();
+            }
+        });
+        
+        dropZone.classList.add("active");
+        dropZone.classList.remove("highlight");
+        const draggableInst = Draggable.get(comp);
+        if (draggableInst) draggableInst.disable();
+        gsap.set(comp, { zIndex: 10 });
+        
+        gsap.fromTo(dropZone, { scale: 1.1 }, { scale: 1, duration: 0.3 });
+        
+        comp.classList.add("placed");
+        
+        this.placedCount++;
+        this.onComponentPlaced(this.placedCount, this.totalComponents);
+    }
+
     initDragAndDrop() {
         const engine = this;
         
@@ -206,77 +260,66 @@ class EliteEngine {
             return;
         }
 
-        Draggable.create(".elite-component", {
-            type: "top,left",
-            bounds: `#${engine.workspaceId}`,
-            edgeResistance: 0.65,
-            onPress: function() {
-                this.startLeft = parseFloat(this.target.style.left) || 0;
-                this.startTop = parseFloat(this.target.style.top) || 0;
-                gsap.set(this.target, { zIndex: 9999 });
-                
-                const targetId = this.target.getAttribute("data-target");
-                if (targetId) {
-                    const dropZone = document.getElementById(targetId);
-                    if (dropZone && !dropZone.classList.contains("active")) {
-                        dropZone.classList.add("highlight");
-                    }
+        document.querySelectorAll('.elite-component').forEach(comp => {
+            // Tap-to-Place mobile & mouse fallback
+            comp.addEventListener('click', () => {
+                if (comp.classList.contains("placed") || comp._hasDragged) return;
+                const targetId = comp.getAttribute("data-target");
+                const dropZone = targetId ? document.getElementById(targetId) : null;
+                if (dropZone && !dropZone.classList.contains("active")) {
+                    engine.snapComponent(comp, dropZone);
                 }
-            },
-            onDrag: function() {
-                if (engine.wireEngine && this.target.classList.contains("placed")) {
-                    if (!this.repainting) {
-                        this.repainting = true;
-                        requestAnimationFrame(() => {
-                            engine.wireEngine.repositionWires();
-                            this.repainting = false;
-                        });
-                    }
-                }
-            },
-            onRelease: function() {
-                const targetId = this.target.getAttribute("data-target");
-                if (!targetId) return;
+            });
 
-                    } else {
-                        dropZone.classList.remove("highlight");
+            Draggable.create(comp, {
+                type: "top,left",
+                bounds: `#${engine.workspaceId}`,
+                edgeResistance: 0.65,
+                onPress: function() {
+                    comp._hasDragged = false;
+                    this.startLeft = parseFloat(this.target.style.left) || 0;
+                    this.startTop = parseFloat(this.target.style.top) || 0;
+                    gsap.set(this.target, { zIndex: 9999 });
+                    
+                    const targetId = this.target.getAttribute("data-target");
+                    if (targetId) {
+                        const dropZone = document.getElementById(targetId);
+                        if (dropZone && !dropZone.classList.contains("active")) {
+                            dropZone.classList.add("highlight");
+                        }
+                    }
+                },
+                onDrag: function() {
+                    comp._hasDragged = true;
+                    if (engine.wireEngine && this.target.classList.contains("placed")) {
+                        if (!this.repainting) {
+                            this.repainting = true;
+                            requestAnimationFrame(() => {
+                                engine.wireEngine.repositionWires();
+                                this.repainting = false;
+                            });
+                        }
                     }
                 },
                 onDragEnd: function() {
-                    const compRect = this.target.getBoundingClientRect();
-                    const zoneRect = dropZone.getBoundingClientRect();
+                    const targetId = this.target.getAttribute("data-target");
+                    const dropZone = targetId ? document.getElementById(targetId) : null;
                     
-                    const isOver = !(compRect.right < zoneRect.left || 
-                                     compRect.left > zoneRect.right || 
-                                     compRect.bottom < zoneRect.top || 
-                                     compRect.top > zoneRect.bottom);
+                    let isOver = false;
+                    if (dropZone) {
+                        const compRect = this.target.getBoundingClientRect();
+                        const zoneRect = dropZone.getBoundingClientRect();
+                        
+                        isOver = !(compRect.right < zoneRect.left || 
+                                   compRect.left > zoneRect.right || 
+                                   compRect.bottom < zoneRect.top || 
+                                   compRect.top > zoneRect.bottom);
 
-                    dropZone.classList.remove("highlight");
+                        dropZone.classList.remove("highlight");
+                    }
 
-                    if (isOver && !dropZone.classList.contains("active")) {
-                        const targetLeft = parseFloat(dropZone.style.left) || 0;
-                        const targetTop = parseFloat(dropZone.style.top) || 0;
-                        
-                        gsap.to(this.target, {
-                            left: targetLeft,
-                            top: targetTop,
-                            duration: 0.3,
-                            ease: "back.out(1.4)",
-                            onUpdate: () => {
-                                if (engine.wireEngine) engine.wireEngine.repositionWires();
-                            }
-                        });
-                        
-                        dropZone.classList.add("active");
-                        this.disable();
-                        gsap.set(this.target, { zIndex: 10 });
-                        
-                        gsap.fromTo(dropZone, { scale: 1.1 }, { scale: 1, duration: 0.3 });
-                        
-                        this.target.classList.add("placed");
-                        
-                        engine.placedCount++;
-                        engine.onComponentPlaced(engine.placedCount, engine.totalComponents);
+                    if (isOver && dropZone && !dropZone.classList.contains("active")) {
+                        engine.snapComponent(this.target, dropZone);
                     } else {
                         gsap.to(this.target, { 
                             left: this.startLeft, 
@@ -305,6 +348,7 @@ class EliteEngine {
 
         document.querySelectorAll('.elite-component').forEach(comp => {
             comp.classList.remove('placed');
+            comp._hasDragged = false;
             const draggables = Draggable.get(comp);
             if (draggables) draggables.enable();
         });
@@ -324,18 +368,46 @@ window.initRaqeemResponsive = function(workspaceSelector = '#workspace', baseWid
     if (!wrapper) {
         wrapper = document.createElement('div');
         wrapper.className = 'workspace-scaler-wrapper';
+            wrapper.style.position = 'relative';
+            wrapper.style.width = '100%';
         ws.parentNode.insertBefore(wrapper, ws);
         wrapper.appendChild(ws);
     }
 
     const updateScale = () => {
-        const containerWidth = wrapper.clientWidth;
+        const containerWidth = wrapper.clientWidth || (wrapper.parentElement ? wrapper.parentElement.clientWidth - 32 : window.innerWidth - 32);
         if (!containerWidth) return;
         const scale = Math.min(1.0, containerWidth / baseWidth);
+        
+        // Pure physical absolute positioning (ignoring RTL logic entirely)
+        const emptySpace = containerWidth - (baseWidth * scale);
+        const physicalLeft = emptySpace / 2;
+        
+        ws.style.position = 'absolute';
+        ws.style.right = 'auto'; // Disable RTL right-anchoring
+        ws.style.left = `${physicalLeft}px`;
+        ws.style.top = '0px';
+        ws.style.transformOrigin = 'top left';
         ws.style.transform = `scale(${scale})`;
-        ws.style.transformOrigin = 'top center';
+        
         wrapper.style.height = `${baseHeight * scale}px`;
     };
+
+    updateScale();
+    requestAnimationFrame(updateScale);
+    window.addEventListener('resize', updateScale, { passive: true });
+    window.addEventListener('orientationchange', () => {
+        setTimeout(updateScale, 50);
+        setTimeout(updateScale, 200);
+    }, { passive: true });
+    window.addEventListener('load', updateScale, { passive: true });
+    if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => updateScale());
+        ro.observe(wrapper);
+        if (wrapper.parentElement) ro.observe(wrapper.parentElement);
+    }
+    setTimeout(updateScale, 50);
+    setTimeout(updateScale, 250);
 
     window.addEventListener('resize', updateScale, { passive: true });
     window.addEventListener('orientationchange', () => setTimeout(updateScale, 150), { passive: true });

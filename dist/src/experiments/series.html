@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ربط المتسعات على التوازي | مختبر الفيزياء الافتراضي</title>
+    <title>ربط المتسعات على التوالي | مختبر الفيزياء الافتراضي</title>
     <link rel="stylesheet" href="../fonts/google-fonts.css">
     <link rel="stylesheet" href="../libs/fontawesome.min.css">
     <script src="../libs/gsap.min.js"></script>
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <h1 class="text-base md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 text-center">ربط المتسعات على التوازي</h1>
+        <h1 class="text-base md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 text-center">ربط المتسعات على التوالي</h1>
 
         <a href="../index.html?showMenu=true" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 bg-black/60 border border-white/5 hover:border-cyan-400/40 text-slate-300 hover:text-white backdrop-blur-md shadow-lg" id="back-btn">
             <i class="fa-solid fa-chevron-right text-cyan-400 text-[10px]"></i> <span>القائمة</span>
@@ -81,24 +81,16 @@
                 <svg style="position: absolute; width: 0; height: 0;">
                   <defs>
                     <linearGradient id="brass" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#ffe082" />
-                      <stop offset="40%" stop-color="#d97706" />
-                      <stop offset="100%" stop-color="#78350f" />
+                      <stop offset="0%" stop-color="#ffe082" /><stop offset="40%" stop-color="#d97706" /><stop offset="100%" stop-color="#78350f" />
                     </linearGradient>
-                    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#5c4033" />
-                      <stop offset="50%" stop-color="#3d2b1f" />
-                      <stop offset="100%" stop-color="#261c13" />
+                    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#5c4033" /><stop offset="50%" stop-color="#3d2b1f" /><stop offset="100%" stop-color="#261c13" />
                     </linearGradient>
                     <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#ea580c" />
-                      <stop offset="50%" stop-color="#f97316" />
-                      <stop offset="100%" stop-color="#c2410c" />
+                      <stop offset="0%" stop-color="#ea580c" /><stop offset="50%" stop-color="#f97316" /><stop offset="100%" stop-color="#c2410c" />
                     </linearGradient>
                     <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#e2e8f0" />
-                      <stop offset="50%" stop-color="#94a3b8" />
-                      <stop offset="100%" stop-color="#475569" />
+                      <stop offset="0%" stop-color="#e2e8f0" /><stop offset="50%" stop-color="#94a3b8" /><stop offset="100%" stop-color="#475569" />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -106,76 +98,77 @@
                 <svg class="wires-layer" id="wiresLayer"></svg>
 
                 <!-- Drop Zones -->
-                <div class="drop-zone" id="zone-battery" style="left: 60px; top: 65px; width: 70px; height: 60px;"></div>
-                <div class="drop-zone" id="zone-switchK" style="left: 60px; top: 185px; width: 80px; height: 100px;"></div>
-                <div class="drop-zone" id="zone-c1" style="left: 280px; top: 55px; width: 140px; height: 125px;"></div>
-                <div class="drop-zone" id="zone-c2" style="left: 520px; top: 55px; width: 140px; height: 125px;"></div>
+                <div class="drop-zone" id="zone-battery" style="left: 60px; top: 110px; width: 70px; height: 60px;"></div>
+                <div class="drop-zone" id="zone-switchK" style="left: 160px; top: 90px; width: 80px; height: 100px;"></div>
+                <div class="drop-zone" id="zone-c1" style="left: 310px; top: 35px; width: 140px; height: 115px;"></div>
+                <div class="drop-zone" id="zone-c2" style="left: 310px; top: 165px; width: 140px; height: 115px;"></div>
 
-                <!-- Components on shelf -->
                 <div id="elite-components-container"></div>
-                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="left: 380px; top: 325px; width: 140px; height: 125px;">
+                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="left: 380px; top: 325px; width: 140px; height: 115px;">
                     <div class="relative w-full h-full overflow-visible">
-                        <div id="c1-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 15px; left: 10px; width: 120px;"></div>
+                        <div id="c1-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 10px; left: 10px; width: 120px;"></div>
                         <div id="c1-top-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="top: 10px; left: 10px; width: 120px;"></div>
-                        
-                        <div id="c1-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c1-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="bottom: 28px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
+                        <div id="c1-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-all duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+                        <div id="c1-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-all duration-300 z-10" style="bottom: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
                         <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 70px; top: 105px;"></div>
                     </div>
                 </div>
 
-                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="left: 580px; top: 325px; width: 140px; height: 125px;">
+                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="left: 580px; top: 325px; width: 140px; height: 115px;">
                     <div class="relative w-full h-full overflow-visible">
-                        <div id="c2-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 15px; left: 10px; width: 120px;"></div>
+                        <div id="c2-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 10px; left: 10px; width: 120px;"></div>
                         <div id="c2-top-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="top: 10px; left: 10px; width: 120px;"></div>
-                        
-                        <div id="c2-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c2-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="bottom: 28px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
+                        <div id="c2-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-all duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+                        <div id="c2-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-all duration-300 z-10" style="bottom: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
                         <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 70px; top: 105px;"></div>
                     </div>
                 </div>
 
                 <!-- Concept Layer -->
                 <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[15]" id="conceptLayer">
-                    <g id="area-vis" style="opacity: 0; transition: opacity 0.5s;">
-                        <rect id="area-box" x="260" y="45" width="420" height="145" rx="10" fill="rgba(6, 182, 212, 0.04)" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6 4" />
-                        <path id="top-bridge" d="M 400 70 L 530 70" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="4 4" />
-                        <path id="bottom-bridge" d="M 400 165 L 530 165" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="4 4" />
+                    <g id="dist-vis" style="opacity: 0; transition: opacity 0.5s;">
+                        <!-- E-field lines from top outer plate to bottom outer plate -->
+                        <g id="e-field-lines" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5 5" opacity="0.6"></g>
+                        <!-- Connecting bracket line showing equivalent distance -->
+                        <path id="dist-line" d="M 0 0" fill="none" stroke="#f43f5e" stroke-width="2" opacity="0.85" stroke-dasharray="4 3" />
                     </g>
-                    <!-- E-field groups for both capacitors -->
-                    <g id="e-field-lines-c1" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
-                    <g id="e-field-lines-c2" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
                 </svg>
 
-                <!-- Floating Concept Tag -->
-                <div id="parallel-concept-tag" class="absolute left-1/2 -translate-x-1/2 bg-slate-950/90 border border-cyan-500/40 px-3 py-1 rounded-full text-cyan-300 font-bold text-xs shadow-lg backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500 flex items-center gap-2 z-20" style="top: 240px;">
-                    <i class="fa-solid fa-arrows-left-right text-cyan-400"></i>
-                    <span>المساحة السطحية المتقابلة تزداد ($A = A_1 + A_2$) ⟵ السعة المكافئة تزداد</span>
+                <!-- Floating Distance & Capacitance Info Badge (Isolated to the right) -->
+                <div id="series-concept-badge" class="absolute right-4 top-[75px] w-[260px] bg-slate-950/95 border border-rose-500/40 rounded-xl p-3 shadow-2xl backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 z-20">
+                    <div class="flex items-center gap-1.5 text-rose-400 font-bold text-xs mb-1.5">
+                        <i class="fa-solid fa-arrows-up-down text-rose-400"></i>
+                        <span>تفسير نقصان السعة المكافئة:</span>
+                    </div>
+                    <div class="text-[11px] text-slate-300 leading-relaxed">
+                        • البعد الفاصل الكلي يزداد: <strong class="text-rose-300 font-mono text-xs">d = d₁ + d₂</strong><br>
+                        • وبما أن <strong class="text-cyan-300 font-mono text-xs">C ∝ 1/d</strong>، فإن السعة المكافئة <strong class="text-amber-300 font-bold">تقل وتكون أصغر من أصغر سعة</strong>.
+                    </div>
                 </div>
                 
             </div>
         </div>
-    
+
         <!-- Compact Sleek Conclusion Strip -->
         <div class="conclusion-panel bg-slate-900/80 border border-emerald-500/30 rounded-xl p-3 shadow-lg hidden transition-all duration-500" id="conclusion">
             <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs mb-2">
                 <i class="fa-solid fa-circle-check text-emerald-400"></i>
-                <span>قوانين ربط المتسعات على التوازي:</span>
+                <span>قوانين ربط المتسعات على التوالي:</span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
                 <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-emerald-400 font-extrabold">⚡ الجهد متساوٍ:</span>
-                    <span>$V_{total} = V_1 = V_2$</span>
+                    <span class="text-cyan-400 font-extrabold">🔋 الشحنة متساوية:</span>
+                    <span>$Q_{total} = Q_1 = Q_2$</span>
                 </div>
                 <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-cyan-400 font-extrabold">🔋 الشحنة تتجزأ:</span>
-                    <span>$Q_{total} = Q_1 + Q_2$</span>
+                    <span class="text-amber-400 font-extrabold">⚡ الجهد يتجزأ:</span>
+                    <span>$V_{total} = V_1 + V_2$</span>
                 </div>
                 <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-amber-400 font-extrabold">📈 السعة تزداد:</span>
-                    <span>$C_{eq} = C_1 + C_2$</span>
+                    <span class="text-rose-400 font-extrabold">📉 السعة تقل:</span>
+                    <span>$\frac{1}{C_{eq}} = \frac{1}{C_1} + \frac{1}{C_2}$</span>
                 </div>
             </div>
         </div>
@@ -191,10 +184,10 @@
     </main>
 
     <script>
-        const EPSILON_0 = 8.854;
+        const EPSILON_0 = 8.854; 
         let V_bat = 10.0;
-        let A1 = 200; let A2 = 200;
-        let isSwitchClosed = false;
+        let d1 = 5.0; let d2 = 5.0;
+        let isSwitchClosed = false; 
         let trappedCharge = null;
 
         function autoConnectCircuit() {
@@ -216,10 +209,9 @@
 
             const pairs = [
                 ['bat-pos', 'c1-top'],
-                ['c1-top', 'c2-top'],
-                ['bat-neg', 'sw-1'],
-                ['sw-k', 'c1-bottom'],
-                ['c1-bottom', 'c2-bottom']
+                ['c1-bottom', 'c2-top'],
+                ['c2-bottom', 'sw-k'],
+                ['sw-1', 'bat-neg']
             ];
 
             setTimeout(() => {
@@ -251,10 +243,10 @@
             document.getElementById('stepBanner').style.color = 'var(--cyber-orange)';
             
             document.getElementById('conclusion').classList.add('hidden');
-            const areaVis = document.getElementById('area-vis');
-            if (areaVis) areaVis.style.opacity = 0;
-            const conceptTag = document.getElementById('parallel-concept-tag');
-            if (conceptTag) conceptTag.style.opacity = 0;
+            const distVis = document.getElementById('dist-vis');
+            if (distVis) distVis.style.opacity = 0;
+            const conceptBadge = document.getElementById('series-concept-badge');
+            if (conceptBadge) conceptBadge.style.opacity = 0;
             
             const switchArm = document.getElementById('sw-arm');
             if (switchArm) gsap.to(switchArm, { rotation: -30, duration: 0.25 });
@@ -265,7 +257,6 @@
             gsap.to('#comp-c1', { left: 380, top: 325, duration: 0.4 });
             gsap.to('#comp-c2', { left: 580, top: 325, duration: 0.4 });
         }
-
         
         // Generate Elite Components
         document.addEventListener('DOMContentLoaded', () => {
@@ -287,13 +278,12 @@
                 workspaceId: 'workspace',
                 expectedPairs: [
                     'bat-pos-c1-top',
-                    'c1-top-c2-top',
-                    'bat-neg-sw-1',
-                    'sw-k-c1-bottom',
-                    'c1-bottom-c2-bottom'
+                    'c1-bottom-c2-top',
+                    'c2-bottom-sw-k',
+                    'sw-1-bat-neg'
                 ],
                 onCircuitComplete: (connections) => {
-                    if (connections.size === 5) {
+                    if (connections.size === 4) {
                         window.isCircuitComplete = true;
                         const stepBanner = document.getElementById('stepBanner');
                         if (stepBanner) {
@@ -322,13 +312,13 @@
             requestAnimationFrame(renderMolecules);
         });
 
-        const voltages = [5, 10, 15, 20];
+        const voltages = [5, 10, 15, 20]; 
         let voltIdx = 1;
-        function cycleBatteryVolt() {
-            voltIdx = (voltIdx + 1) % voltages.length;
-            V_bat = voltages[voltIdx];
-            document.querySelector('#bat text:last-child').textContent = V_bat + "V CELL";
-            createSpark(95, 95);
+        function cycleBatteryVolt() { 
+            voltIdx = (voltIdx + 1) % voltages.length; 
+            V_bat = voltages[voltIdx]; 
+            document.querySelector('#bat text:last-child').textContent = V_bat + "V CELL"; 
+            createSpark(95, 140); 
         }
 
         function handleSwitchClick(eventOrForce) {
@@ -338,122 +328,117 @@
             
             isSwitchClosed = isForceOpen ? false : !isSwitchClosed;
             const switchArm = document.getElementById('sw-arm');
-
+            
             if (isSwitchClosed) {
-                gsap.to(switchArm, { rotation: 0, duration: 0.25 });
-                createSpark(100, 235);
-                document.getElementById('stepBanner').innerText = "الدائرة مغلقة والبطارية متصلة! يتساوى فرق جهد المتسعتين: V₁ = V₂ = V_total";
+                gsap.to(switchArm, { rotation: 0, duration: 0.25 }); 
+                createSpark(200, 140);
+                document.getElementById('stepBanner').innerText = "الدائرة مغلقة! ينساب تيار وتتراكم شحنة متساوية: Q₁ = Q₂ = Q_total";
                 document.getElementById('stepBanner').style.color = 'var(--success-green)';
                 document.getElementById('conclusion').classList.remove('hidden');
                 
-                document.getElementById('area-vis').style.opacity = 1;
-                const conceptTag = document.getElementById('parallel-concept-tag');
-                if (conceptTag) conceptTag.style.opacity = 1;
+                const distVis = document.getElementById('dist-vis');
+                if (distVis) distVis.style.opacity = 1;
+                const conceptBadge = document.getElementById('series-concept-badge');
+                if (conceptBadge) conceptBadge.style.opacity = 1;
                 
             } else {
                 gsap.to(switchArm, { rotation: -30, duration: 0.25 });
                 document.getElementById('stepBanner').innerText = "المفتاح مفتوح. المجموعة معزولة. تظل الشحنة الكلية ثابتة.";
                 document.getElementById('stepBanner').style.color = "var(--accent-orange)";
                 
-                const areaVis = document.getElementById('area-vis');
-                if (areaVis) areaVis.style.opacity = 0;
-                const conceptTag = document.getElementById('parallel-concept-tag');
-                if (conceptTag) conceptTag.style.opacity = 0;
+                const distVis = document.getElementById('dist-vis');
+                if (distVis) distVis.style.opacity = 0;
+                const conceptBadge = document.getElementById('series-concept-badge');
+                if (conceptBadge) conceptBadge.style.opacity = 0;
             }
         }
 
         function renderMolecules() {
-            const C1 = (EPSILON_0 * 1.0 * A1) / 500;
-            const C2 = (EPSILON_0 * 1.0 * A2) / 500;
-            const C_eq = C1 + C2;
+            const C1 = (EPSILON_0 * 1.0 * 200) / (d1 * 100);
+            const C2 = (EPSILON_0 * 1.0 * 200) / (d2 * 100);
+            const C_eq = (C1 * C2) / (C1 + C2);
 
-            let Q1=0, Q2=0, V1=0, V2=0, Q_total=0;
+            let Q_total = 0;
             if (window.isCircuitComplete) {
                 if (isSwitchClosed) {
-                    V1 = V_bat; V2 = V_bat;
-                    Q1 = C1 * V1; Q2 = C2 * V2;
-                    Q_total = Q1 + Q2;
-                    trappedCharge = Q_total;
+                    Q_total = C_eq * V_bat; 
+                    trappedCharge = Q_total; 
                 } else {
-                    if (trappedCharge !== null) {
-                        Q_total = trappedCharge;
-                        let V_tot = Q_total / C_eq;
-                        V1 = V_tot; V2 = V_tot;
-                        Q1 = C1 * V1; Q2 = C2 * V2;
+                    if (trappedCharge !== null) { 
+                        Q_total = trappedCharge; 
                     }
                 }
             }
 
-            const op1 = Math.min(1, Q1/10); const op2 = Math.min(1, Q2/10);
-            document.getElementById('c1-pos-charges').style.opacity = op1; document.getElementById('c1-neg-charges').style.opacity = op1;
-            document.getElementById('c2-pos-charges').style.opacity = op2; document.getElementById('c2-neg-charges').style.opacity = op2;
+            const qOp = Math.min(1, Math.max(0, Q_total / 10)); // Normalize to max 10pC
             
+            document.getElementById('c1-pos-charges').style.opacity = qOp;
+            document.getElementById('c2-neg-charges').style.opacity = qOp;
+            
+            // Inner plates show induced charges
+            const innerQOp = (isSwitchClosed || trappedCharge !== null) ? (qOp * 0.4) : qOp;
+            document.getElementById('c1-neg-charges').style.opacity = innerQOp;
+            document.getElementById('c2-pos-charges').style.opacity = innerQOp;
+
             // Position concept SVG using actual rendered positions
             if (window.isCircuitComplete) {
                 const ws = document.getElementById('workspace');
                 const c1 = document.getElementById('comp-c1');
                 const c2 = document.getElementById('comp-c2');
-                if (ws && c1 && c2) {
-                    const x1 = parseFloat(c1.style.left) || 0;
-                    const y1 = parseFloat(c1.style.top) || 0;
-                    const x2 = parseFloat(c2.style.left) || 0;
-                    const y2 = parseFloat(c2.style.top) || 0;
-                    const w1 = parseFloat(c1.style.width) || 140;
-                    const h1 = parseFloat(c1.style.height) || 125;
-                    const w2 = parseFloat(c2.style.width) || 140;
+                const c1tp = document.getElementById('c1-top-plate');
+                const c1bp = document.getElementById('c1-bottom-plate');
+                const c2tp = document.getElementById('c2-top-plate');
+                const c2bp = document.getElementById('c2-bottom-plate');
+                if (ws && c1 && c2 && c1tp && c1bp && c2tp && c2bp) {
+                    const c1tY = (parseFloat(c1.style.top) || 325) + 10;
+                    const c1tX = (parseFloat(c1.style.left) || 380) + 10;
+                    const c2bY = (parseFloat(c2.style.top) || 325) + 115 - 10 - 12; // container height - bottom offset - plate height
+                    const pw = 120;
 
-                    // Bounding box around both capacitors
-                    const areaBox = document.getElementById('area-box');
-                    if (areaBox) {
-                        areaBox.setAttribute('x', x1 - 8);
-                        areaBox.setAttribute('y', y1 - 8);
-                        areaBox.setAttribute('width', (x2 + w2) - x1 + 16);
-                        areaBox.setAttribute('height', h1 + 16);
-                    }
+                    // Update opacities to visually merge the inner plates
+                    const innerOpacity = (isSwitchClosed || trappedCharge !== null) ? '0.35' : '1';
+                    c1bp.style.opacity = innerOpacity;
+                    c2tp.style.opacity = innerOpacity;
+                    c1bp.style.transition = 'opacity 0.5s';
+                    c2tp.style.transition = 'opacity 0.5s';
 
-                    // Bridge lines between the two top plates and two bottom plates
-                    const topBridge = document.getElementById('top-bridge');
-                    if (topBridge) topBridge.setAttribute('d', `M ${x1 + w1} ${y1 + 16} L ${x2} ${y2 + 16}`);
-                    const botBridge = document.getElementById('bottom-bridge');
-                    if (botBridge) botBridge.setAttribute('d', `M ${x1 + w1} ${y1 + h1 - 22} L ${x2} ${y2 + h1 - 22}`);
-
-                    // E-field animation
-                    const eFieldC1 = document.getElementById('e-field-lines-c1');
-                    const eFieldC2 = document.getElementById('e-field-lines-c2');
-                    
-                    if (eFieldC1 && eFieldC2) {
-                        eFieldC1.innerHTML = '';
-                        eFieldC2.innerHTML = '';
-                        
+                    // E-field lines from top outer plate to bottom outer plate
+                    const eFieldGroup = document.getElementById('e-field-lines');
+                    if (eFieldGroup) {
+                        eFieldGroup.innerHTML = '';
                         if (isSwitchClosed) {
                             window.eFieldTime = (window.eFieldTime || 0) + 0.05;
                             const numLines = 5;
+                            let newHTML = '';
+                            const startY = c1tY + 12;
+                            const endY = c2bY;
+                            const distanceY = endY - startY;
                             
-                            function buildFieldLines(cx, cW, cTopY, cBotY) {
-                                let linesHTML = '';
-                                const distanceY = cBotY - cTopY;
-                                for (let i = 0; i <= numLines; i++) {
-                                    const ratio = i / numLines;
-                                    const lx = cx + (cW * ratio);
-                                    
-                                    const centerDist = ratio - 0.5;
-                                    const bulgeFactor = distanceY * 0.15;
-                                    const curveAmount = (Math.pow(centerDist * 2, 3)) * bulgeFactor;
-                                    
-                                    const controlX = lx + curveAmount;
-                                    const controlY = (cTopY + cBotY) / 2;
-                                    const waveOffset = Math.sin(window.eFieldTime + i) * 1.5;
-                                    const finalControlX = controlX + waveOffset;
-                                    
-                                    linesHTML += `<path d="M ${lx} ${cTopY} Q ${finalControlX} ${controlY} ${lx} ${cBotY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5 5" opacity="0.6" />`;
-                                    linesHTML += `<polygon points="${lx-3},${cBotY-6} ${lx+3},${cBotY-6} ${lx},${cBotY}" fill="#3b82f6" opacity="0.8" />`;
-                                }
-                                return linesHTML;
+                            for(let i=0; i<=numLines; i++) {
+                                const ratio = i / numLines;
+                                const lx = c1tX + (pw * ratio);
+                                
+                                const centerDist = ratio - 0.5;
+                                const bulgeFactor = distanceY * 0.12;
+                                const curveAmount = (Math.pow(centerDist * 2, 3)) * bulgeFactor;
+                                
+                                const controlX = lx + curveAmount;
+                                const controlY = (startY + endY) / 2;
+                                const waveOffset = Math.sin(window.eFieldTime + i) * 1.5;
+                                const finalControlX = controlX + waveOffset;
+                                
+                                newHTML += `<path d="M ${lx} ${startY} Q ${finalControlX} ${controlY} ${lx} ${endY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5 5" opacity="0.6" />`;
+                                newHTML += `<polygon points="${lx-3},${endY-6} ${lx+3},${endY-6} ${lx},${endY}" fill="#3b82f6" opacity="0.8" />`;
                             }
-                            
-                            eFieldC1.innerHTML = buildFieldLines(x1 + 10, 100, y1 + 20, y1 + h1 - 22);
-                            eFieldC2.innerHTML = buildFieldLines(x2 + 10, 100, y2 + 20, y2 + h1 - 22);
+                            eFieldGroup.innerHTML = newHTML;
                         }
+                    }
+
+                    // Vertical dimension bracket on the right of the capacitors
+                    const rightX = c1tX + pw + 18;
+                    const distLine = document.getElementById('dist-line');
+                    if (distLine) {
+                        distLine.setAttribute('d', `M ${rightX - 6} ${c1tY + 6} L ${rightX + 6} ${c1tY + 6} M ${rightX} ${c1tY + 6} L ${rightX} ${c2bY + 6} M ${rightX - 6} ${c2bY + 6} L ${rightX + 6} ${c2bY + 6}`);
                     }
                 }
             }
@@ -464,10 +449,8 @@
         function createSpark(x, y) {
             const workspace = document.getElementById('workspace');
             for (let i = 0; i < 6; i++) {
-                const spark = document.createElement('div');
-                spark.style.position = 'absolute'; spark.style.left = x + 'px'; spark.style.top = y + 'px';
-                spark.style.width = '3px'; spark.style.height = '3px'; spark.style.borderRadius = '50%';
-                spark.style.backgroundColor = '#ffd700'; spark.style.boxShadow = '0 0 4px #ff9f03, 0 0 8px #ffffff';
+                const spark = document.createElement('div'); spark.style.position = 'absolute'; spark.style.left = x + 'px'; spark.style.top = y + 'px';
+                spark.style.width = '3px'; spark.style.height = '3px'; spark.style.borderRadius = '50%'; spark.style.backgroundColor = '#ffd700'; spark.style.boxShadow = '0 0 4px #ff9f03, 0 0 8px #ffffff';
                 spark.style.zIndex = '50'; workspace.appendChild(spark);
                 const angle = Math.random() * Math.PI * 2; const dist = Math.random() * 20 + 10;
                 gsap.to(spark, { x: Math.cos(angle)*dist, y: Math.sin(angle)*dist, opacity: 0, duration: 0.4, onComplete: ()=>spark.remove() });

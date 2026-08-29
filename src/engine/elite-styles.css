@@ -94,8 +94,8 @@ body {
 /* Terminal Nodes */
 .terminal-node {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: rgba(0, 210, 255, 0.4);
     border: 2px solid #00d2ff;
@@ -103,6 +103,27 @@ body {
     z-index: 20;
     box-shadow: 0 0 5px #00d2ff;
     touch-action: none;
+    cursor: crosshair;
+}
+
+/* 44px Invisible Touch Hitbox for Fingers and Mobile */
+.terminal-node::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    cursor: crosshair;
+}
+
+.terminal-node.terminal-active-source {
+    background: #facc15;
+    border-color: #ffffff;
+    box-shadow: 0 0 14px #facc15;
+    transform: translate(-50%, -50%) scale(1.4);
+    animation: pulseGlow 1s infinite;
 }
 
 .terminal-node.connected {
@@ -130,8 +151,6 @@ body {
 }
 
 .workspace-area {
-    width: 100%;
-    height: 600px;
     background: radial-gradient(circle at center, #111e32 0%, #05080f 100%);
     border-radius: 20px;
     position: relative;
@@ -211,15 +230,14 @@ body {
     position: relative;
     overflow: hidden;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     transition: height 0.2s ease-out;
 }
 
 .workspace-scaler-wrapper .workspace-area {
-    transform-origin: top center;
     flex-shrink: 0;
-    margin: 0 auto;
+    margin: 0;
     transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 

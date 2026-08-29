@@ -63,8 +63,8 @@
         /* Dashboard Bars */
         .dash-bar-container {
             width: 100%;
-            height: 10px;
-            background: #111823;
+            height: 12px;
+            background: #090e17;
             border-radius: 6px;
             overflow: hidden;
             border: 1px solid #1e293b;
@@ -72,17 +72,8 @@
         }
         .dash-bar-fill {
             height: 100%;
+            border-radius: 6px;
             transition: width 0.15s ease-out;
-        }
-
-        /* Connecting beam animation */
-        @keyframes beamFlow {
-            from { stroke-dashoffset: 20; }
-            to { stroke-dashoffset: 0; }
-        }
-        .magnify-beam {
-            stroke-dasharray: 8 6;
-            animation: beamFlow 1s linear infinite;
         }
 
         /* HTML Keyboard Keys */
@@ -120,12 +111,26 @@
             box-shadow: 0 0px 2px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.4);
         }
 
-        /* Drawer Overlay */
+        /* Premium Glassy Modal Panel */
+        #drawer-backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: opacity 0.3s ease;
+        }
+
         #scientific-drawer {
+            background: #090e17;
+            background: linear-gradient(145deg, #0e1726, #070a12);
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(0, 210, 255, 0.15);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
         }
-        #drawer-backdrop {
-            transition: opacity 0.3s ease;
+
+        .drawer-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
         }
     </style>
 </head>
@@ -152,7 +157,7 @@
             </div>
             <div>
                 <h1 class="text-lg md:text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-cyan-400">لوحة المفاتيح (الكيبورد)</h1>
-                <p class="text-xs text-cyan-400/90 font-medium">تطبيق عملي: تغير البعد ($d$) لتوليد الإشارة الكهربائية ($d \downarrow \implies C \uparrow$)</p>
+                <p class="text-xs text-cyan-400/90 font-medium">تطبيق عملي: تغير البعد (d) لتوليد الإشارة الكهربائية (d ↓ ← C ↑)</p>
             </div>
         </div>
 
@@ -177,7 +182,7 @@
                     <i class="fa-solid fa-microchip"></i>
                 </span>
                 <span id="live-physics-status" class="text-xs md:text-sm font-bold text-slate-200">
-                    حالة السكون: البعد <span class="text-blue-400 font-en">(d)</span> كبير $\implies$ السعة <span class="text-cyan-400 font-en">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!
+                    حالة السكون: البعد <span class="text-blue-400 font-en font-bold">(d)</span> كبير ← السعة <span class="text-cyan-400 font-en font-bold">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!
                 </span>
             </div>
             
@@ -267,9 +272,9 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center flex-1">
                     
-                    <!-- SVG Key Cross Section -->
-                    <div class="md:col-span-8 w-full h-[250px] md:h-[290px] relative bg-black/60 rounded-xl border border-slate-800 flex items-center justify-center p-2">
-                        <svg width="100%" height="100%" viewBox="0 0 300 370" preserveAspectRatio="xMidYMid meet">
+                    <!-- SVG Key Cross Section (530x260 widescreen viewBox with locked center callouts) -->
+                    <div class="md:col-span-8 w-full h-[240px] md:h-[270px] relative bg-black/60 rounded-xl border border-slate-800 flex items-center justify-center p-1 overflow-hidden">
+                        <svg width="100%" height="100%" viewBox="0 0 530 260" preserveAspectRatio="xMidYMid meet">
                             <defs>
                                 <linearGradient id="capTop" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#475569" />
@@ -284,88 +289,168 @@
                                     <stop offset="100%" stop-color="#64748b" />
                                 </linearGradient>
                                 <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-                                    <line x1="0" y1="0" x2="0" y2="8" stroke="#f59e0b" stroke-width="1.5" opacity="0.4"/>
+                                    <line x1="0" y1="0" x2="0" y2="8" stroke="#00d2ff" stroke-width="1.5" opacity="0.35"/>
                                 </pattern>
-                                <filter id="pcbGlow">
+                                <filter id="pcbGlow" x="-50%" y="-50%" width="200%" height="200%">
                                     <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                                     <feMerge>
                                         <feMergeNode in="coloredBlur"/>
                                         <feMergeNode in="SourceGraphic"/>
                                     </feMerge>
                                 </filter>
+                                <filter id="sparkGlow" x="-60%" y="-60%" width="220%" height="220%">
+                                    <feGaussianBlur stdDeviation="2" result="sharpGlow"/>
+                                    <feGaussianBlur stdDeviation="6" result="softGlow"/>
+                                    <feMerge>
+                                        <feMergeNode in="softGlow"/>
+                                        <feMergeNode in="sharpGlow"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
                             </defs>
 
-                            <!-- Guides/Measurements (d) -->
-                            <g id="measurement-guide" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 3">
-                                <line x1="50" y1="180" x2="75" y2="180" />
-                                <line x1="50" y1="290" x2="75" y2="290" />
-                                <line x1="62" y1="180" x2="62" y2="290" />
-                                <path d="M 58 185 L 62 180 L 66 185 M 58 285 L 62 290 L 66 285" fill="none" stroke-dasharray="0" />
+                            <!-- ================= 1. LEFT SIDE: DISTANCE (d) MEASUREMENT ================= -->
+                            <g id="measurement-guide">
+                                <!-- Top Tick & Arrow (Moves dynamically with top plate) -->
+                                <g id="dist-top-group">
+                                    <line x1="125" y1="86" x2="155" y2="86" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <path d="M 131 92 L 135 86 L 139 92" fill="none" stroke="#38bdf8" stroke-width="2"/>
+                                </g>
+                                <!-- Fixed Bottom Tick & Arrow (Strictly locked to bottom plate y=186) -->
+                                <g id="dist-bottom-group">
+                                    <line x1="125" y1="186" x2="155" y2="186" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <path d="M 131 180 L 135 186 L 139 180" fill="none" stroke="#38bdf8" stroke-width="2"/>
+                                </g>
+                                <!-- Vertical Connecting Caliper Line -->
+                                <line id="dist-vert-line" x1="135" y1="86" x2="135" y2="186" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                <text id="distance-label" x="110" y="136" fill="#38bdf8" font-size="12" font-family="Outfit" font-weight="bold" transform="rotate(-90 110 136)" text-anchor="middle">Distance (d)</text>
                             </g>
-                            <text id="distance-label" x="42" y="240" fill="#3b82f6" font-size="14" font-family="Outfit" font-weight="bold" transform="rotate(-90 42 240)" text-anchor="middle">Distance (d)</text>
 
-                            <!-- Moving Assembly -->
+                            <!-- ================= 2. CENTER: MECHANICAL ASSEMBLY ================= -->
+                            
+                            <!-- Moving Assembly (Keycap, Stem, Top Plate) -->
                             <g id="moving-assembly">
                                 <!-- Keycap -->
-                                <path d="M 90 50 L 230 50 L 250 140 L 70 140 Z" fill="url(#capTop)" stroke="#0f172a" stroke-width="3"/>
-                                <path d="M 100 50 L 70 140" stroke="#0f172a" stroke-width="2" opacity="0.4"/>
-                                <path d="M 220 50 L 250 140" stroke="#0f172a" stroke-width="2" opacity="0.4"/>
-                                <text id="magnified-key-text" x="160" y="105" fill="#ffffff" font-size="34" font-family="Outfit" font-weight="black" text-anchor="middle">SPACE</text>
+                                <path d="M 195 24 L 265 24 L 280 62 L 180 62 Z" fill="url(#capTop)" stroke="#0f172a" stroke-width="2.5"/>
+                                <text id="magnified-key-text" x="230" y="49" fill="#ffffff" font-size="22" font-family="Outfit" font-weight="black" text-anchor="middle">SPACE</text>
                                 
                                 <!-- Stem -->
-                                <rect x="145" y="140" width="30" height="30" fill="#334155" />
+                                <rect x="217" y="62" width="26" height="18" fill="#334155" />
                                 
                                 <!-- Top Plate (Movable) -->
-                                <rect x="90" y="170" width="140" height="14" rx="3" fill="url(#plateGrad)" stroke="#475569" stroke-width="2"/>
-                                <text x="238" y="181" fill="#94a3b8" font-size="10" font-family="Tajawal" font-weight="bold">صفيحة علوية متحركة</text>
+                                <rect x="165" y="80" width="130" height="12" rx="3" fill="url(#plateGrad)" stroke="#475569" stroke-width="1.5"/>
                                 
                                 <!-- Negative Charges on Top Plate -->
-                                <g id="top-charges" fill="#00d2ff" font-size="14" font-family="Outfit" font-weight="bold">
-                                    <text x="100" y="181">-</text>
-                                    <text x="125" y="181">-</text>
-                                    <text x="150" y="181">-</text>
-                                    <text x="175" y="181">-</text>
-                                    <text x="200" y="181">-</text>
+                                <g id="top-charges" fill="#00d2ff" font-size="13" font-family="Outfit" font-weight="black">
+                                    <text x="175" y="90">-</text>
+                                    <text x="198" y="90">-</text>
+                                    <text x="221" y="90">-</text>
+                                    <text x="244" y="90">-</text>
+                                    <text x="267" y="90">-</text>
+                                    <text x="285" y="90">-</text>
                                 </g>
+
+                                <!-- Top Plate Anchor Dot -->
+                                <circle cx="295" cy="86" r="3" fill="#00d2ff"/>
                             </g>
+
+                            <!-- Dynamic Top Leader Line (Connects moving plate to top badge) -->
+                            <line id="top-leader-line" x1="295" y1="86" x2="340" y2="86" stroke="#00d2ff" stroke-width="1.5" stroke-dasharray="3 2" />
 
                             <!-- Flexible Dielectric Spring -->
                             <g id="dielectric-group">
-                                <rect id="dielectric-block" x="110" y="184" width="100" height="106" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" rx="4"/>
-                                <rect id="dielectric-pattern" x="110" y="184" width="100" height="106" fill="url(#diagonalHatch)" rx="4"/>
-                                <text x="218" y="240" fill="#f59e0b" font-size="10" font-family="Tajawal" font-weight="bold">عازل مرن (زنبرك)</text>
+                                <rect id="dielectric-block" x="185" y="92" width="90" height="88" fill="rgba(0, 210, 255, 0.08)" stroke="#00d2ff" stroke-width="1.2" stroke-dasharray="3 3" rx="3"/>
+                                <rect id="dielectric-pattern" x="185" y="92" width="90" height="88" fill="url(#diagonalHatch)" rx="3"/>
                             </g>
 
                             <!-- Fixed Bottom Plate -->
-                            <rect x="90" y="290" width="140" height="14" rx="3" fill="url(#plateGrad)" stroke="#475569" stroke-width="2"/>
-                            <text x="238" y="301" fill="#94a3b8" font-size="10" font-family="Tajawal" font-weight="bold">صفيحة سفلية ثابتة</text>
+                            <rect x="165" y="180" width="130" height="12" rx="3" fill="url(#plateGrad)" stroke="#475569" stroke-width="1.5"/>
                             
                             <!-- Positive Charges on Bottom Plate -->
-                            <g id="bottom-charges" fill="#ef4444" font-size="14" font-family="Outfit" font-weight="bold">
-                                <text x="100" y="302">+</text>
-                                <text x="125" y="302">+</text>
-                                <text x="150" y="302">+</text>
-                                <text x="175" y="302">+</text>
-                                <text x="200" y="302">+</text>
+                            <g id="bottom-charges" fill="#ef4444" font-size="13" font-family="Outfit" font-weight="black">
+                                <text x="175" y="190">+</text>
+                                <text x="198" y="190">+</text>
+                                <text x="221" y="190">+</text>
+                                <text x="244" y="190">+</text>
+                                <text x="267" y="190">+</text>
+                                <text x="285" y="190">+</text>
                             </g>
 
                             <!-- Electric Field Lines -->
-                            <g id="e-field-lines" stroke="#ffffff" stroke-width="2" stroke-dasharray="3 3" opacity="0.3">
-                                <line x1="115" y1="184" x2="115" y2="290" class="field-line-dynamic" />
-                                <line x1="160" y1="184" x2="160" y2="290" class="field-line-dynamic" />
-                                <line x1="205" y1="184" x2="205" y2="290" class="field-line-dynamic" />
+                            <g id="e-field-lines" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.35">
+                                <line x1="195" y1="92" x2="195" y2="180" class="field-line-dynamic" />
+                                <line x1="230" y1="92" x2="230" y2="180" class="field-line-dynamic" />
+                                <line x1="265" y1="92" x2="265" y2="180" class="field-line-dynamic" />
                             </g>
 
                             <!-- PCB Base -->
-                            <path d="M 40 304 L 280 304 L 295 330 L 25 330 Z" fill="url(#pcbGrad)" stroke="#047857" stroke-width="2"/>
+                            <path d="M 130 194 L 330 194 L 345 220 L 115 220 Z" fill="url(#pcbGrad)" stroke="#047857" stroke-width="2"/>
                             <!-- Circuit Traces -->
-                            <path d="M 60 316 L 110 316 L 130 322 L 180 322" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
-                            <circle cx="180" cy="322" r="3" fill="#10b981"/>
-                            <circle cx="60" cy="316" r="3" fill="#10b981"/>
-                            <text x="240" y="322" fill="#a7f3d0" font-size="11" font-family="Outfit" font-weight="bold">PCB Controller</text>
+                            <path d="M 140 207 L 180 207 L 200 213 L 260 213" fill="none" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+                            <circle cx="260" cy="213" r="2.5" fill="#10b981"/>
+                            <circle cx="140" cy="207" r="2.5" fill="#10b981"/>
                             
-                            <!-- Signal Pulse on PCB -->
-                            <path id="pcb-signal" d="M 130 304 L 130 322 L 180 322" fill="none" stroke="#00d2ff" stroke-width="4" filter="url(#pcbGlow)" opacity="0"/>
+                            <!-- High-Tech Signal & Spark on PCB -->
+                            <!-- 1. Contact Spark Arc at Base Connection (200, 194) -->
+                            <g id="pcb-contact-spark" opacity="0" transform="translate(200, 194)">
+                                <circle id="pcb-spark-ring" r="0" fill="none" stroke="#00f0ff" stroke-width="2" opacity="0.9" />
+                                <path d="M 0 0 L -6 -8 L -2 -3 L -10 -2 L -3 1 L -8 9 L -1 3 L 2 10 L 3 2 L 9 5 L 4 -2 L 10 -7 L 2 -4 Z" fill="#ffffff" stroke="#00d2ff" stroke-width="1.2" filter="url(#sparkGlow)" />
+                                <circle cx="0" cy="0" r="3.5" fill="#ffffff" filter="url(#sparkGlow)" />
+                            </g>
+
+                            <!-- 2. Dual-Layer Plasma Signal Pulse along PCB Trace -->
+                            <path id="pcb-signal-glow" d="M 200 194 L 200 213 L 260 213" fill="none" stroke="#00e5ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#sparkGlow)" opacity="0"/>
+                            <path id="pcb-signal-core" d="M 200 194 L 200 213 L 260 213" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+                            <circle id="pcb-signal-head" cx="200" cy="194" r="5" fill="#ffffff" stroke="#00f0ff" stroke-width="2" filter="url(#sparkGlow)" opacity="0"/>
+
+                            <!-- 3. Micro-Burst Flash at Controller IC (260, 213) -->
+                            <g id="pcb-terminal-spark" opacity="0" transform="translate(260, 213)">
+                                <circle id="terminal-burst-ring" r="0" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.9"/>
+                                <path d="M -8 0 L 8 0 M 0 -8 L 0 8 M -5 -5 L 5 5 M -5 5 L 5 -5" stroke="#ffffff" stroke-width="2" filter="url(#sparkGlow)"/>
+                                <circle cx="0" cy="0" r="4.5" fill="#ffffff" filter="url(#sparkGlow)"/>
+                            </g>
+
+                            <!-- ================= 3. RIGHT SIDE: UNIFIED HIGH-TECH CALLOUTS ================= -->
+                            
+                            <!-- Callout 1: Top Movable Plate -->
+                            <g class="callout-group" transform="translate(340, 74)">
+                                <rect width="165" height="24" rx="6" fill="#0b1329" stroke="rgba(0, 210, 255, 0.45)" stroke-width="1.2"/>
+                                <circle cx="12" cy="12" r="3" fill="#00d2ff"/>
+                                <text x="88" y="16" text-anchor="middle" fill="#f8fafc" font-size="11" font-family="Tajawal" font-weight="bold">صفيحة علوية (متحركة)</text>
+                            </g>
+
+                            <!-- Callout 2: Dielectric Spring -->
+                            <g class="callout-group">
+                                <line x1="275" y1="136" x2="340" y2="136" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                <circle cx="275" cy="136" r="3" fill="#38bdf8"/>
+                                <g transform="translate(340, 124)">
+                                    <rect width="165" height="24" rx="6" fill="#0b1329" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2"/>
+                                    <circle cx="12" cy="12" r="3" fill="#38bdf8"/>
+                                    <text x="88" y="16" text-anchor="middle" fill="#f8fafc" font-size="11" font-family="Tajawal" font-weight="bold">عازل مرن (زنبرك)</text>
+                                </g>
+                            </g>
+
+                            <!-- Callout 3: Bottom Fixed Plate -->
+                            <g class="callout-group">
+                                <line x1="295" y1="186" x2="340" y2="186" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                <circle cx="295" cy="186" r="3" fill="#ef4444"/>
+                                <g transform="translate(340, 174)">
+                                    <rect width="165" height="24" rx="6" fill="#0b1329" stroke="rgba(239, 68, 68, 0.45)" stroke-width="1.2"/>
+                                    <circle cx="12" cy="12" r="3" fill="#ef4444"/>
+                                    <text x="88" y="16" text-anchor="middle" fill="#f8fafc" font-size="11" font-family="Tajawal" font-weight="bold">صفيحة سفلية (ثابتة)</text>
+                                </g>
+                            </g>
+
+                            <!-- Callout 4: PCB Controller -->
+                            <g class="callout-group">
+                                <line x1="330" y1="207" x2="340" y2="224" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                <circle cx="330" cy="207" r="3" fill="#10b981"/>
+                                <g transform="translate(340, 212)">
+                                    <rect width="165" height="24" rx="6" fill="#0b1329" stroke="rgba(16, 185, 129, 0.45)" stroke-width="1.2"/>
+                                    <circle cx="12" cy="12" r="3" fill="#10b981"/>
+                                    <text x="88" y="16" text-anchor="middle" fill="#f8fafc" font-size="11" font-family="Tajawal" font-weight="bold">شريحة التحكم (PCB)</text>
+                                </g>
+                            </g>
                         </svg>
                     </div>
 
@@ -379,7 +464,7 @@
                                 <span id="dist-value" class="text-sm font-black text-blue-300 font-en">100%</span>
                             </div>
                             <div class="dash-bar-container">
-                                <div id="dist-bar" class="dash-bar-fill bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" style="width: 100%"></div>
+                                <div id="dist-bar" class="dash-bar-fill" style="width: 100%; background: linear-gradient(90deg, #2563eb, #3b82f6); box-shadow: 0 0 10px rgba(59,130,246,0.8);"></div>
                             </div>
                         </div>
 
@@ -390,7 +475,7 @@
                                 <span id="cap-value" class="text-sm font-black text-cyan-300 font-en">10%</span>
                             </div>
                             <div class="dash-bar-container">
-                                <div id="cap-bar" class="dash-bar-fill bg-cyan-400 shadow-[0_0_8px_rgba(0,210,255,0.8)]" style="width: 10%"></div>
+                                <div id="cap-bar" class="dash-bar-fill" style="width: 10%; background: linear-gradient(90deg, #00d2ff, #38bdf8); box-shadow: 0 0 10px rgba(0,210,255,0.8);"></div>
                             </div>
                         </div>
 
@@ -409,9 +494,9 @@
 
     </main>
 
-    <!-- COLLAPSIBLE EDUCATIONAL DRAWER / MODAL -->
-    <div id="drawer-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 pointer-events-none opacity-0 flex items-end md:items-center justify-center p-0 md:p-6">
-        <div id="scientific-drawer" class="w-full max-w-[750px] bg-slate-950/95 border border-cyan-500/30 rounded-t-[28px] md:rounded-[28px] p-6 shadow-2xl transform translate-y-full flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+    <!-- COLLAPSIBLE EDUCATIONAL DRAWER / MODAL (Premium Glassy Styling) -->
+    <div id="drawer-backdrop" class="fixed inset-0 z-50 pointer-events-none opacity-0 flex items-end md:items-center justify-center p-0 md:p-6">
+        <div id="scientific-drawer" class="w-full max-w-[750px] rounded-t-[28px] md:rounded-[28px] p-6 shadow-2xl transform translate-y-full flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
             
             <div class="flex items-center justify-between border-b border-white/10 pb-3">
                 <div class="flex items-center gap-2">
@@ -430,7 +515,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 
-                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col gap-1.5">
+                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-cyan-400">
                     <h3 class="font-bold text-cyan-400 flex items-center gap-1.5">
                         <span class="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-[10px]">1</span>
                         التركيب الأساسي
@@ -440,7 +525,7 @@
                     </p>
                 </div>
 
-                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-amber-500/30 flex flex-col gap-1.5">
+                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-amber-400">
                     <h3 class="font-bold text-amber-400 flex items-center gap-1.5">
                         <span class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px]">2</span>
                         عند الضغط على المفتاح
@@ -450,17 +535,17 @@
                     </p>
                 </div>
 
-                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-cyan-500/30 flex flex-col gap-1.5">
+                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-cyan-400">
                     <h3 class="font-bold text-cyan-400 flex items-center gap-1.5">
                         <span class="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-[10px]">3</span>
                         التغير في السعة الكهربائية
                     </h3>
                     <p class="text-slate-300 leading-relaxed text-justify">
-                        بما أن السعة تتناسب عكسياً مع البعد ($C \propto \frac{1}{d}$)، فإن نقصان ($d$) يؤدي إلى <strong class="text-white">ازدياد سعة المتسعة</strong> فوراً وبشكل ملحوظ.
+                        بما أن السعة تتناسب عكسياً مع البعد (<span class="font-en text-cyan-300 font-bold">C ∝ 1/d</span>)، فإن نقصان (<span class="font-en text-blue-300 font-bold">d</span>) يؤدي إلى <strong class="text-white">ازدياد سعة المتسعة</strong> فوراً وبشكل ملحوظ.
                     </p>
                 </div>
 
-                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-emerald-500/30 flex flex-col gap-1.5">
+                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-emerald-400">
                     <h3 class="font-bold text-emerald-400 flex items-center gap-1.5">
                         <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">4</span>
                         توليد الإشارة الإلكترونية
@@ -472,12 +557,12 @@
 
             </div>
 
-            <div class="mt-1 p-3 bg-cyan-950/30 border border-cyan-500/20 rounded-xl flex items-center justify-between">
+            <div class="mt-1 p-3 bg-cyan-950/40 border border-cyan-500/30 rounded-xl flex items-center justify-between">
                 <span class="text-slate-300 text-xs">العلاقة الرياضية الأساسية:</span>
                 <span class="font-en text-cyan-400 font-bold text-sm tracking-wider">C = ε₀ · (A / d)</span>
             </div>
 
-            <button id="btn-close-drawer-bottom" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition">
+            <button id="btn-close-drawer-bottom" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-white/10">
                 إغلاق الشرح والعودة للتجربة
             </button>
 
@@ -516,10 +601,15 @@
             const dielectricBlock = document.getElementById('dielectric-block');
             const dielectricPattern = document.getElementById('dielectric-pattern');
             const fieldLines = document.querySelectorAll('.field-line-dynamic');
-            const measurementGuide = document.getElementById('measurement-guide');
             
-            // PCB elements
-            const pcbSignal = document.getElementById('pcb-signal');
+            // PCB elements & Spark components
+            const pcbSignalGlow = document.getElementById('pcb-signal-glow');
+            const pcbSignalCore = document.getElementById('pcb-signal-core');
+            const pcbSignalHead = document.getElementById('pcb-signal-head');
+            const pcbContactSpark = document.getElementById('pcb-contact-spark');
+            const pcbSparkRing = document.getElementById('pcb-spark-ring');
+            const pcbTerminalSpark = document.getElementById('pcb-terminal-spark');
+            const terminalBurstRing = document.getElementById('terminal-burst-ring');
             const pcbAlert = document.getElementById('pcb-alert');
             const circuitBadge = document.getElementById('circuit-state-badge');
             const liveStatus = document.getElementById('live-physics-status');
@@ -543,22 +633,29 @@
                     pcbAlert.innerHTML = `⚡ Signal: [${keyChar}]`;
                 }
 
-                // 1. Moving assembly drops down by 55px
-                gsap.to(movingAssembly, { y: 55, duration: 0.12, ease: "power2.out" });
+                // 1. Moving assembly drops down by 45px
+                gsap.to(movingAssembly, { y: 45, duration: 0.12, ease: "power2.out" });
                 
                 // 2. Compress Dielectric
                 gsap.to([dielectricBlock, dielectricPattern], { 
-                    y: 55, 
-                    height: 51, 
+                    y: 45, 
+                    height: 43, 
                     duration: 0.12, 
                     ease: "power2.out" 
                 });
 
-                // 3. Compress Field Lines & Measurement Guide
-                gsap.to(fieldLines, { attr: { y1: 239 }, duration: 0.12, ease: "power2.out" });
-                gsap.to(measurementGuide, { y: 55, scaleY: 0.5, transformOrigin: "bottom", duration: 0.12, ease: "power2.out" });
+                // 3. Compress Field Lines
+                gsap.to(fieldLines, { attr: { y1: 137 }, duration: 0.12, ease: "power2.out" });
 
-                // 4. Update Dashboard (d goes down to 30%, C spikes to 90%)
+                // 4. Update Distance Caliper (Top tick drops 45px, vertical line connects to fixed 186, bottom tick stays locked at 186)
+                gsap.to('#dist-top-group', { y: 45, duration: 0.12, ease: "power2.out" });
+                gsap.to('#dist-vert-line', { attr: { y1: 131 }, duration: 0.12, ease: "power2.out" });
+                gsap.to('#distance-label', { y: 22.5, duration: 0.12, ease: "power2.out" });
+
+                // 5. Update Top Leader Line (Connects moving plate y=131 to fixed badge y=86)
+                gsap.to('#top-leader-line', { attr: { y1: 131 }, duration: 0.12, ease: "power2.out" });
+
+                // 6. Update Dashboard (d goes down to 30%, C spikes to 90%)
                 gsap.to({ dist: 100, cap: 10 }, {
                     dist: 30,
                     cap: 90,
@@ -574,9 +671,69 @@
                     }
                 });
 
-                // 5. PCB Signal Pulse
-                gsap.to(pcbSignal, { opacity: 1, duration: 0.08, delay: 0.05 });
-                gsap.to(pcbSignal, { strokeDashoffset: -100, strokeDasharray: "20 100", duration: 0.35, ease: "linear" });
+                // 7. Enhanced SOTA PCB Spark & Signal Pulse
+                // A. Instant Contact Arc Burst & Shockwave Ring at (200, 194)
+                gsap.killTweensOf([pcbContactSpark, pcbSparkRing, pcbSignalGlow, pcbSignalCore, pcbSignalHead, pcbTerminalSpark, terminalBurstRing]);
+                
+                gsap.fromTo(pcbContactSpark, 
+                    { opacity: 1, scale: 0.5, transformOrigin: "center center" }, 
+                    { opacity: 0, scale: 1.4, duration: 0.22, ease: "power1.out", delay: 0.04 }
+                );
+                gsap.fromTo(pcbSparkRing, 
+                    { attr: { r: 1 }, opacity: 1 }, 
+                    { attr: { r: 18 }, opacity: 0, duration: 0.25, ease: "power2.out", delay: 0.04 }
+                );
+
+                // B. Dual-Layer Plasma Pulse Flowing to Controller
+                gsap.set([pcbSignalGlow, pcbSignalCore], { strokeDasharray: "40 120", strokeDashoffset: 60, opacity: 1 });
+                gsap.to([pcbSignalGlow, pcbSignalCore], { 
+                    strokeDashoffset: -70, 
+                    duration: 0.28, 
+                    delay: 0.05, 
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        gsap.to([pcbSignalGlow, pcbSignalCore], { opacity: 0, duration: 0.1 });
+                    }
+                });
+
+                // C. Traveling Spark Head Particle
+                gsap.fromTo(pcbSignalHead,
+                    { opacity: 1, attr: { cx: 200, cy: 194 } },
+                    { 
+                        duration: 0.28,
+                        delay: 0.05,
+                        ease: "power2.inOut",
+                        onUpdate: function() {
+                            const prog = this.progress();
+                            if (prog < 0.25) {
+                                const subProg = prog / 0.25;
+                                pcbSignalHead.setAttribute('cx', 200);
+                                pcbSignalHead.setAttribute('cy', 194 + 19 * subProg);
+                            } else {
+                                const subProg = (prog - 0.25) / 0.75;
+                                pcbSignalHead.setAttribute('cx', 200 + 60 * subProg);
+                                pcbSignalHead.setAttribute('cy', 213);
+                            }
+                        },
+                        onComplete: () => {
+                            gsap.to(pcbSignalHead, { opacity: 0, duration: 0.08 });
+                        }
+                    }
+                );
+
+                // D. Terminal Impact Burst at IC Controller (260, 213)
+                gsap.fromTo(pcbTerminalSpark,
+                    { opacity: 0, scale: 0.4, transformOrigin: "center center" },
+                    { opacity: 1, scale: 1.4, duration: 0.12, delay: 0.28, ease: "back.out(2)", 
+                      onComplete: () => {
+                          gsap.to(pcbTerminalSpark, { opacity: 0, scale: 1.8, duration: 0.18 });
+                      }
+                    }
+                );
+                gsap.fromTo(terminalBurstRing,
+                    { attr: { r: 1 }, opacity: 1 },
+                    { attr: { r: 16 }, opacity: 0, duration: 0.25, delay: 0.28, ease: "power2.out" }
+                );
                 
                 // Alert badge
                 pcbAlert.classList.remove('opacity-0', 'translate-y-1');
@@ -588,7 +745,7 @@
                 }
 
                 if (liveStatus) {
-                    liveStatus.innerHTML = `حالة الضغط: قل البعد <span class="text-blue-400 font-en">(d ↓)</span> $\implies$ ارتفعت السعة فوراً <span class="text-cyan-400 font-en">(C ↑)</span> لتسجيل النبضة!`;
+                    liveStatus.innerHTML = `حالة الضغط: قل البعد <span class="text-blue-400 font-en font-bold">(d ↓)</span> ← ارتفعت السعة فوراً <span class="text-cyan-400 font-en font-bold">(C ↑)</span> لتسجيل النبضة!`;
                 }
             };
 
@@ -602,16 +759,23 @@
                 // 2. Decompress Dielectric (elastic spring)
                 gsap.to([dielectricBlock, dielectricPattern], { 
                     y: 0, 
-                    height: 106, 
+                    height: 88, 
                     duration: 0.4, 
                     ease: "elastic.out(1, 0.45)" 
                 });
 
-                // 3. Decompress Field Lines & Measurement Guide
-                gsap.to(fieldLines, { attr: { y1: 184 }, duration: 0.4, ease: "elastic.out(1, 0.45)" });
-                gsap.to(measurementGuide, { y: 0, scaleY: 1, duration: 0.4, ease: "elastic.out(1, 0.45)" });
+                // 3. Decompress Field Lines
+                gsap.to(fieldLines, { attr: { y1: 92 }, duration: 0.4, ease: "elastic.out(1, 0.45)" });
 
-                // 4. Update Dashboard
+                // 4. Reset Distance Caliper
+                gsap.to('#dist-top-group', { y: 0, duration: 0.4, ease: "elastic.out(1, 0.45)" });
+                gsap.to('#dist-vert-line', { attr: { y1: 86 }, duration: 0.4, ease: "elastic.out(1, 0.45)" });
+                gsap.to('#distance-label', { y: 0, duration: 0.4, ease: "elastic.out(1, 0.45)" });
+
+                // 5. Reset Top Leader Line
+                gsap.to('#top-leader-line', { attr: { y1: 86 }, duration: 0.4, ease: "elastic.out(1, 0.45)" });
+
+                // 6. Update Dashboard
                 gsap.to({ dist: 30, cap: 90 }, {
                     dist: 100,
                     cap: 10,
@@ -627,9 +791,9 @@
                     }
                 });
 
-                // 5. Reset PCB
-                gsap.to(pcbSignal, { opacity: 0, duration: 0.15 });
-                gsap.set(pcbSignal, { strokeDashoffset: 0, strokeDasharray: "none", delay: 0.15 });
+                // 7. Reset PCB Spark & Signal Elements
+                gsap.killTweensOf([pcbContactSpark, pcbSparkRing, pcbSignalGlow, pcbSignalCore, pcbSignalHead, pcbTerminalSpark, terminalBurstRing]);
+                gsap.to([pcbSignalGlow, pcbSignalCore, pcbSignalHead, pcbContactSpark, pcbTerminalSpark], { opacity: 0, duration: 0.12 });
 
                 pcbAlert.classList.add('opacity-0', 'translate-y-1');
                 pcbAlert.classList.remove('opacity-100', 'translate-y-0');
@@ -640,7 +804,7 @@
                 }
 
                 if (liveStatus) {
-                    liveStatus.innerHTML = `حالة السكون: البعد <span class="text-blue-400 font-en">(d)</span> كبير $\implies$ السعة <span class="text-cyan-400 font-en">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!`;
+                    liveStatus.innerHTML = `حالة السكون: البعد <span class="text-blue-400 font-en font-bold">(d)</span> كبير ← السعة <span class="text-cyan-400 font-en font-bold">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!`;
                 }
             };
 

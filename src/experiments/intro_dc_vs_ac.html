@@ -220,6 +220,10 @@
             width: 100%;
             display: flex;
             justify-content: center;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            line-height: 1.4;
             align-items: center;
             position: relative;
         }
@@ -276,17 +280,15 @@
         /* Footer Console */
         .footer-console {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 10px 20px;
+            padding: 8px 20px;
             background-color: #090e17;
             border-top: 1px solid rgba(0, 210, 255, 0.2);
             flex-shrink: 0;
             z-index: 40;
-            min-height: 70px;
-            gap: 10px;
+            height: 70px;
             box-sizing: border-box;
         }
 
@@ -346,7 +348,7 @@
 <body class="w-screen h-screen flex flex-col overflow-hidden">
 
     <!-- Top Navigation Bar -->
-    <header class="flex flex-wrap md:flex-nowrap items-center justify-between px-6 py-2 border-b border-cyber-border bg-cyber-panel flex-shrink-0 min-h-[54px] gap-3">
+    <header class="flex items-center justify-between px-6 py-2 border-b border-cyber-border bg-cyber-panel flex-shrink-0" style="height: 54px;">
         <div class="flex items-center gap-3">
             <i class="fa-solid fa-code-compare text-cyber-cyan text-lg"></i>
             <h1 class="text-sm md:text-base font-black text-white">
@@ -373,10 +375,10 @@
     </header>
 
     <!-- Main Layout (In RTL: 1st Child is RIGHT, 2nd is CENTER, 3rd is LEFT) -->
-    <div class="flex flex-col md:flex-row flex-1 gap-3 p-3 overflow-y-auto md:overflow-hidden min-h-0">
+    <div class="flex flex-1 gap-3 p-3 overflow-hidden min-h-0">
 
         <!-- 1. RIGHT PANEL: Dynamic Toolbox (HTML) -->
-        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl w-full md:w-[175px] flex-shrink-0 z-50" id="toolbox">
+        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl" id="toolbox" style="width: 175px; flex-shrink: 0; z-index: 50;">
             <div class="bg-gradient-to-r from-cyan-950/50 to-transparent border-b border-cyan-500/20 px-3 py-2.5 text-xs font-bold text-cyan-400 flex items-center gap-2">
                 <i class="fa-solid fa-toolbox"></i>
                 <span>صندوق الأدوات</span>
@@ -575,7 +577,7 @@
         </div>
 
         <!-- 2. CENTER: Main Sandbox Workspace -->
-        <div class="flex-1 workspace-area min-h-[50vh] md:min-h-0" id="workspace">
+        <div class="flex-1 workspace-area" id="workspace" style="width: 780px; height: 460px;">
             <!-- Canvas for Circuit Wiring Skeleton, 4 Dashed Slots, and Animated Charge Particles -->
             <canvas id="workspace-canvas" style="position:absolute; inset:0; width:100%; height:100%; z-index:10;"></canvas>
 
@@ -596,7 +598,7 @@
         </div>
 
         <!-- 3. LEFT PANEL: Graph & Live Measurements -->
-        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl w-full md:w-[240px] flex-shrink-0 z-50" id="graph-panel">
+        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl" id="graph-panel" style="width: 240px; flex-shrink: 0; z-index: 50;">
             <div class="bg-gradient-to-r from-cyan-950/50 to-transparent border-b border-cyan-500/20 px-4 py-2.5 text-xs font-bold text-cyan-400 flex items-center justify-between">
                 <span class="flex items-center gap-2">
                     <i class="fa-solid fa-chart-line"></i>
@@ -646,7 +648,7 @@
         </div>
 
         <!-- Sliders (Center) -->
-        <div class="flex flex-wrap justify-center items-center gap-3 md:gap-5 w-full md:w-auto">
+        <div class="flex items-center gap-5">
             <!-- Voltage Slider -->
             <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-cyan-500/30 shadow-inner">
                 <label id="volt-slider-lbl" class="text-xs font-bold text-cyan-400">فولتية المصدر V</label>
@@ -661,8 +663,8 @@
                 <span id="res-val" class="text-xs text-white font-bold w-12 text-left font-mono" dir="ltr">10 Ω</span>
             </div>
 
-            <!-- Frequency Slider (Only visible in AC) -->
-            <div id="freq-ctrl-box" class="items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-green-500/30 shadow-inner" style="display: none;">
+            <!-- Frequency Slider (Only active in AC) -->
+            <div id="freq-ctrl-box" class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-green-500/30 shadow-inner opacity-40 pointer-events-none transition-opacity">
                 <label class="text-xs font-bold text-green-400">التردد f</label>
                 <input type="range" id="freq-slider" min="10" max="60" value="50" step="1" class="w-24 accent-green-400 cursor-pointer">
                 <span id="freq-val" class="text-xs text-white font-bold w-12 text-left font-mono" dir="ltr">50 Hz</span>
@@ -936,7 +938,7 @@
 
                 modeDescText.textContent = 'التيار المستمر (DC): تيار ثابت المقدار والاتجاه مع مرور الزمن، ينساب باتجاه واحد من القطب الموجب إلى السالب.';
 
-                if (freqCtrlBox) freqCtrlBox.style.display = 'none';
+                freqCtrlBox.classList.add('opacity-40', 'pointer-events-none');
             } else {
                 tabDc.className = 'mode-tab-btn inactive';
                 tabAc.className = 'mode-tab-btn active-ac';
@@ -954,7 +956,7 @@
 
                 modeDescText.textContent = 'التيار المتناوب (AC): تيار يتغير دورياً مع الزمن وينعكس اتجاهه مرتين في الدورة الواحدة بموجة جيبية.';
 
-                if (freqCtrlBox) freqCtrlBox.style.display = 'flex';
+                freqCtrlBox.classList.remove('opacity-40', 'pointer-events-none');
             }
 
             updateToolboxVisibility();
@@ -1133,47 +1135,12 @@
             };
         }
 
-        // Clean 90-degree outer corner circuit wiring aligned with the perimeter track
+        // Clean 90-degree orthogonal circuit wiring
         function createOrthogonalPath(x1, y1, x2, y2) {
-            const wsRect = workspaceEl.getBoundingClientRect();
-            const W = wsRect.width || 800;
-            const H = wsRect.height || 600;
-
-            const centerX = W / 2;
-            const centerY = H / 2;
-            const leftX = centerX - 0.32 * W;
-            const rightX = centerX + 0.32 * W;
-            const topY = centerY - 0.30 * H;
-            const bottomY = centerY + 0.30 * H;
-
-            const minX = Math.min(x1, x2);
-            const maxX = Math.max(x1, x2);
-            const minY = Math.min(y1, y2);
-            const maxY = Math.max(y1, y2);
-
-            // 1. Top-Left: Ammeter (Left) <-> Resistor (Top)
-            if (minX <= centerX + 30 && minY <= centerY + 30 && minX < centerX - 0.10 * W && minY < centerY - 0.10 * H) {
-                return `M ${x1} ${y1} L ${leftX} ${topY} L ${x2} ${y2}`;
-            }
-
-            // 2. Top-Right: Resistor (Top) <-> Switch (Right)
-            if (maxX >= centerX - 30 && minY <= centerY + 30 && maxX > centerX + 0.10 * W && minY < centerY - 0.10 * H) {
-                return `M ${x1} ${y1} L ${rightX} ${topY} L ${x2} ${y2}`;
-            }
-
-            // 3. Bottom-Right: Switch (Right) <-> Source (Bottom)
-            if (maxX >= centerX - 30 && maxY >= centerY - 30 && maxX > centerX + 0.10 * W && maxY > centerY + 0.10 * H) {
-                return `M ${x1} ${y1} L ${rightX} ${bottomY} L ${x2} ${y2}`;
-            }
-
-            // 4. Bottom-Left: Source (Bottom) <-> Ammeter (Left)
-            if (minX <= centerX + 30 && maxY >= centerY - 30 && minX < centerX - 0.10 * W && maxY > centerY + 0.10 * H) {
-                return `M ${x1} ${y1} L ${leftX} ${bottomY} L ${x2} ${y2}`;
-            }
-
-            // Generic fallback
             const dx = Math.abs(x2 - x1);
             const dy = Math.abs(y2 - y1);
+            
+            // Choose corner routing based on relative geometry
             if (dx > dy) {
                 return `M ${x1} ${y1} L ${x2} ${y1} L ${x2} ${y2}`;
             } else {
@@ -1913,11 +1880,10 @@
                 ctx.shadowBlur = 10;
 
                 ctx.beginPath();
-                const cycles = 1.0 + (f / 50) * 2.0;
-                const speed = f / 12;
                 for (let px = padL; px <= padL + graphW; px += 1.5) {
                     const t = (px - padL) / graphW;
-                    const py = centerY - Math.sin((t * cycles * 2 * Math.PI) - (animTime * speed)) * amplitude;
+                    const cycles = 2.5;
+                    const py = centerY - Math.sin((t * cycles * 2 * Math.PI) - (animTime * 3)) * amplitude;
 
                     if (px === padL) ctx.moveTo(px, py);
                     else ctx.lineTo(px, py);
@@ -1946,6 +1912,11 @@
             ctx.fill();
         }
     </script>
+    <script>
+        if(window.initRaqeemResponsive) { window.initRaqeemResponsive('#workspace', 780, 460); }
+    </script>
 </body>
 
 </html>
+
+

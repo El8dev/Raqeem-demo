@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مختبر الفيزياء | دائرة تيار متناوب - مقاومة صرف</title>
+    
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    
+    <!-- GSAP (No jsPlumb needed for this wiring engine) -->
+    <script src="../libs/gsap.min.js"></script>
+    <script src="../libs/Draggable.min.js"></script>
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    
+    <!-- Elite Components & Dragging Engine -->
+    <script src="../engine/elite-components.js"></script>
+    
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.window.tailwind = window.tailwind || {}; window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            off: '#07090e',
+                            on: '#0f131a',
+                            panel: '#0d1420',
+                            border: 'rgba(0, 210, 255, 0.2)',
+                            gold: '#ffe082',
+                            orange: '#ff9f43',
+                            cyan: '#00d2ff',
+                            green: '#2ecc71',
+                            red: '#ef4444',
+                            blue: '#3b82f6'
+                        }
+                    },
+                    fontFamily: {
+                        ar: ['Tajawal', 'sans-serif'],
+                        en: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #07090e;
+            color: #e2e8f0;
+            font-family: 'Tajawal', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .workspace-area {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0e1e38 0%, #050810 100%);
+            border-radius: 12px;
+            position: relative;
+            border: 2px solid rgba(0, 210, 255, 0.15);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+            overflow: hidden;
+        }
+
+        /* Custom SVG Wires Canvas */
+        #svg-wires-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        
+        .custom-wire {
+            fill: none;
+            stroke: #00f3ff;
+            stroke-width: 4px;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
+            transition: filter 0.1s;
+        }
+
+        .ghost-wire {
+            fill: none;
+            stroke: #00f3ff;
+            stroke-width: 4px;
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.8));
+            pointer-events: none;
+        }
+
+        .circuit-skeleton {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            border: 2px dashed rgba(0, 210, 255, 0.15);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 3-Zone Footer Architecture */
+        .footer-console {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 24px;
+            background-color: #0b1120;
+            border-top: 1px solid rgba(0, 210, 255, 0.15);
+            flex-shrink: 0;
+            z-index: 30;
+            height: 75px;
+            box-sizing: border-box;
+        }
+
+        .footer-right {
+            flex: 1 1 0%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .footer-center {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tab-pill-box {
+            display: flex;
+            gap: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 6px 12px;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.05);
+        }
+
+        .tab-pill-btn {
+            position: relative;
+            padding: 10px 35px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid transparent;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .tab-pill-btn.inactive {
+            background-color: transparent;
+            color: #94a3b8;
+            border-color: transparent;
+        }
+        .tab-pill-btn.inactive:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-pill-btn.active-resistor {
+            background-color: rgba(6, 182, 212, 0.25);
+            color: #22d3ee;
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .tab-pill-btn.active-power {
+            background-color: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .footer-left {
+            flex: 1 1 0%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            min-width: 0;
+        }
+
+        /* Delete Button (X) */
+        .wire-del-btn {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            font-family: sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+            transform: translate(-50%, -50%);
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+        .wire-del-btn:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: #ef4444;
+        }
+
+        /* Terminals */
+        .terminal-node {
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            border: 3px solid #64748b;
+            border-radius: 50%;
+            position: absolute;
+            cursor: crosshair;
+            z-index: 30;
+            transition: all 0.2s;
+            pointer-events: auto;
+            margin-left: -8px;
+            margin-top: -8px;
+        }
+        .terminal-node:hover {
+            transform: scale(1.3);
+            background: #ff9f43;
+            border-color: #fff;
+            box-shadow: 0 0 10px #ff9f43;
+        }
+        .terminal-node.target-glow {
+            animation: pulseGlow 1.2s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: scale(1.2); }
+            50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: scale(1.5); }
+            100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: scale(1.2); }
+        }
+
+        /* Inventory Component Reset */
+        #inventory .component-wrapper {
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+        #inventory .elite-component {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            margin: 0 auto !important;
+            cursor: grab;
+            max-width: 90px !important;
+            max-height: 90px !important;
+            transform: scale(0.9);
+            transform-origin: center top;
+        }
+        #inventory .elite-component > svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #inventory .elite-component:active {
+            cursor: grabbing;
+        }
+
+        .component {
+            position: absolute;
+            z-index: 20;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* Dropzones */
+        .dropzone {
+            position: absolute;
+            border: 2px dashed rgba(0, 210, 255, 0.4);
+            border-radius: 12px;
+            background: rgba(0, 210, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            line-height: 1.4;
+            color: rgba(0,210,255,0.55);
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 5;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .dropzone.highlight {
+            border-color: rgba(0, 210, 255, 0.8);
+            background: rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+        .dropzone.occupied {
+            border-color: rgba(46, 204, 113, 0.5);
+            background: transparent;
+            color: transparent;
+        }
+
+        /* Oscilloscopes / Monitors */
+        .osc-screen {
+            flex: 1;
+            background: #020a14;
+            border: 1.5px solid #1e3a4a;
+            border-radius: 10px;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 0 12px rgba(0,210,255,0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+            margin-bottom: 12px;
+        }
+        .osc-screen:last-child { margin-bottom: 0; }
+        .osc-header {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 10px 4px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(30,58,74,0.8);
+        }
+        .osc-canvas-wrap {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-image:
+                linear-gradient(rgba(0,210,255,0.055) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,210,255,0.055) 1px, transparent 1px);
+            background-size: 22px 22px;
+        }
+        .osc-canvas-wrap canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Formulas Modal */
+        #formulas-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #formulas-overlay.open { opacity: 1; pointer-events: all; }
+        #formulas-modal-box {
+            background: #0d1420;
+            border: 1px solid rgba(0,210,255,0.28);
+            border-radius: 22px;
+            padding: 30px 28px;
+            width: 430px;
+            max-width: 95vw;
+            box-shadow: 0 0 70px rgba(0,210,255,0.12), 0 30px 80px rgba(0,0,0,0.8);
+            transform: scale(0.94) translateY(16px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #formulas-overlay.open #formulas-modal-box { transform: scale(1) translateY(0); }
+        .formula-box { border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+        .formula-box p { color: #64748b; font-size: 0.82rem; font-weight: 700; margin-bottom: 8px; }
+        .formula-eq { font-family: 'Outfit', monospace; font-size: 1.4rem; font-weight: 900; text-align: center; letter-spacing: 0.04em; }
+        .formula-eq sub { font-size: 0.65em; }
+
+        .sandbox-badge {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,210,255,0.07);
+            border: 1px solid rgba(0,210,255,0.18);
+            border-radius: 8px;
+            padding: 4px 14px;
+            font-size: 0.75rem;
+            color: rgba(0,210,255,0.65);
+            font-weight: 700;
+            z-index: 10;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="flex h-screen bg-cyber-off">
+
+    <!-- TOOLBOX -->
+    <aside class="w-64 bg-cyber-panel border-l border-cyber-border p-4 flex flex-col h-full shadow-2xl z-50 flex-shrink-0">
+        <h2 class="text-lg font-bold text-cyber-cyan mb-6 text-center border-b border-gray-700 pb-3">
+            <i class="fas fa-toolbox mr-2"></i> صندوق الأدوات
+        </h2>
+        
+        <div class="flex-1 overflow-y-auto" id="inventory"></div>
+
+        <div class="mt-4 border-t border-gray-700 pt-4 flex flex-col gap-3">
+            <button id="reset-btn" class="w-full bg-red-600/10 border border-red-500/30 hover:bg-red-600/20 text-red-500 font-bold py-2 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-rotate-left"></i> إعادة الضبط
+            </button>
+            <button id="formulas-btn" class="w-full bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 font-bold py-2 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-square-root-variable"></i> القوانين
+            </button>
+            <a href="../index.html" class="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-slate-300 font-bold py-2 px-4 rounded-xl transition flex items-center justify-center gap-2 text-center text-sm">
+                <i class="fas fa-house"></i> الرئيسية
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col relative h-full min-w-0">
+        <!-- HEADER -->
+        <header class="h-16 bg-cyber-panel border-b border-cyber-border flex items-center justify-between px-6 z-20 flex-shrink-0">
+            <h1 class="text-lg font-black text-white flex items-center">
+                <i class="fa-solid fa-wave-square text-cyber-cyan ml-2"></i>
+                دائرة تيار متناوب الحمل فيها مقاومة صرف
+            </h1>
+            <div style="width:100px;"></div>
+        </header>
+
+        <!-- CONTENT ROW -->
+        <div class="flex-1 flex p-4 gap-4 min-h-0">
+            <!-- WORKSPACE (Sandbox) -->
+            <div class="flex-1 relative min-w-0">
+                <div class="workspace-area pointer-events-auto" id="workspace" style="width: 780px; height: 460px;">
+                    <div class="sandbox-badge">الشكل (5) — دائرة التيار المتناوب مع مقاومة صرف</div>
+                    
+                    <!-- Circuit Skeleton -->
+                    <div class="circuit-skeleton"></div>
+
+                    <!-- SVG Wires overlay -->
+                    <svg id="svg-wires-canvas">
+                        <path id="ghost-wire" class="ghost-wire" visibility="hidden" />
+                    </svg>
+
+                    <!-- Dropzones & Components -->
+                    <div id="dropzones-container"></div>
+                </div>
+            </div>
+
+            <!-- MONITORS PANEL (Left side) -->
+            <div class="w-72 flex flex-col flex-shrink-0 relative">
+                <!-- Tabs moved to Footer Console -->
+
+                <!-- Mode 1: Waveforms & Phasors -->
+                <div id="mode1-container" class="flex flex-col flex-1 min-h-0">
+                    <div class="osc-screen" style="margin-bottom:12px;">
+                        <div class="osc-header">
+                            <span style="font-size:0.62rem;color:#334155;font-weight:700;letter-spacing:0.06em;">الشكل (6) · Waveform</span>
+                            <div style="display:flex;gap:10px;font-size:0.62rem;font-weight:800;">
+                                <span style="color:#2ecc71;">&#9679; V<sub>R</sub></span>
+                                <span style="color:#f59e0b;">&#9679; I<sub>R</sub></span>
+                            </div>
+                        </div>
+                        <div class="osc-canvas-wrap"><canvas id="waveform-canvas"></canvas></div>
+                    </div>
+
+                    <div class="osc-screen" style="margin-bottom:0;">
+                        <div class="osc-header">
+                            <span style="font-size:0.62rem;color:#334155;font-weight:700;letter-spacing:0.06em;">الشكل (7) · Phasors</span>
+                            <div style="display:flex;gap:10px;font-size:0.62rem;font-weight:800;">
+                                <span style="color:#2ecc71;">&#9679; V<sub>m</sub></span>
+                                <span style="color:#f59e0b;">&#9679; I<sub>m</sub></span>
+                            </div>
+                        </div>
+                        <div class="osc-canvas-wrap"><canvas id="phasor-canvas"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Mode 2: Power Curve -->
+                <div id="mode2-container" class="flex-col flex-1 min-h-0 hidden">
+                    <div class="osc-screen flex-1" style="margin-bottom:12px;">
+                        <div class="osc-header">
+                            <span style="font-size:0.62rem;color:#334155;font-weight:700;letter-spacing:0.06em;">الشكل (8) · Power</span>
+                            <div style="display:flex;gap:10px;font-size:0.62rem;font-weight:800;">
+                                <span style="color:#ef4444;">&#9679; P(t)</span>
+                            </div>
+                        </div>
+                        <div class="osc-canvas-wrap"><canvas id="power-canvas"></canvas></div>
+                    </div>
+                    
+                    <!-- Power Data Panel -->
+                    <div class="bg-cyber-panel border border-cyber-border rounded-lg p-3 shrink-0 flex flex-col gap-2 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                        <div class="flex justify-between items-center text-sm border-b border-gray-700/50 pb-2">
+                            <span class="text-slate-400 font-bold">القدرة العظمى (P<sub>m</sub>):</span>
+                            <span class="text-red-400 font-bold" id="val-pm" dir="ltr">-- W</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400 font-bold">القدرة المتوسطة (P<sub>avg</sub>):</span>
+                            <span class="text-yellow-500 font-bold" id="val-pavg" dir="ltr">-- W</span>
+                        </div>
+                        <div class="mt-2 text-xs text-center text-cyan-300 bg-cyan-900/20 border border-cyan-800/50 p-2 rounded leading-relaxed">
+                            القدرة تستهلك بأجمعها في المقاومة بهيئة حرارة
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer-console">
+            <!-- RIGHT (Start in RTL) -->
+            <div class="footer-right">
+                <div id="status-text" class="text-base font-bold text-cyber-orange truncate">
+                    يرجى سحب المكونات من صندوق الأدوات أو اضغط "الربط التلقائي"
+                </div>
+            </div>
+
+            <!-- CENTER (Tabs inside Pill Box) -->
+            <div class="footer-center">
+                <div class="tab-pill-box">
+                    <button id="tab-mode1" class="tab-pill-btn active-resistor">
+                        الموجات والطور
+                    </button>
+                    <button id="tab-mode2" class="tab-pill-btn inactive">
+                        القدرة
+                    </button>
+                </div>
+            </div>
+
+            <!-- LEFT (End in RTL) -->
+            <div class="footer-left">
+                <button id="auto-connect-btn" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3 rounded-full font-bold shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 text-base">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> الربط التلقائي
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <!-- FORMULAS MODAL -->
+    <div id="formulas-overlay">
+        <div id="formulas-modal-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+                <h2 style="font-size:1.1rem;font-weight:800;color:#00d2ff;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-book-open"></i> القوانين الرياضية
+                </h2>
+                <button id="close-modal-btn" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.3rem;cursor:pointer;line-height:1;padding:4px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="formula-box" style="background:rgba(0,210,255,0.055);border:1px solid rgba(0,210,255,0.2);">
+                <p>الفولتية الآنية عبر المقاومة الصرف:</p>
+                <div class="formula-eq" dir="ltr" style="color:#2ecc71;">V<sub>R</sub> = V<sub>m</sub> &middot; sin(&#969;t)</div>
+            </div>
+            <div class="formula-box" style="background:rgba(245,158,11,0.055);border:1px solid rgba(245,158,11,0.2);">
+                <p>التيار الآني المنساب في المقاومة الصرف:</p>
+                <div class="formula-eq" dir="ltr" style="color:#f59e0b;">I<sub>R</sub> = I<sub>m</sub> &middot; sin(&#969;t)</div>
+            </div>
+            <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.25);border-radius:12px;padding:14px;text-align:center;">
+                <i class="fa-solid fa-circle-info" style="color:#8b5cf6;margin-left:6px;"></i>
+                <span style="color:#a78bfa;font-weight:700;font-size:0.85rem;">
+                    الفولتية والتيار يتغيران بـ (طور واحد) وزاوية فرق الطور &#981; = 0
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        'use strict';
+        gsap.registerPlugin(Draggable);
+
+        // =====================================================
+        // STATE & CONFIG
+        // =====================================================
+        const state = {
+            components: {},
+            circuitValid: false,
+            simRunning: false
+        };
+
+        const config = {
+            components: [
+                { id: 'ac-source', name: 'مصدر متناوب', w: 80, h: 80, getHTML: (id, dz) => EliteComponents.getACSource(id, 0, 0, dz) },
+                { id: 'resistor', name: 'مقاومة صرف R', w: 80, h: 40, getHTML: (id, dz) => EliteComponents.getResistor(id, 0, 0, dz, 'R') },
+                { id: 'switch', name: 'مفتاح', w: 80, h: 100, getHTML: (id, dz) => EliteComponents.getSwitch(id, 0, 0, dz, true) }
+            ],
+            layoutGrid: [
+                { id: 'resistor',  gx: 0, gy: -0.3 },
+                { id: 'ac-source', gx: 0, gy: 0.3 },
+                { id: 'switch',    gx: -0.3, gy: 0 }
+            ]
+        };
+
+        const EXPECTED_PAIRS = [
+            'resistor-left-switch-1',
+            'switch-1-resistor-left',
+            'ac-source-left-switch-k',
+            'switch-k-ac-source-left',
+            'resistor-right-ac-source-right',
+            'ac-source-right-resistor-right'
+        ];
+
+        // Simulation Vars
+        const OMEGA = 1.6;
+        const V_AMP_FRAC = 0.38;
+        const I_AMP_FRAC = 0.26;
+        const HISTORY_LEN = 220;
+        let animFrameId = null;
+        let simTime = 0;
+        let vHistory = [];
+        let iHistory = [];
+
+        // DOM elements
+        const inventoryEl = document.getElementById('inventory');
+        const workspaceEl = document.getElementById('workspace');
+        const dropzonesContainer = document.getElementById('dropzones-container');
+        const statusText = document.getElementById('status-text');
+        const cvWave = document.getElementById('waveform-canvas');
+        const cvPhasor = document.getElementById('phasor-canvas');
+        const ctxW = cvWave.getContext('2d');
+        const ctxP = cvPhasor.getContext('2d');
+
+        let cvPower = null;
+        let ctxPow = null;
+        let currentMode = 1;
+
+        // Wiring Engine State
+        const wiresSVG = document.getElementById('svg-wires-canvas');
+        const ghostWire = document.getElementById('ghost-wire');
+        let wires = []; // Array of active wire objects: { path, btn, sourceId, targetId }
+        let isDrawingWire = false;
+        let drawingStartTerminal = null;
+
+        // =====================================================
+        // INIT
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            buildInventory();
+            buildDropzones();
+            
+            document.getElementById('reset-btn').addEventListener('click', resetWorkspace);
+            document.getElementById('auto-connect-btn').addEventListener('click', autoConnect);
+            
+            // Init Power Canvas
+            cvPower = document.getElementById('power-canvas');
+            if (cvPower) ctxPow = cvPower.getContext('2d');
+
+            // Tab Switcher
+            const tab1 = document.getElementById('tab-mode1');
+            const tab2 = document.getElementById('tab-mode2');
+            const mode1Container = document.getElementById('mode1-container');
+            const mode2Container = document.getElementById('mode2-container');
+
+            tab1.addEventListener('click', () => {
+                currentMode = 1;
+                tab1.className = 'tab-pill-btn active-resistor';
+                tab2.className = 'tab-pill-btn inactive';
+                mode1Container.classList.remove('hidden');
+                mode1Container.classList.add('flex');
+                mode2Container.classList.add('hidden');
+                mode2Container.classList.remove('flex');
+                syncCanvasSizes();
+            });
+
+            tab2.addEventListener('click', () => {
+                currentMode = 2;
+                tab2.className = 'tab-pill-btn active-power';
+                tab1.className = 'tab-pill-btn inactive';
+                mode2Container.classList.remove('hidden');
+                mode2Container.classList.add('flex');
+                mode1Container.classList.add('hidden');
+                mode1Container.classList.remove('flex');
+                syncCanvasSizes();
+            });
+
+            const formulasOvl = document.getElementById('formulas-overlay');
+            document.getElementById('formulas-btn').addEventListener('click', () => formulasOvl.classList.add('open'));
+            document.getElementById('close-modal-btn').addEventListener('click', () => formulasOvl.classList.remove('open'));
+            formulasOvl.addEventListener('click', (e) => { if (e.target === formulasOvl) formulasOvl.classList.remove('open'); });
+
+            window.addEventListener('resize', () => {
+                syncCanvasSizes();
+                repositionWires();
+            });
+            syncCanvasSizes();
+
+            initWireEvents();
+        });
+
+        // =====================================================
+        // BUILDERS
+        // =====================================================
+        function buildInventory() {
+            config.components.forEach(comp => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'component-wrapper relative flex flex-col items-center mb-4';
+                wrapper.id = `wrapper-${comp.id}`;
+
+                const nameTag = document.createElement('div');
+                nameTag.className = 'text-xs font-bold text-gray-400 mb-1';
+                nameTag.innerText = comp.name;
+                wrapper.appendChild(nameTag);
+
+                const dzId = `dz-${comp.id}`;
+                wrapper.insertAdjacentHTML('beforeend', comp.getHTML(comp.id, dzId));
+                inventoryEl.appendChild(wrapper);
+
+                const el = document.getElementById(comp.id);
+                el.dataset.locked = 'false';
+                
+                // EXPLICIT DIMENSION LOCK (NO RESIZING ON RESET)
+                el.style.width = comp.w + 'px';
+                el.style.height = comp.h + 'px';
+                el.style.objectFit = 'contain';
+                el.style.flexShrink = '0';
+                
+                // Hide terminals initially
+                el.querySelectorAll('.terminal-node').forEach(t => t.style.display = 'none');
+
+                // Make draggable
+                Draggable.create(el, {
+                    type: 'x,y',
+                    edgeResistance: 0.65,
+                    bounds: document.body,
+                    onPress: function() {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, { scale: 1.05, boxShadow: '0 10px 20px rgba(0,0,0,0.5)', duration: 0.2 });
+                        
+                        const rect = this.target.getBoundingClientRect();
+                        document.body.appendChild(this.target);
+                        gsap.set(this.target, { position: 'absolute', left: rect.left, top: rect.top, x: 0, y: 0, margin: 0 });
+                        this.update();
+                    },
+                    onDrag: function() {
+                        const targetId = this.target.id;
+                        document.querySelectorAll('.dropzone').forEach(dz => {
+                            if (dz.dataset.accepts === targetId && !dz.classList.contains('occupied')) {
+                                if (this.hitTest(dz, '50%')) dz.classList.add('highlight');
+                                else dz.classList.remove('highlight');
+                            }
+                        });
+                    },
+                    onRelease: function() {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, { scale: 1, boxShadow: 'none', duration: 0.2 });
+
+                        let found = null;
+                        document.querySelectorAll('.dropzone').forEach(dz => {
+                            if (dz.dataset.accepts === this.target.id && !dz.classList.contains('occupied')) {
+                                if (this.hitTest(dz, '50%')) found = dz;
+                            }
+                            dz.classList.remove('highlight');
+                        });
+
+                        if (found) {
+                            // Find config dimensions to avoid layout measure bugs
+                            const compConfig = config.components.find(c => c.id === this.target.id);
+                            const compW = compConfig ? compConfig.w : (this.target.offsetWidth || 80);
+                            const compH = compConfig ? compConfig.h : (this.target.offsetHeight || 80);
+
+                            // Calculate target position in workspace coordinates BEFORE re-parenting
+                            const dzRect = found.getBoundingClientRect();
+                            const wsRect = workspaceEl.getBoundingClientRect();
+                            
+                            const dzX = dzRect.left - wsRect.left;
+                            const dzY = dzRect.top - wsRect.top;
+                            const targetX = dzX + (dzRect.width / 2) - (compW / 2);
+                            const targetY = dzY + (dzRect.height / 2) - (compH / 2);
+
+                            // Reparent to workspace. This changes the coordinate context for 'left' and 'top'.
+                            workspaceEl.appendChild(this.target);
+
+                            // Force explicit positioning and visibility as requested
+                            gsap.set(this.target, {
+                                opacity: 1,
+                                visibility: 'visible',
+                                zIndex: 20,
+                                position: 'absolute'
+                            });
+
+                            // Animate to the perfectly centered target coordinates
+                            gsap.to(this.target, {
+                                left: targetX,
+                                top: targetY,
+                                x: 0,
+                                y: 0,
+                                duration: 0.2,
+                                ease: "power2.out",
+                                onComplete: () => {
+                                    this.target.dataset.locked = 'true';
+                                    found.classList.add('occupied');
+                                    state.components[this.target.id] = this.target;
+        
+                                    const wrapper = document.getElementById(`wrapper-${this.target.id}`);
+                                    if (wrapper) wrapper.style.display = 'none';
+        
+                                    // RE-INDEX TERMINAL COORDINATES: 
+                                    // Display them, then update bounds so they are immediately ready for wires
+                                    this.target.querySelectorAll('.terminal-node').forEach(t => {
+                                        t.style.display = 'block';
+                                        bindTerminalEvents(t);
+                                    });
+        
+                                    checkAllComponentsPlaced();
+                                }
+                            });
+                            this.disable();
+                        } else {
+                            // SAFE FALLBACK: Return smoothly to toolbox wrapper
+                            const wrapper = document.getElementById(`wrapper-${this.target.id}`);
+                            if (wrapper) wrapper.appendChild(this.target);
+                            gsap.set(this.target, { clearProps: 'all' });
+                            this.target.style.position = 'relative';
+                            this.update();
+                        }
+                    }
+                });
+            });
+        }
+
+        function buildDropzones() {
+            config.layoutGrid.forEach(pos => {
+                const compDef = config.components.find(c => c.id === pos.id);
+                const rect = workspaceEl.getBoundingClientRect();
+                const absX = rect.width / 2 + pos.gx * rect.width;
+                const absY = rect.height / 2 + pos.gy * rect.height;
+
+                const dz = document.createElement('div');
+                dz.className = 'dropzone';
+                dz.id = `dz-${pos.id}`;
+                dz.dataset.accepts = pos.id;
+                dz.style.width = `${compDef.w + 20}px`;
+                dz.style.height = `${compDef.h + 20}px`;
+                dz.style.left = `${absX}px`;
+                dz.style.top = `${absY}px`;
+                dz.innerHTML = `<span>${compDef.name}</span>`;
+                dropzonesContainer.appendChild(dz);
+            });
+        }
+
+        function checkAllComponentsPlaced() {
+            if (Object.keys(state.components).length >= config.components.length) {
+                setStatus('قم بتوصيل الأسلاك بين الأقطاب (اسحب من القطب) لإكمال الدائرة', '#00d2ff');
+            }
+        }
+
+        // =====================================================
+        // CUSTOM SVG WIRE ENGINE
+        // =====================================================
+        function getTerminalCenter(termEl) {
+            const rect = termEl.getBoundingClientRect();
+            const wsRect = workspaceEl.getBoundingClientRect();
+            return {
+                x: rect.left - wsRect.left + rect.width / 2,
+                y: rect.top - wsRect.top + rect.height / 2
+            };
+        }
+
+        function createBezierPath(x1, y1, x2, y2) {
+            // Calculate a nice curve
+            const dx = Math.abs(x2 - x1);
+            const cpOffset = dx * 0.4 + 20;
+            // Assuming horizontal connections generally, we push control points outwards
+            const cp1x = x1 + (x1 < x2 ? cpOffset : -cpOffset);
+            const cp2x = x2 + (x2 < x1 ? cpOffset : -cpOffset);
+            return `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`;
+        }
+
+        function bindTerminalEvents(t) {
+            // ISOLATE MOUSE EVENTS: prevent Draggable from acting when we draw a wire
+            t.onmousedown = (e) => {
+                e.stopPropagation(); 
+                e.preventDefault();
+                startWireDrawing(t);
+            };
+            t.ontouchstart = (e) => {
+                e.stopPropagation();
+                if(e.touches.length > 0) {
+                    startWireDrawing(t, e.touches[0].clientX, e.touches[0].clientY);
+                }
+            };
+            // Highlight handling
+            t.onmouseenter = () => {
+                if (isDrawingWire && drawingStartTerminal && drawingStartTerminal !== t) {
+                    const pair = `${drawingStartTerminal.id}-${t.id}`;
+                    const rev = `${t.id}-${drawingStartTerminal.id}`;
+                    if (EXPECTED_PAIRS.includes(pair) || EXPECTED_PAIRS.includes(rev)) {
+                        t.classList.add('target-glow');
+                    }
+                }
+            };
+            t.onmouseleave = () => {
+                t.classList.remove('target-glow');
+            };
+        }
+
+        function startWireDrawing(term) {
+            isDrawingWire = true;
+            drawingStartTerminal = term;
+            ghostWire.setAttribute('visibility', 'visible');
+            
+            // Highlight ONLY matching, un-connected target terminals
+            document.querySelectorAll('.terminal-node').forEach(t => {
+                if (t === term || t.offsetParent === null) return;
+                const pair = `${term.id}-${t.id}`;
+                const rev = `${t.id}-${term.id}`;
+                const isExpected = EXPECTED_PAIRS.includes(pair) || EXPECTED_PAIRS.includes(rev);
+                const already = wires.some(w => (w.sourceId === term.id && w.targetId === t.id) || (w.sourceId === t.id && w.targetId === term.id));
+                if (isExpected && !already) {
+                    t.classList.add('target-glow');
+                }
+            });
+        }
+
+        function initWireEvents() {
+            // Mouse movement → update ghost wire preview
+            workspaceEl.addEventListener('mousemove', (e) => {
+                if (!isDrawingWire || !drawingStartTerminal) return;
+                const wsRect   = workspaceEl.getBoundingClientRect();
+                const startPos = getTerminalCenter(drawingStartTerminal); // always re-read live position
+                const mouseX   = e.clientX - wsRect.left;
+                const mouseY   = e.clientY - wsRect.top;
+                ghostWire.setAttribute('d', createBezierPath(startPos.x, startPos.y, mouseX, mouseY));
+            });
+
+            // Touch movement → same logic (startPos was missing from touchmove scope before)
+            workspaceEl.addEventListener('touchmove', (e) => {
+                if (!isDrawingWire || !drawingStartTerminal) return;
+                const wsRect   = workspaceEl.getBoundingClientRect();
+                const startPos = getTerminalCenter(drawingStartTerminal); // FIX: was undefined here
+                const mouseX   = e.touches[0].clientX - wsRect.left;
+                const mouseY   = e.touches[0].clientY - wsRect.top;
+                ghostWire.setAttribute('d', createBezierPath(startPos.x, startPos.y, mouseX, mouseY));
+            }, { passive: true });
+
+            // Pointer up anywhere → attempt to complete wire
+            window.addEventListener('mouseup',  handleWireDrop);
+            window.addEventListener('touchend', handleWireDrop);
+        }
+
+        function handleWireDrop(e) {
+            if (!isDrawingWire) return;
+            
+            // Cleanup highlights
+            document.querySelectorAll('.terminal-node').forEach(t => {
+                t.style.boxShadow = 'none';
+                t.classList.remove('target-glow');
+            });
+            
+            ghostWire.setAttribute('visibility', 'hidden');
+            ghostWire.setAttribute('d', '');
+            
+            const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+            const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+            
+            // 30px radius snap threshold — find closest valid terminal within range
+            let snappedTerm = null;
+            let minDist = 30; // upgraded from 25px per requirements
+
+            document.querySelectorAll('.terminal-node').forEach(t => {
+                // Skip the source terminal and any hidden terminals
+                if (t === drawingStartTerminal) return;
+                if (t.style.display === 'none' || t.offsetParent === null) return;
+
+                const tRect = t.getBoundingClientRect();
+                const tx = tRect.left + tRect.width  / 2;
+                const ty = tRect.top  + tRect.height / 2;
+
+                const dist = Math.hypot(clientX - tx, clientY - ty);
+                if (dist < minDist) {
+                    minDist = dist;
+                    snappedTerm = t;
+                }
+            });
+
+            if (snappedTerm) {
+                // Check if pair is allowed
+                const sid = drawingStartTerminal.id;
+                const tid = snappedTerm.id;
+                const pair = `${sid}-${tid}`;
+                const revPair = `${tid}-${sid}`;
+                
+                if (EXPECTED_PAIRS.includes(pair) || EXPECTED_PAIRS.includes(revPair)) {
+                    drawPermanentWire(drawingStartTerminal, snappedTerm);
+                }
+            }
+
+            isDrawingWire = false;
+            drawingStartTerminal = null;
+        }
+
+        function drawPermanentWire(sourceTerm, targetTerm) {
+            // Prevent duplicate wires between same two terminals
+            const existing = wires.find(w => 
+                (w.sourceId === sourceTerm.id && w.targetId === targetTerm.id) ||
+                (w.sourceId === targetTerm.id && w.targetId === sourceTerm.id)
+            );
+            if (existing) return;
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.classList.add('custom-wire');
+            wiresSVG.appendChild(path);
+
+            const btn = document.createElement('div');
+            btn.className = 'wire-del-btn';
+            btn.innerHTML = 'X';
+            workspaceEl.appendChild(btn);
+
+            // Interactive X Delete Button logic (Array filtering)
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // 1. Instantly delete that wire from the circuit array
+                wires = wires.filter(w => w.id !== wireObj.id);
+                
+                // 2. Remove from canvas
+                wireObj.path.remove();
+                wireObj.btn.remove();
+                
+                // 3. Disconnect and re-validate circuit
+                checkCircuitValid();
+            });
+
+            // Map data accurately to requested strict state object structure
+            const wireObj = { 
+                id: `wire-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                sourceId: sourceTerm.id, 
+                targetId: targetTerm.id, 
+                fromTerminal: sourceTerm,
+                toTerminal: targetTerm,
+                path: path, 
+                btn: btn,
+                sourceEl: sourceTerm, // Fallback references
+                targetEl: targetTerm,
+                connected: true,
+                x1: 0, y1: 0, x2: 0, y2: 0
+            };
+
+            wires.push(wireObj);
+            
+            // Draw immediately
+            updateWirePath(wireObj);
+            
+            // Animate line drawing
+            const len = path.getTotalLength();
+            path.style.strokeDasharray = len;
+            path.style.strokeDashoffset = len;
+            gsap.to(path, { strokeDashoffset: 0, duration: 0.4 });
+
+            checkCircuitValid();
+        }
+
+        function updateWirePath(wire) {
+            const p1 = getTerminalCenter(wire.sourceEl || wire.fromTerminal);
+            const p2 = getTerminalCenter(wire.targetEl || wire.toTerminal);
+            
+            // Log coords in active object as requested
+            wire.x1 = p1.x; wire.y1 = p1.y;
+            wire.x2 = p2.x; wire.y2 = p2.y;
+            
+            wire.path.setAttribute('d', createBezierPath(p1.x, p1.y, p2.x, p2.y));
+            
+            // Render the 'X' button exactly at the midpoint of the Bezier line path
+            try {
+                // If path is fully rendered, we can get the exact midpoint via SVG native function
+                const midpoint = wire.path.getPointAtLength(wire.path.getTotalLength() / 2);
+                wire.btn.style.left = `${midpoint.x}px`;
+                wire.btn.style.top = `${midpoint.y}px`;
+            } catch(e) {
+                // Fallback math if svg isn't ready
+                wire.btn.style.left = `${(p1.x + p2.x) / 2}px`;
+                wire.btn.style.top = `${(p1.y + p2.y) / 2}px`;
+            }
+        }
+
+        function repositionWires() {
+            wires.forEach(w => updateWirePath(w));
+        }
+
+        function setStatus(msg, color) {
+            statusText.textContent = msg;
+            statusText.style.color = color;
+        }
+
+        function checkCircuitValid() {
+            if (Object.keys(state.components).length < config.components.length) return;
+            
+            // Total expected unique wires in this simple series circuit is 3
+            if (wires.length >= 3) {
+                state.circuitValid = true;
+                
+                // Close the switch visually
+                const arm = document.getElementById('switch-arm');
+                if (arm) gsap.to(arm, { rotation: -30, duration: 0.3 });
+                
+                setStatus('الدائرة مغلقة — الفولتية والتيار يتغيران بطور واحد', '#2ecc71');
+                startSim();
+            } else {
+                state.circuitValid = false;
+                stopSim();
+                // Open the switch visually
+                const arm = document.getElementById('switch-arm');
+                if (arm) gsap.to(arm, { rotation: -15, duration: 0.3 });
+                
+                checkAllComponentsPlaced(); // Reset text
+            }
+        }
+
+        function autoConnect() {
+            resetWorkspace();
+
+            // 1. Move components to dropzones using KNOWN config dimensions
+            //    (do NOT use offsetWidth — element may not be in DOM with real layout yet)
+            config.components.forEach(comp => {
+                const id = comp.id;
+                const el = document.getElementById(id);
+                const dropzone = document.getElementById(`dz-${id}`);
+                const wrapper = document.getElementById(`wrapper-${id}`);
+
+                // Clear any inherited styles before re-measuring the dropzone
+                gsap.set(el, { clearProps: 'all' });
+                workspaceEl.appendChild(el);
+
+                // Force layout flush so getBoundingClientRect is accurate
+                void el.offsetWidth;
+
+                // Use config dimensions — guaranteed correct, no DOM measurement needed
+                const compW = comp.w;
+                const compH = comp.h;
+
+                const dzRect = dropzone.getBoundingClientRect();
+                const wsRect = workspaceEl.getBoundingClientRect();
+                const dzX = dzRect.left - wsRect.left;
+                const dzY = dzRect.top - wsRect.top;
+
+                // Center formula: box.x + (box.w/2) - (comp.w/2)
+                const targetX = dzX + (dzRect.width  / 2) - (compW / 2);
+                const targetY = dzY + (dzRect.height / 2) - (compH / 2);
+
+                gsap.set(el, {
+                    position: 'absolute',
+                    left: targetX,
+                    top:  targetY,
+                    x: 0, y: 0,
+                    width:  compW,
+                    height: compH,
+                    margin: 0
+                });
+
+                if (wrapper) wrapper.style.display = 'none';
+                el.dataset.locked = 'true';
+                dropzone.classList.add('occupied');
+                state.components[id] = el;
+
+                el.querySelectorAll('.terminal-node').forEach(t => {
+                    t.style.display = 'block';
+                    bindTerminalEvents(t);
+                });
+
+                const draggable = Draggable.get(el);
+                if (draggable) draggable.disable();
+            });
+
+            // 2. Give the browser one frame to paint terminals, then draw wires
+            requestAnimationFrame(() => {
+                const pairs = [
+                    { s: 'resistor-left',  t: 'switch-1' },
+                    { s: 'switch-k',       t: 'ac-source-left' },
+                    { s: 'resistor-right', t: 'ac-source-right' }
+                ];
+                pairs.forEach(p => {
+                    const sTerm = document.getElementById(p.s);
+                    const tTerm = document.getElementById(p.t);
+                    if (sTerm && tTerm) drawPermanentWire(sTerm, tTerm);
+                });
+            });
+        }
+
+        function resetWorkspace() {
+            // 1. Immediately kill animation loop and clear canvas histories
+            stopSim();
+            vHistory = [];
+            iHistory = [];
+            simTime  = 0;
+
+            // 2. Delete all custom wires from DOM and array
+            wires.forEach(w => {
+                w.path.remove();
+                w.btn.remove();
+            });
+            wires = [];
+
+            // 3. Reset circuit state
+            state.components = {};
+            state.circuitValid = false;
+
+            // 4. Return every component back to its toolbox wrapper
+            config.components.forEach(comp => {
+                const wrapper = document.getElementById(`wrapper-${comp.id}`);
+                const el = document.getElementById(comp.id);
+
+                if (wrapper) wrapper.style.display = '';
+                if (wrapper && el) wrapper.appendChild(el);
+
+                // DO NOT clear all inline props. Only clear transformation/position metrics. 
+                // Using 'clearProps: all' breaks EliteComponent rendering styles.
+                gsap.set(el, { clearProps: 'x,y,left,top,transform,zIndex,opacity,visibility,scale,boxShadow,margin' });
+                
+                // EXPLICIT DIMENSION LOCK FOR RESET
+                el.style.position = 'relative';
+                el.style.width = comp.w + 'px';
+                el.style.height = comp.h + 'px';
+                el.style.objectFit = 'contain';
+                el.style.flexShrink = '0';
+                
+                el.dataset.locked = 'false';
+
+                el.querySelectorAll('.terminal-node').forEach(t => t.style.display = 'none');
+
+                const d = Draggable.get(el);
+                if (d) { d.enable(); d.update(); }
+            });
+
+            // 5. Reset switch arm
+            const arm = document.getElementById('switch-arm');
+            if (arm) gsap.set(arm, { rotation: -15 });
+
+            // 6. Remove occupied/highlight state from all dropzones
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                dz.classList.remove('occupied', 'highlight');
+            });
+
+            // 7. Redraw idle (static grid) canvases — CRITICAL: clears leftover animation frames
+            drawIdleWaveform();
+            drawIdlePhasor();
+            if (typeof drawIdlePowerCurve === 'function') drawIdlePowerCurve();
+
+            const valPm = document.getElementById('val-pm');
+            const valPavg = document.getElementById('val-pavg');
+            if (valPm) valPm.innerHTML = '-- W';
+            if (valPavg) valPavg.innerHTML = '-- W';
+
+            setStatus('يرجى سحب المكونات من صندوق الأدوات أو اضغط "الربط التلقائي"', '#ff9f43');
+        }
+
+        // =====================================================
+        // SIMULATION & CANVAS
+        // =====================================================
+        function syncCanvasSizes() {
+            var ww = cvWave.parentElement;
+            cvWave.width  = ww.clientWidth  || 260;
+            cvWave.height = ww.clientHeight || 140;
+            var pw = cvPhasor.parentElement;
+            cvPhasor.width  = pw.clientWidth  || 260;
+            cvPhasor.height = pw.clientHeight || 140;
+            
+            if (cvPower && cvPower.parentElement) {
+                var pow = cvPower.parentElement;
+                cvPower.width = pow.clientWidth || 260;
+                cvPower.height = pow.clientHeight || 140;
+            }
+
+            const rect = workspaceEl.getBoundingClientRect();
+            config.layoutGrid.forEach(pos => {
+                const dz = document.getElementById(`dz-${pos.id}`);
+                if (dz) {
+                    dz.style.left = `${rect.width / 2 + pos.gx * rect.width}px`;
+                    dz.style.top = `${rect.height / 2 + pos.gy * rect.height}px`;
+                }
+            });
+            repositionWires();
+
+            if (!state.simRunning) { 
+                drawIdleWaveform(); 
+                drawIdlePhasor(); 
+                if (typeof drawIdlePowerCurve === 'function') drawIdlePowerCurve();
+            }
+        }
+
+        function startSim() {
+            if (state.simRunning) return;
+            state.simRunning = true;
+            vHistory = []; iHistory = []; simTime = 0;
+            animFrameId = requestAnimationFrame(animLoop);
+        }
+
+        function stopSim() {
+            state.simRunning = false;
+            if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+            resetWireGlow();
+        }
+
+        function drawIdleWaveform() {
+            var W = cvWave.width, H = cvWave.height, midY = H / 2;
+            ctxW.clearRect(0, 0, W, H);
+            ctxW.strokeStyle = 'rgba(255,255,255,0.18)'; ctxW.lineWidth = 1;
+            ctxW.beginPath(); ctxW.moveTo(36, midY); ctxW.lineTo(W-6, midY);
+            ctxW.moveTo(42, 4); ctxW.lineTo(42, H-4); ctxW.stroke();
+            ctxW.fillStyle = 'rgba(255,255,255,0.18)';
+            ctxW.beginPath(); ctxW.moveTo(W-6,midY); ctxW.lineTo(W-14,midY-4); ctxW.lineTo(W-14,midY+4); ctxW.closePath(); ctxW.fill();
+            ctxW.beginPath(); ctxW.moveTo(42,4); ctxW.lineTo(38,12); ctxW.lineTo(46,12); ctxW.closePath(); ctxW.fill();
+            ctxW.fillStyle = '#334155'; ctxW.font = 'bold 10px Outfit,sans-serif'; ctxW.textAlign = 'center';
+            ctxW.fillText('0', 30, midY+13); ctxW.fillText('t', W-10, midY-8);
+        }
+
+        function drawIdlePhasor() {
+            var W = cvPhasor.width, H = cvPhasor.height, cx = W/2, cy = H/2;
+            ctxP.clearRect(0, 0, W, H);
+            ctxP.strokeStyle = 'rgba(255,255,255,0.2)'; ctxP.lineWidth = 1;
+            ctxP.beginPath(); ctxP.moveTo(10, cy); ctxP.lineTo(W-10, cy);
+            ctxP.moveTo(cx, 10); ctxP.lineTo(cx, H-10); ctxP.stroke();
+            ctxP.fillStyle = 'rgba(255,255,255,0.2)';
+            ctxP.beginPath(); ctxP.moveTo(W-10,cy); ctxP.lineTo(W-18,cy-4); ctxP.lineTo(W-18,cy+4); ctxP.closePath(); ctxP.fill();
+            ctxP.beginPath(); ctxP.moveTo(cx,10); ctxP.lineTo(cx-4,18); ctxP.lineTo(cx+4,18); ctxP.closePath(); ctxP.fill();
+            ctxP.fillStyle = '#334155'; ctxP.font = 'bold 10px Outfit,sans-serif'; ctxP.textAlign = 'left';
+            ctxP.fillText('X', W-24, cy-7); ctxP.textAlign = 'right'; ctxP.fillText('Y', cx-6, 20);
+            ctxP.textAlign = 'center'; ctxP.fillText('O', cx+13, cy+16);
+        }
+
+        function animLoop() {
+            if (!state.simRunning) return;
+            try {
+                simTime += 0.032;
+                var angle = simTime * OMEGA;
+                var vNow = Math.sin(angle);
+                var iNow = Math.sin(angle);
+
+                vHistory.push(vNow); iHistory.push(iNow);
+                if (vHistory.length > HISTORY_LEN) { vHistory.shift(); iHistory.shift(); }
+
+                renderWaveform();
+                renderPhasor(angle);
+                if (currentMode === 2 && typeof renderPowerCurve === 'function') renderPowerCurve();
+                pulseWires(Math.abs(vNow));
+            } catch(err) {
+                console.warn('Sim error:', err);
+                state.simRunning = false;
+                return;
+            }
+            animFrameId = requestAnimationFrame(animLoop);
+        }
+
+        function renderWaveform() {
+            var W = cvWave.width, H = cvWave.height, midY = H/2, vAmp = H*V_AMP_FRAC, iAmp = H*I_AMP_FRAC, L = 44, plotW = W-L-10;
+            ctxW.clearRect(0, 0, W, H);
+            ctxW.strokeStyle = 'rgba(255,255,255,0.22)'; ctxW.lineWidth = 1;
+            ctxW.beginPath(); ctxW.moveTo(L-4, midY); ctxW.lineTo(W-6, midY); ctxW.moveTo(L, 4); ctxW.lineTo(L, H-4); ctxW.stroke();
+            ctxW.fillStyle = 'rgba(255,255,255,0.22)';
+            ctxW.beginPath(); ctxW.moveTo(W-6,midY); ctxW.lineTo(W-14,midY-4); ctxW.lineTo(W-14,midY+4); ctxW.closePath(); ctxW.fill();
+            ctxW.beginPath(); ctxW.moveTo(L,4); ctxW.lineTo(L-4,12); ctxW.lineTo(L+4,12); ctxW.closePath(); ctxW.fill();
+            
+            ctxW.font = 'bold 10px Outfit,sans-serif'; ctxW.fillStyle = '#475569'; ctxW.textAlign = 'center';
+            ctxW.fillText('0', L-13, midY+13); ctxW.fillText('t', W-10, midY-8);
+            ctxW.fillText('T/2', L+plotW*0.5, midY+13); ctxW.fillText('T', L+plotW, midY+13);
+            ctxW.fillStyle = 'rgba(46,204,113,0.65)'; ctxW.textAlign = 'right'; ctxW.fillText('Vm', L-3, midY-vAmp+5);
+            ctxW.fillStyle = 'rgba(245,158,11,0.65)'; ctxW.fillText('Im', L-3, midY-iAmp+5);
+
+            var pts = vHistory.length; if (pts < 2) return;
+
+            ctxW.beginPath();
+            for (var i=0; i<pts; i++) {
+                var x = L + (i/(HISTORY_LEN-1))*plotW, y = midY - vHistory[i]*vAmp;
+                if (i===0) ctxW.moveTo(x,y); else ctxW.lineTo(x,y);
+            }
+            ctxW.strokeStyle = '#2ecc71'; ctxW.lineWidth = 2.5; ctxW.shadowBlur = 8; ctxW.shadowColor = '#2ecc71'; ctxW.stroke(); ctxW.shadowBlur = 0;
+
+            ctxW.beginPath();
+            for (var j=0; j<pts; j++) {
+                var x2 = L + (j/(HISTORY_LEN-1))*plotW, y2 = midY - iHistory[j]*iAmp;
+                if (j===0) ctxW.moveTo(x2,y2); else ctxW.lineTo(x2,y2);
+            }
+            ctxW.strokeStyle = '#f59e0b'; ctxW.lineWidth = 2; ctxW.shadowBlur = 7; ctxW.shadowColor = '#f59e0b'; ctxW.stroke(); ctxW.shadowBlur = 0;
+
+            ctxW.fillStyle = 'rgba(46,204,113,0.8)'; ctxW.font = 'bold 10px Outfit,sans-serif'; ctxW.textAlign = 'right'; ctxW.fillText('\u03d5 = 0\u00b0', W-6, 14);
+        }
+
+        function renderPhasor(angle) {
+            var W = cvPhasor.width, H = cvPhasor.height, cx = W/2, cy = H/2, maxR = Math.min(cx, cy)*0.78, vLen = maxR, iLen = maxR*0.65;
+            ctxP.clearRect(0, 0, W, H);
+            ctxP.strokeStyle = 'rgba(255,255,255,0.07)'; ctxP.lineWidth = 1; ctxP.setLineDash([3,5]);
+            ctxP.beginPath(); ctxP.arc(cx, cy, maxR, 0, Math.PI*2); ctxP.stroke(); ctxP.setLineDash([]);
+            ctxP.strokeStyle = 'rgba(255,255,255,0.24)'; ctxP.lineWidth = 1;
+            ctxP.beginPath(); ctxP.moveTo(10, cy); ctxP.lineTo(W-10, cy); ctxP.moveTo(cx, 10); ctxP.lineTo(cx, H-10); ctxP.stroke();
+            ctxP.fillStyle = 'rgba(255,255,255,0.24)';
+            ctxP.beginPath(); ctxP.moveTo(W-10,cy); ctxP.lineTo(W-18,cy-4); ctxP.lineTo(W-18,cy+4); ctxP.closePath(); ctxP.fill();
+            ctxP.beginPath(); ctxP.moveTo(cx,10); ctxP.lineTo(cx-4,18); ctxP.lineTo(cx+4,18); ctxP.closePath(); ctxP.fill();
+            ctxP.fillStyle = 'rgba(148,163,184,0.75)'; ctxP.font = 'bold 10px Outfit,sans-serif'; ctxP.textAlign = 'left'; ctxP.fillText('X', W-24, cy-7);
+            ctxP.textAlign = 'right'; ctxP.fillText('Y', cx-6, 20); ctxP.textAlign = 'center'; ctxP.fillText('O', cx+13, cy+16);
+            ctxP.fillStyle = 'rgba(148,163,184,0.35)'; ctxP.font = '9px Tajawal,sans-serif'; ctxP.fillText('\u2190 \u0627\u062a\u062c\u0627\u0647 \u0627\u0644\u062f\u0648\u0631\u0627\u0646', cx, cy - maxR*0.35 - 6);
+
+            var vx = cx + Math.cos(angle)*vLen, vy = cy - Math.sin(angle)*vLen;
+            var ix = cx + Math.cos(angle)*iLen, iy = cy - Math.sin(angle)*iLen;
+
+            ctxP.strokeStyle = 'rgba(46,204,113,0.15)'; ctxP.lineWidth = 1; ctxP.setLineDash([3,4]);
+            ctxP.beginPath(); ctxP.moveTo(vx, vy); ctxP.lineTo(vx, cy); ctxP.stroke();
+            ctxP.beginPath(); ctxP.moveTo(vx, vy); ctxP.lineTo(cx, vy); ctxP.stroke(); ctxP.setLineDash([]);
+
+            drawArrow(ctxP, cx, cy, vx, vy, '#2ecc71', 'Vm', 3);
+            drawArrow(ctxP, cx, cy, ix, iy, '#f59e0b', 'Im', 2.5);
+        }
+
+        function drawArrow(ctx, ox, oy, tx, ty, color, label, lw) {
+            var dx = tx-ox, dy = ty-oy, a = Math.atan2(dy, dx);
+            if (Math.hypot(dx,dy) < 3) return;
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(tx, ty);
+            ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.shadowBlur = 10; ctx.shadowColor = color; ctx.stroke(); ctx.shadowBlur = 0;
+            var hs = 9;
+            ctx.beginPath(); ctx.moveTo(tx, ty);
+            ctx.lineTo(tx - hs*Math.cos(a-0.42), ty - hs*Math.sin(a-0.42));
+            ctx.lineTo(tx - hs*Math.cos(a+0.42), ty - hs*Math.sin(a+0.42));
+            ctx.closePath();
+            ctx.fillStyle = color; ctx.shadowBlur = 8; ctx.shadowColor = color; ctx.fill(); ctx.shadowBlur = 0;
+            if (label) {
+                var ox2 = 14*Math.cos(a) + (dy>0?5:-5), oy2 = 14*Math.sin(a) + (dx>0?-4:12);
+                ctx.font = 'bold 11px Outfit,sans-serif'; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.fillText(label, tx+ox2, ty+oy2);
+            }
+        }
+
+        function pulseWires(intensity) {
+            const maxShadow = 15;
+            const minShadow = 2;
+            const blur = minShadow + (maxShadow - minShadow) * intensity;
+            const opacity = 0.4 + (0.6 * intensity);
+            
+            wires.forEach(w => {
+                w.path.style.filter = `drop-shadow(0 0 ${blur}px rgba(0, 210, 255, ${opacity}))`;
+            });
+        }
+        
+        function resetWireGlow() {
+            wires.forEach(w => {
+                w.path.style.filter = `drop-shadow(0 0 8px rgba(0, 210, 255, 0.6))`;
+            });
+        }
+
+        function drawIdlePowerCurve() {
+            if (!cvPower || !ctxPow) return;
+            var W = cvPower.width, H = cvPower.height, btmY = H - 20;
+            ctxPow.clearRect(0, 0, W, H);
+            ctxPow.strokeStyle = 'rgba(255,255,255,0.18)'; ctxPow.lineWidth = 1;
+            ctxPow.beginPath(); ctxPow.moveTo(36, btmY); ctxPow.lineTo(W-6, btmY); 
+            ctxPow.moveTo(42, 4); ctxPow.lineTo(42, H-4); ctxPow.stroke();
+            
+            ctxPow.fillStyle = 'rgba(255,255,255,0.18)';
+            ctxPow.beginPath(); ctxPow.moveTo(W-6,btmY); ctxPow.lineTo(W-14,btmY-4); ctxPow.lineTo(W-14,btmY+4); ctxPow.closePath(); ctxPow.fill();
+            ctxPow.beginPath(); ctxPow.moveTo(42,4); ctxPow.lineTo(38,12); ctxPow.lineTo(46,12); ctxPow.closePath(); ctxPow.fill();
+            
+            ctxPow.fillStyle = '#334155'; ctxPow.font = 'bold 10px Outfit,sans-serif'; ctxPow.textAlign = 'center';
+            ctxPow.fillText('0', 30, btmY+13); ctxPow.fillText('t', W-10, btmY-8);
+        }
+
+        function renderPowerCurve() {
+            if (!cvPower || !ctxPow) return;
+            var W = cvPower.width, H = cvPower.height;
+            var btmY = H - 20;
+            var topY = 24; 
+            var pAmp = btmY - topY;
+            var L = 44, plotW = W - L - 10;
+            
+            ctxPow.clearRect(0, 0, W, H);
+            
+            ctxPow.strokeStyle = 'rgba(255,255,255,0.22)'; ctxPow.lineWidth = 1;
+            ctxPow.beginPath(); ctxPow.moveTo(L-4, btmY); ctxPow.lineTo(W-6, btmY); 
+            ctxPow.moveTo(L, 4); ctxPow.lineTo(L, H-4); ctxPow.stroke(); 
+            
+            ctxPow.fillStyle = 'rgba(255,255,255,0.22)';
+            ctxPow.beginPath(); ctxPow.moveTo(W-6,btmY); ctxPow.lineTo(W-14,btmY-4); ctxPow.lineTo(W-14,btmY+4); ctxPow.closePath(); ctxPow.fill();
+            ctxPow.beginPath(); ctxPow.moveTo(L,4); ctxPow.lineTo(L-4,12); ctxPow.lineTo(L+4,12); ctxPow.closePath(); ctxPow.fill();
+            
+            ctxPow.font = 'bold 10px Outfit,sans-serif'; ctxPow.fillStyle = '#475569'; ctxPow.textAlign = 'center';
+            ctxPow.fillText('0', L-13, btmY+13); ctxPow.fillText('t', W-10, btmY-8);
+            
+            ctxPow.font = 'bold 9px Tajawal,sans-serif';
+            ctxPow.strokeStyle = 'rgba(239, 68, 68, 0.4)'; ctxPow.lineWidth = 1; ctxPow.setLineDash([4, 4]);
+            
+            ctxPow.beginPath(); ctxPow.moveTo(L, topY); ctxPow.lineTo(L+plotW, topY); ctxPow.stroke();
+            ctxPow.fillStyle = '#ef4444'; ctxPow.textAlign = 'right'; 
+            ctxPow.fillText('Pm = Im × Vm (القدرة العظمى)', L+plotW, topY - 5);
+            
+            var midY = topY + pAmp/2;
+            ctxPow.strokeStyle = 'rgba(234, 179, 8, 0.4)';
+            ctxPow.beginPath(); ctxPow.moveTo(L, midY); ctxPow.lineTo(L+plotW, midY); ctxPow.stroke();
+            ctxPow.fillStyle = '#eab308';
+            ctxPow.fillText('Pavg = Pm / 2 (القدرة المتوسطة)', L+plotW, midY - 5);
+            
+            ctxPow.setLineDash([]);
+            
+            var pts = vHistory.length; if (pts < 2) return;
+            
+            ctxPow.beginPath();
+            ctxPow.moveTo(L, btmY);
+            for (var i=0; i<pts; i++) {
+                var x = L + (i/(HISTORY_LEN-1))*plotW;
+                var p = vHistory[i] * iHistory[i]; 
+                var y = btmY - p * pAmp;
+                ctxPow.lineTo(x, y);
+            }
+            ctxPow.lineTo(L + ((pts-1)/(HISTORY_LEN-1))*plotW, btmY);
+            ctxPow.lineTo(L, btmY);
+            ctxPow.closePath();
+            
+            var gradient = ctxPow.createLinearGradient(0, topY, 0, btmY);
+            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.8)'); 
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0.1)'); 
+            ctxPow.fillStyle = gradient;
+            ctxPow.fill();
+            
+            ctxPow.beginPath();
+            for (var i=0; i<pts; i++) {
+                var x = L + (i/(HISTORY_LEN-1))*plotW;
+                var p = vHistory[i] * iHistory[i];
+                var y = btmY - p * pAmp;
+                if (i===0) ctxPow.moveTo(x,y); else ctxPow.lineTo(x,y);
+            }
+            ctxPow.strokeStyle = '#ef4444'; ctxPow.lineWidth = 2.5; 
+            ctxPow.shadowBlur = 10; ctxPow.shadowColor = '#ef4444'; 
+            ctxPow.stroke(); ctxPow.shadowBlur = 0;
+            
+            const valPm = document.getElementById('val-pm');
+            const valPavg = document.getElementById('val-pavg');
+            if (valPm && state.simRunning) {
+                valPm.innerHTML = '440.0 W';
+                valPavg.innerHTML = '220.0 W';
+            }
+        }
+    </script>
+    <script>
+        if(window.initRaqeemResponsive) { window.initRaqeemResponsive('#workspace', 780, 460); }
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مختبر الفيزياء الافتراضي المنهجي | تجربة فراداي - الحث الكهرومغناطيسي</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <!-- GSAP & Draggable -->
+    <script src="../libs/gsap.min.js"></script>
+    <script src="../libs/Draggable.min.js"></script>
+    <script src="../engine/svg-wire-engine.js"></script>
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <!-- Elite Components Factory -->
+    <script src="../engine/elite-components.js"></script>
+    <script src="../engine/elite-engine.js"></script>
+    
+    <script>
+        window.tailwind = window.tailwind || {}; window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            off: '#07090e',
+                            on: '#0f131a',
+                            panel: '#111823',
+                            border: 'rgba(0, 210, 255, 0.2)',
+                            gold: '#ffe082',
+                            orange: '#ff9f43',
+                            cyan: '#00d2ff',
+                            green: '#2ecc71',
+                            red: '#ef4444',
+                            blue: '#3b82f6'
+                        }
+                    },
+                    fontFamily: {
+                        ar: ['Tajawal', 'sans-serif'],
+                        en: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #07090e;
+            --panel-bg: #111823;
+            --accent-blue: #3b82f6;
+            --accent-orange: #ff9f43;
+            --text-color: #e2e8f0;
+            --neon-red: #ef4444;
+            --neon-cyan: #00d2ff;
+        }
+
+        body { user-select: none; -webkit-user-select: none;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Tajawal', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .workspace-area {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #111e32 0%, #05080f 100%);
+            border-radius: 12px;
+            position: relative;
+            border: 2px solid rgba(0, 210, 255, 0.15);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 35, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 210, 255, 0.15);
+        }
+
+        .glow-text-cyan { text-shadow: 0 0 10px rgba(0, 210, 255, 0.6); }
+        .glow-text-orange { text-shadow: 0 0 10px rgba(255, 159, 67, 0.6); }
+        .glow-text-red { text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        .glow-text-green { text-shadow: 0 0 10px rgba(46, 204, 113, 0.6); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 210, 255, 0.4); }
+
+        .dropzone {
+            position: absolute;
+            border: 2px dashed rgba(0, 210, 255, 0.4);
+            border-radius: 12px;
+            background: rgba(0, 210, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            z-index: 5;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .dropzone.highlight {
+            border-color: rgba(0, 210, 255, 0.8);
+            background: rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .dropzone.occupied {
+            border-color: rgba(46, 204, 113, 0.5);
+            background: transparent;
+            color: transparent;
+        }
+
+        .component {
+            position: absolute;
+            z-index: 20;
+            user-select: none;
+            touch-action: none;
+        }
+
+        #inventory .component {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            margin: 10px auto;
+            cursor: grab;
+            transform: scale(0.9);
+        }
+        
+        #inventory .component:active {
+            cursor: grabbing;
+        }
+
+        .terminal-node {
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            border: 3px solid #64748b;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 30;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .flux-line {
+            fill: none;
+            stroke: #00d2ff;
+            stroke-width: 3;
+            stroke-dasharray: 15 10;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Flux animation */
+        @keyframes flowClockwise {
+            from { stroke-dashoffset: 50; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes flowCounterClockwise {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 50; }
+        }
+        .flux-cw {
+            animation: flowClockwise 0.5s linear infinite;
+        }
+        .flux-ccw {
+            animation: flowCounterClockwise 0.5s linear infinite;
+        }
+
+    </style>
+</head>
+<body class="flex h-screen bg-cyber-off">
+
+    <!-- Toolbox Panel (Left) -->
+    <div class="w-72 bg-cyber-panel border-l border-r border-cyber-border p-4 flex flex-col h-full shadow-2xl z-50">
+        <h2 class="text-xl font-bold text-cyber-cyan mb-6 text-center border-b border-gray-700 pb-3">
+            صندوق الأدوات
+        </h2>
+        <div class="flex-1 overflow-y-auto space-y-4" id="inventory">
+            <!-- Inventory items generated here -->
+        </div>
+        <div class="mt-4 border-t border-gray-700 pt-4">
+            <button id="auto-wire-btn" disabled class="w-full bg-slate-700 text-slate-400 font-bold py-3 px-4 rounded transition mb-3 opacity-50 cursor-not-allowed">
+                توصيل الدائرة تلقائياً
+            </button>
+            <button id="reset-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                إعادة ضبط المختبر
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col relative h-full">
+        <!-- Header -->
+        <header class="bg-cyber-panel border-b border-cyber-border p-4 flex justify-between items-center z-20">
+            <div class="flex items-center gap-3">
+                <a href="../index.html?showMenu=true" class="bg-[#0a101a73] border border-white/5 backdrop-blur-md flex items-center justify-center gap-2 text-cyan-400 font-bold text-sm cursor-pointer shadow-lg hover:bg-cyan-500/10 hover:scale-105 px-4 py-2 rounded-xl transition-all" style="text-decoration: none;"><i class="fa-solid fa-chevron-right text-xs"></i> التجارب الرئيسية</a>
+                <div class="flex items-center gap-3 bg-black/40 border border-white/5 px-4 py-1.5 rounded-xl backdrop-blur-md shadow-lg">
+                    <div class="flex flex-col text-right font-bold">
+                        <span class="text-xs text-white" style="font-family: 'Outfit', sans-serif;">ELITE LAB</span>
+                        <span class="text-[7px] text-cyber-cyan">محاكيات الفيزياء المنهجية</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Workspace Canvas -->
+        <div class="flex-1 p-6 flex items-center justify-center relative pointer-events-none h-full w-full">
+            <div class="workspace-area pointer-events-auto w-full h-full" id="workspace" style="width: 780px; height: 460px;">
+                <div id="dropzones-container"></div>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="h-16 bg-cyber-panel border-t border-cyber-border flex items-center justify-center px-6">
+            <div id="status-text" class="text-lg font-bold text-cyber-orange">
+                يرجى سحب المكونات الأربعة من صندوق الأدوات إلى أماكنها المخصصة
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel (Teacher's Sidebar) -->
+    <div class="w-96 bg-cyber-panel border-l border-r border-cyber-border p-5 flex flex-col h-full shadow-2xl z-50 overflow-y-auto">
+        <div class="border-b border-gray-700 pb-4 mb-5 text-center">
+            <h1 class="text-xl font-bold text-cyber-cyan tracking-wide mb-1 glow-text-cyan">
+                نشاط تجربة فراداي - الحث الكهرومغناطيسي
+            </h1>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
+                أدوات التجربة:
+            </h2>
+            <div class="space-y-2 text-sm text-slate-300 font-bold bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+                <div class="flex items-center gap-2">حلقة حديدية مقفلة ملفوف عليها ملفين</div>
+                <div class="flex items-center gap-2">بطارية</div>
+                <div class="flex items-center gap-2">مفتاح كهربائي</div>
+                <div class="flex items-center gap-2">جلفانوميتر</div>
+            </div>
+        </div>
+
+        <!-- Historical Challenge Story -->
+        <div class="mt-auto border-t border-gray-800 pt-5">
+            <button id="story-btn" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                <span>قصة التحدي التاريخي</span>
+            </button>
+            
+            <div id="story-panel" class="max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out bg-white/[0.01] border border-white/5 rounded-xl mt-3">
+                <div class="p-4 text-slate-300 space-y-4 text-sm leading-relaxed text-justify">
+                    <p class="font-bold text-cyber-gold text-lg border-b border-white/10 pb-2 text-center">قصة اكتشاف فراداي والحلقة المقفلة</p>
+                    <p><span class="text-cyber-cyan font-bold">التحدي:</span> بعد اكتشاف أورستد أن التيار الكهربائي يولد مجالا مغناطيسيا، حاول العلماء لسنوات توليد الكهرباء من المغناطيس لكنهم فشلوا لأنهم استخدموا مجالات مغناطيسية ثابتة.</p>
+                    <p><span class="text-cyber-orange font-bold">التجربة:</span> لغرض حل هذا اللغز، صمم فراداي حلقة مقفلة من الحديد المطاوع ولف حولها ملفين سلكيين معزولين تماما عن بعضهما. ربط الملف الابتدائي ببطارية ومفتاح، وربط الملف الثانوي بجهاز جلفانوميتر.</p>
+                    <p><span class="text-cyber-red font-bold">المفاجأة:</span> لاحظ فراداي أن مؤشر الجلفانوميتر لا يتحرك أثناء انسياب تيار ثابت، ولكنه ينحرف فقط لحظة غلق المفتاح ولحظة فتحه.</p>
+                    <p><span class="text-cyber-green font-bold">الاستنتاج:</span> التيار المحتث يتولد فقط عند حدوث تغير في الفيض المغناطيسي الذي يخترق الملف لوحدة الزمن.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        gsap.registerPlugin(Draggable);
+
+        // Faraday Ring SVG definition
+        function getFaradayRing(id, x, y, dz) {
+            const svg = \`
+            <svg viewBox="0 0 200 200" class="w-full h-full overflow-visible">
+                <!-- Iron Ring Body -->
+                <circle cx="100" cy="100" r="70" fill="none" stroke="#64748b" stroke-width="30" filter="drop-shadow(0 0 10px rgba(0,0,0,0.5))" />
+                <circle cx="100" cy="100" r="85" fill="none" stroke="#475569" stroke-width="2" />
+                <circle cx="100" cy="100" r="55" fill="none" stroke="#475569" stroke-width="2" />
+                
+                <!-- Flux Line Path (Invisible initially) -->
+                <circle cx="100" cy="100" r="70" class="flux-line" id="ring-flux-line" />
+                
+                <!-- Primary Coil (Left) -->
+                <path d="M 40 80 Q 20 90 40 100 Q 20 110 40 120" fill="none" stroke="#ef4444" stroke-width="5" stroke-linecap="round" />
+                <line x1="40" y1="80" x2="10" y2="80" stroke="#ef4444" stroke-width="5" stroke-linecap="round" />
+                <line x1="40" y1="120" x2="10" y2="120" stroke="#ef4444" stroke-width="5" stroke-linecap="round" />
+
+                <!-- Secondary Coil (Right) -->
+                <path d="M 160 80 Q 180 90 160 100 Q 180 110 160 120" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" />
+                <line x1="160" y1="80" x2="190" y2="80" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" />
+                <line x1="160" y1="120" x2="190" y2="120" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" />
+            </svg>
+            \`;
+            const terminals = [
+                { id: \`\${id}-p1\`, x: 10, y: 80 },
+                { id: \`\${id}-p2\`, x: 10, y: 120 },
+                { id: \`\${id}-s1\`, x: 190, y: 80 },
+                { id: \`\${id}-s2\`, x: 190, y: 120 }
+            ];
+            return EliteComponents.createWrapper(id, 'faraday-ring', x, y, 200, 200, dz, svg, terminals);
+        }
+
+        let engine;
+
+        const state = {
+            components: {},
+            wired: false,
+            switchState: 0, // 0 = open, 1 = closed
+            animating: false
+        };
+
+        const config = {
+            components: [
+                { id: 'ring', name: 'حلقة فراداي', w: 200, h: 200, getHTML: (id, dz) => getFaradayRing(id, 0, 0, dz) },
+                { id: 'battery', name: 'البطارية', w: 70, h: 60, getHTML: (id, dz) => EliteComponents.getBattery(id, 0, 0, dz) },
+                { id: 'switch', name: 'المفتاح الكهربائي', w: 80, h: 100, getHTML: (id, dz) => EliteComponents.getSwitch(id, 0, 0, dz, true) },
+                { id: 'galvanometer', name: 'الجلفانوميتر', w: 110, h: 90, getHTML: (id, dz) => EliteComponents.getGalvanometer(id, 0, 0, dz) }
+            ],
+            layoutGrid: [
+                { id: 'ring', gx: 0, gy: 0 },
+                { id: 'battery', gx: -0.3, gy: 0.2 },
+                { id: 'switch', gx: -0.3, gy: -0.2 },
+                { id: 'galvanometer', gx: 0.3, gy: 0 }
+            ]
+        };
+
+        const inventoryEl = document.getElementById('inventory');
+        const workspaceEl = document.getElementById('workspace');
+        const dropzonesContainer = document.getElementById('dropzones-container');
+        const wiresCanvas = document.getElementById('wires-canvas');
+        const statusText = document.getElementById('status-text');
+        const resetBtn = document.getElementById('reset-btn');
+        const autoWireBtn = document.getElementById('auto-wire-btn');
+        const storyBtn = document.getElementById('story-btn');
+        const storyPanel = document.getElementById('story-panel');
+
+        function setStatus(msg, colorStr) {
+            statusText.textContent = msg;
+            statusText.className = \`text-lg font-bold text-cyber-\${colorStr}\`;
+        }
+
+        storyBtn.addEventListener('click', () => {
+            if (storyPanel.classList.contains('max-h-0')) {
+                storyPanel.classList.remove('max-h-0', 'opacity-0');
+                storyPanel.classList.add('max-h-[1000px]', 'opacity-100');
+                gsap.fromTo(storyPanel, { scaleY: 0.8 }, { scaleY: 1, duration: 0.3, ease: 'power2.out' });
+            } else {
+                storyPanel.classList.add('max-h-0', 'opacity-0');
+                storyPanel.classList.remove('max-h-[1000px]', 'opacity-100');
+            }
+        });
+
+        function getPos(gx, gy) {
+            const rect = workspaceEl.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            return {
+                x: centerX + (gx * 800),
+                y: centerY + (gy * 600)
+            };
+        }
+
+        function buildInventory() {
+            config.components.forEach(comp => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'component-wrapper relative flex flex-col items-center mb-4';
+                wrapper.id = \`wrapper-\${comp.id}\`;
+                
+                const nameTag = document.createElement('div');
+                nameTag.className = 'text-xs font-bold text-gray-400 mb-1';
+                nameTag.innerText = comp.name;
+                wrapper.appendChild(nameTag);
+
+                const dzId = \`dz-\${comp.id}\`;
+                wrapper.insertAdjacentHTML('beforeend', comp.getHTML(comp.id, dzId));
+                
+                inventoryEl.appendChild(wrapper);
+
+                const el = document.getElementById(comp.id);
+                el.dataset.locked = 'false';
+                
+                if (engine) engine.registerComponent(el, comp);
+                
+                Draggable.create(el, {
+                    type: "x,y",
+                    edgeResistance: 0.65,
+                    bounds: document.body,
+                    onPress: function(e) {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, {scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.5)", duration: 0.2});
+                        
+                        this._dropzones = Array.from(document.querySelectorAll('.dropzone')).filter(dz => dz.dataset.accepts === this.target.id && !dz.classList.contains('occupied'));
+                        const rect = this.target.getBoundingClientRect();
+                        document.body.appendChild(this.target);
+                        gsap.set(this.target, { position: 'absolute', left: rect.left, top: rect.top, x: 0, y: 0, margin: 0 });
+                        this.update();
+                    },
+                    onDrag: function() {
+                        (this._dropzones || []).forEach(dz => {
+                            if (this.hitTest(dz, "50%")) dz.classList.add('highlight');
+                            else dz.classList.remove('highlight');
+                        });
+                    },
+                    onRelease: function(e) {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, {scale: 1, boxShadow: "0 0 0 rgba(0,0,0,0)", duration: 0.2});
+                        
+                        let dropzone = null;
+                        (this._dropzones || document.querySelectorAll('.dropzone')).forEach(dz => {
+                            if (dz.dataset.accepts === this.target.id && !dz.classList.contains('occupied')) {
+                                if (this.hitTest(dz, "50%")) dropzone = dz;
+                            }
+                            dz.classList.remove('highlight');
+                        });
+
+                        if (dropzone) {
+                            const absPos = { x: parseFloat(dropzone.style.left), y: parseFloat(dropzone.style.top) };
+                            workspaceEl.appendChild(this.target);
+                            gsap.set(this.target, { left: 0, top: 0, x: 0, y: 0, scale: 1 }); 
+                            
+                            const compDef = config.components.find(c => c.id === this.target.id);
+                            const adjustX = absPos.x - compDef.w/2;
+                            const adjustY = absPos.y - compDef.h/2;
+
+                            gsap.to(this.target, {
+                                x: adjustX,
+                                y: adjustY,
+                                duration: 0.3,
+                                ease: "power2.out",
+                                onUpdate: () => {
+                                    if (engine && engine.jsPlumbInstance && !this._repainting) {
+                                        this._repainting = true;
+                                        requestAnimationFrame(() => {
+                                            if (engine && engine.jsPlumbInstance) engine.jsPlumbInstance.revalidate(this.target);
+                                            this._repainting = false;
+                                        });
+                                    }
+                                },
+                                onComplete: () => {
+                                    this.target.dataset.locked = 'true';
+                                    dropzone.classList.add('occupied');
+                                    state.components[this.target.id] = this.target;
+                                    
+                                    if (Object.keys(state.components).length === 4) {
+                                        setStatus('ممتاز! انقر على زر "توصيل الدائرة تلقائيا"', 'cyan');
+                                        autoWireBtn.disabled = false;
+                                        autoWireBtn.classList.remove('bg-slate-700', 'text-slate-400', 'opacity-50', 'cursor-not-allowed');
+                                        autoWireBtn.classList.add('bg-cyber-blue', 'text-white', 'hover:bg-blue-600', 'shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                                    }
+                                }
+                            });
+                            this.disable();
+                        } else {
+                            const wrapper = document.getElementById(\`wrapper-\${this.target.id}\`);
+                            wrapper.appendChild(this.target);
+                            gsap.set(this.target, {position: 'relative', x: 0, y: 0, left: 'auto', top: 'auto', scale: 0.9});
+                            this.update();
+                        }
+                    }
+                });
+            });
+        }
+
+        function buildDropzones() {
+            config.layoutGrid.forEach(pos => {
+                const compDef = config.components.find(c => c.id === pos.id);
+                const absPos = getPos(pos.gx, pos.gy);
+
+                const dz = document.createElement('div');
+                dz.className = 'dropzone';
+                dz.id = \`dz-\${pos.id}\`;
+                dz.dataset.accepts = pos.id;
+                dz.style.width = \`\${compDef.w + 20}px\`;
+                dz.style.height = \`\${compDef.h + 20}px\`;
+                dz.style.left = \`\${absPos.x}px\`;
+                dz.style.top = \`\${absPos.y}px\`;
+                dz.innerHTML = \`<span>\${compDef.name}</span>\`;
+                dropzonesContainer.appendChild(dz);
+            });
+        }
+
+        function resetWorkspace() {
+            Object.values(state.components).forEach(el => {
+                const d = Draggable.get(el);
+                if (d) d.kill();
+            });
+            gsap.killTweensOf("*");
+
+            state.components = {};
+            state.wired = false;
+            state.switchState = 0;
+            state.animating = false;
+
+            if (engine && engine.jsPlumbInstance) {
+                engine.jsPlumbInstance.deleteEveryConnection();
+                engine.userConnections.clear();
+            }
+
+            inventoryEl.innerHTML = '';
+            dropzonesContainer.innerHTML = '';
+            workspaceEl.querySelectorAll('.component').forEach(el => el.remove());
+
+            autoWireBtn.disabled = true;
+            autoWireBtn.className = 'w-full bg-slate-700 text-slate-400 font-bold py-3 px-4 rounded transition mb-3 opacity-50 cursor-not-allowed';
+
+            buildInventory();
+            buildDropzones();
+            setStatus('يرجى سحب المكونات الأربعة من صندوق الأدوات إلى أماكنها المخصصة', 'orange');
+        }
+
+        function autoWire() {
+            if (Object.keys(state.components).length < 4) return;
+            autoWireBtn.disabled = true;
+            autoWireBtn.classList.remove('opacity-100', 'cursor-pointer');
+            autoWireBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const REQUIRED_PAIRS = [
+                'battery-pos-switch-k', 'switch-1-ring-p1', 'ring-p2-battery-neg',
+                'ring-s1-galvanometer-left', 'ring-s2-galvanometer-right'
+            ];
+            engine.autoWire(REQUIRED_PAIRS);
+        }
+
+        function checkWiringComplete(connections) {
+            if (connections.size >= 5) {
+                const switchArm = document.getElementById('switch-arm');
+                if (switchArm) {
+                    switchArm.style.cursor = 'pointer';
+                    switchArm.style.pointerEvents = 'all';
+                    switchArm.addEventListener('pointerdown', handleSwitchClick);
+                }
+
+                setStatus('تم التوصيل بنجاح. اضغط على المفتاح لغلقه ولاحظ مؤشر الجلفانوميتر!', 'green');
+            }
+        }
+
+        autoWireBtn.addEventListener('click', autoWire);
+
+        function handleSwitchClick(e) {
+            e.stopPropagation();
+            if (state.animating) return;
+            
+            const arm = document.getElementById('switch-arm');
+            const needle = document.getElementById('galvanometer-needle');
+            const flux = document.getElementById('ring-flux-line');
+            
+            state.animating = true;
+            
+            if (state.switchState === 0) {
+                // CLOSING SWITCH
+                state.switchState = 1;
+                gsap.to(arm, {rotation: 0, duration: 0.2});
+                
+                // Flux grows (CW)
+                flux.className.baseVal = "flux-line flux-cw";
+                gsap.to(flux, {opacity: 1, duration: 0.1});
+                
+                // Needle sweeps right (+)
+                gsap.to(needle, {
+                    rotation: 30, duration: 0.2, ease: "power2.out",
+                    onComplete: () => {
+                        // Return to 0
+                        gsap.to(needle, {
+                            rotation: 0, duration: 0.8, ease: "power2.inOut",
+                            onComplete: () => {
+                                gsap.to(flux, {opacity: 0, duration: 0.2});
+                                state.animating = false;
+                                setStatus('استقر الفيض المغناطيسي (لا يوجد تغير)، فعاد المؤشر للصفر.', 'orange');
+                            }
+                        });
+                    }
+                });
+                setStatus('لحظة الغلق: ينمو الفيض المغناطيسي، يتولد تيار محتث مؤقت!', 'cyan');
+            } else {
+                // OPENING SWITCH
+                state.switchState = 0;
+                gsap.to(arm, {rotation: -30, duration: 0.2});
+                
+                // Flux decays (CCW)
+                flux.className.baseVal = "flux-line flux-ccw";
+                gsap.to(flux, {opacity: 1, duration: 0.1});
+                
+                // Needle sweeps left (-)
+                gsap.to(needle, {
+                    rotation: -30, duration: 0.2, ease: "power2.out",
+                    onComplete: () => {
+                        // Return to 0
+                        gsap.to(needle, {
+                            rotation: 0, duration: 0.8, ease: "power2.inOut",
+                            onComplete: () => {
+                                gsap.to(flux, {opacity: 0, duration: 0.2});
+                                state.animating = false;
+                                setStatus('تلاشى الفيض المغناطيسي تماماً، وعاد المؤشر للصفر.', 'orange');
+                            }
+                        });
+                    }
+                });
+                setStatus('لحظة الفتح: يتلاشى الفيض المغناطيسي، يتولد تيار محتث مؤقت معاكس!', 'red');
+            }
+        }
+
+        resetBtn.addEventListener('click', resetWorkspace);
+        
+        window.addEventListener('resize', () => {
+            if(Object.keys(state.components).length === 0) {
+                resetWorkspace();
+            }
+        });
+
+        // Init
+        engine = new EliteEngine({
+            workspaceId: 'workspace',
+            onCircuitComplete: (connections) => checkWiringComplete(connections)
+        });
+        resetWorkspace();
+
+    </script>
+    <script>
+        if(window.initRaqeemResponsive) { window.initRaqeemResponsive('#workspace', 780, 460); }
+    </script>
+</body>
+</html>
+
+

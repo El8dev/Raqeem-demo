@@ -625,6 +625,17 @@
             0%, 100% { opacity: 0.32; }
             50%       { opacity: 0.62; }
         }
+        @media (max-width: 768px) {
+            .app { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+            .toolbox { width: 100%; min-width: auto; border-left: none; border-top: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
+            .toolbox-title, .section-label, .divider { width: 100%; }
+            .mode-btn, .btn { flex: 1; min-width: 120px; }
+            .main { min-height: 60vh; flex: 0 0 auto; }
+            .topbar { padding: 10px 20px 10px 70px; height: auto; flex-wrap: wrap; justify-content: center; }
+            .page-title { width: 100%; text-align: center; margin-bottom: 10px; }
+            .canvas-wrap { min-height: 400px; }
+            .statusbar { height: auto; padding: 10px; }
+        }
     </style>
 </head>
 
@@ -731,14 +742,10 @@
                         <!-- CRT Glass Envelope -->
                         <path id="crt-glass-envelope" fill="url(#crt-glow)" stroke="rgba(0, 210, 255, 0.28)" stroke-width="2.5" style="filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.12));" />
                         
-                        <!-- Fluorescent Phosphor Screen -->
-                        <line id="fluorescent-screen" stroke="rgba(46, 204, 113, 0.65)" stroke-width="5.5" stroke-linecap="round" style="filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.8));" />
-                        
                         <g id="field-halos"></g>
                         <g id="e-lines"></g>
                         <g id="b-symbols"></g>
                         <g id="p-trail"></g>
-                        <g id="screen-impacts"></g> <!-- Persistent Phosphor Impact Spots -->
                         <g id="p-group" style="display:none;">
                             <circle id="p-glow"   r="18" fill="rgba(255,159,67,0.12)" cx="0" cy="0"/>
                             <circle id="p-circle" r="11" fill="#ff9f43" cx="0" cy="0"
@@ -963,8 +970,6 @@
             fArrows.innerHTML  = '';
             const halos = document.getElementById('field-halos');
             if (halos) halos.innerHTML = '';
-            const impacts = document.getElementById('screen-impacts');
-            if (impacts) impacts.innerHTML = '';
             fArrows.style.display = 'none';
             pGroup.style.display  = 'none';
             platePos.style.opacity = '0';
@@ -1180,6 +1185,8 @@
 
             if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
 
+            pTrail.style.transition = '';
+            pTrail.style.opacity = '1';
             pTrail.innerHTML  = '';
             fArrows.innerHTML = '';
             fArrows.style.display = 'block';
@@ -1264,7 +1271,6 @@
             // Educational status update on crossing screen threshold
             if (px >= x2 && !hasImpacted) {
                 hasImpacted = true;
-                addImpactPoint(x2, py);
                 let msg = '';
                 let col = '';
                 if (currentMode === 'electric') {
@@ -1289,6 +1295,17 @@
                 fArrows.style.display = 'none';
                 btnFire.disabled = false;
                 if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+                // Fade out the trail smoothly so no orphaned tail remains visible on screen
+                pTrail.style.transition = 'opacity 0.4s ease';
+                pTrail.style.opacity = '0';
+                setTimeout(() => {
+                    pTrail.innerHTML = '';
+                    pTrail.style.transition = '';
+                    pTrail.style.opacity = '1';
+                    trailPts = [];
+                }, 400);
+
                 return;
             }
 
@@ -1306,27 +1323,6 @@
             pLabel.setAttribute('y', y + 4);
         }
 
-        function addImpactPoint(x, y) {
-            const g = ns('g');
-            g.className = 'impact-dot';
-            
-            const glow = ns('circle');
-            setAttr(glow, { cx: x, cy: y, r: 16, fill: 'rgba(46, 204, 113, 0.35)', style: 'filter: blur(4px);' });
-            
-            const mid = ns('circle');
-            setAttr(mid, { cx: x, cy: y, r: 7, fill: '#2ecc71', style: 'filter: drop-shadow(0 0 5px #2ecc71);' });
-            
-            const core = ns('circle');
-            setAttr(core, { cx: x, cy: y, r: 2.5, fill: '#ffffff' });
-            
-            g.appendChild(glow);
-            g.appendChild(mid);
-            g.appendChild(core);
-            
-            const screenImpacts = document.getElementById('screen-impacts');
-            if (screenImpacts) screenImpacts.appendChild(g);
-        }
-
         function drawCRTOutline() {
             const { w, h } = dims();
             const path = document.getElementById('crt-glass-envelope');
@@ -1335,13 +1331,6 @@
             }
 
             const x2 = w - 16;
-            const screenLine = document.getElementById('fluorescent-screen');
-            if (screenLine) {
-                screenLine.setAttribute('x1', x2);
-                screenLine.setAttribute('y1', 12);
-                screenLine.setAttribute('x2', x2);
-                screenLine.setAttribute('y2', h - 12);
-            }
 
             // Adjust injector position
             const inj = document.querySelector('.injector');

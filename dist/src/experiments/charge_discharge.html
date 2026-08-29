@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مختبر الفيزياء الافتراضي المنهجي | شحن وتفريغ المتسعة</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <!-- GSAP -->
+    <script src="../libs/gsap.min.js"></script>
+    <script src="../libs/Draggable.min.js"></script>
+    <script src="../engine/svg-wire-engine.js"></script>
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <script src="../engine/elite-components.js"></script>
+    <script src="../engine/elite-engine.js"></script>
+    
+    <script>
+        window.tailwind = window.tailwind || {}; window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            off: '#07090e',
+                            on: '#0f131a',
+                            panel: '#111823',
+                            border: 'rgba(0, 210, 255, 0.2)',
+                            gold: '#ffe082',
+                            orange: '#ff9f43',
+                            cyan: '#00d2ff',
+                            green: '#2ecc71',
+                            red: '#ef4444',
+                            blue: '#3b82f6'
+                        }
+                    },
+                    fontFamily: {
+                        ar: ['Tajawal', 'sans-serif'],
+                        en: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --bg-color: #07090e;
+            --panel-bg: #111823;
+            --accent-blue: #3b82f6;
+            --accent-orange: #ff9f43;
+            --text-color: #e2e8f0;
+            --neon-red: #ef4444;
+        }
+
+        body { user-select: none; -webkit-user-select: none;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Tajawal', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .workspace-area {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #111e32 0%, #05080f 100%);
+            border-radius: 12px;
+            position: relative;
+            border: 2px solid rgba(0, 210, 255, 0.15);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+            overflow: hidden;
+        }
+
+        /* SVG Wire Canvas */
+        #wires-canvas { display: none; }
+        .wire-path { display: none; }
+        #ghost-wiring { display: none; }
+        .ghost-path { display: none; }
+
+        /* Override terminals for jsPlumb */
+        .terminal-node {
+            width: 16px;
+            height: 16px;
+            background: rgba(0, 210, 255, 0.4);
+            border: 2px solid #00d2ff;
+            border-radius: 50%;
+            position: absolute;
+            cursor: crosshair;
+            z-index: 30;
+            transition: all 0.2s;
+            pointer-events: all;
+            margin-left: -8px;
+            margin-top: -8px;
+            box-shadow: 0 0 5px #00d2ff;
+        }
+
+        .terminal-node:hover, .terminal-node.hovered {
+            background: rgba(0, 210, 255, 1);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px #00d2ff;
+        }
+
+        .terminal-node.target-glow {
+            animation: pulseGlow 1.2s infinite;
+            z-index: 40;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: scale(1.2); }
+            50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: scale(1.5); }
+            100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: scale(1.2); }
+        }
+
+        /* Inventory Reset for Elite Components */
+        #inventory .component {
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+            margin: 10px auto;
+            cursor: grab;
+            transform: scale(0.9);
+        }
+        
+        #inventory .component:active {
+            cursor: grabbing;
+        }
+
+        .component {
+            position: absolute;
+            z-index: 20;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* Terminal Overrides */
+        .terminal-node {
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            border: 3px solid #64748b;
+            border-radius: 50%;
+            position: absolute;
+            cursor: crosshair;
+            z-index: 30;
+            transition: all 0.2s;
+            pointer-events: all;
+            margin-left: -8px;
+            margin-top: -8px;
+        }
+
+        .terminal-node:hover {
+            transform: scale(1.3);
+            background: #ff9f43;
+            border-color: #fff;
+            box-shadow: 0 0 10px #ff9f43;
+        }
+
+        .terminal-node[data-active="true"] {
+            background: #2ecc71;
+            border-color: #fff;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        /* Dropzones */
+        .dropzone {
+            position: absolute;
+            border: 2px dashed rgba(0, 210, 255, 0.4);
+            border-radius: 12px;
+            background: rgba(0, 210, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            z-index: 5;
+            transition: all 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .dropzone.highlight {
+            border-color: rgba(0, 210, 255, 0.8);
+            background: rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .dropzone.occupied {
+            border-color: rgba(46, 204, 113, 0.5);
+            background: transparent;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="flex h-screen bg-cyber-off">
+
+    <!-- Sidebar / Toolbox -->
+    <div class="w-72 bg-cyber-panel border-l border-cyber-border p-4 flex flex-col h-full shadow-2xl z-50">
+        <h2 class="text-xl font-bold text-cyber-cyan mb-6 text-center border-b border-gray-700 pb-3">
+            <i class="fas fa-toolbox mr-2"></i> صندوق الأدوات
+        </h2>
+        
+        <div class="flex-1 overflow-y-auto space-y-4" id="inventory">
+            <!-- Inventory items generated here -->
+        </div>
+
+        <div class="mt-4 border-t border-gray-700 pt-4">
+            <button id="reset-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition">
+                <i class="fas fa-trash-restore mr-2"></i> إعادة ضبط المختبر
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col relative h-full">
+        
+        <!-- Top Tabs -->
+        <div class="bg-cyber-panel border-b border-cyber-border p-4 flex justify-center space-x-4 rtl:space-x-reverse z-20">
+            <button class="tab-btn active px-6 py-2 rounded-full font-bold transition text-white bg-cyber-blue shadow-[0_0_15px_rgba(59,130,246,0.5)]" data-tab="charging">
+                <i class="fas fa-bolt mr-2"></i> نشاط 1: شحن المتسعة
+            </button>
+            <button class="tab-btn px-6 py-2 rounded-full font-bold transition text-gray-400 hover:text-white hover:bg-gray-800" data-tab="discharging">
+                <i class="fas fa-battery-empty mr-2"></i> نشاط 2: تفريغ المتسعة
+            </button>
+        </div>
+
+        <!-- Workspace Canvas -->
+        <div class="flex-1 p-6 flex items-center justify-center relative pointer-events-none h-full w-full">
+            <div class="workspace-area pointer-events-auto w-full h-full" id="workspace" style="width: 780px; height: 460px;">
+                <svg id="ghost-wiring"></svg>
+                <svg id="wires-canvas"></svg>
+                <div id="dropzones-container"></div>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="h-16 bg-cyber-panel border-t border-cyber-border flex items-center justify-center px-6">
+            <div id="status-text" class="text-lg font-bold text-cyber-orange">
+                يرجى سحب المكونات من صندوق الأدوات إلى أماكنها المخصصة
+            </div>
+        </div>
+    </div>
+
+    <script>
+        gsap.registerPlugin(Draggable);
+
+        // -- STATE MANAGEMENT --
+        const state = {
+            currentTab: 'charging',
+            components: {},
+            wires: [],
+            circuitValid: false,
+            switchPosition: 0 
+        };
+        let engine;
+
+        const config = {
+            components: [
+                { id: 'battery', name: 'بطارية', w: 70, h: 60, getHTML: (id, dz) => EliteComponents.getBattery(id, 0, 0, dz) },
+                { id: 'resistor', name: 'مقاومة R', w: 80, h: 40, getHTML: (id, dz) => EliteComponents.getResistor(id, 0, 0, dz, '10 kΩ') },
+                { id: 'lamp1', name: 'مصباح L1', w: 50, h: 75, getHTML: (id, dz) => EliteComponents.getLamp(id, 0, 0, dz, 'Yellow', 'L1') },
+                { id: 'lamp2', name: 'مصباح L2', w: 50, h: 75, getHTML: (id, dz) => EliteComponents.getLamp(id, 0, 0, dz, 'Yellow', 'L2') },
+                { id: 'galvanometer', name: 'كلڤانومتر', w: 110, h: 90, getHTML: (id, dz) => EliteComponents.getGalvanometer(id, 0, 0, dz) },
+                { id: 'capacitor', name: 'متسعة C', w: 120, h: 160, getHTML: (id, dz) => EliteComponents.getCapacitor(id, 0, 0, dz) },
+                { id: 'switch', name: 'مفتاح K', w: 80, h: 100, getHTML: (id, dz) => EliteComponents.getSwitch(id, 0, 0, dz, false) }
+            ],
+            // Relative grid layout (0.0 to 1.0) to dynamically center based on workspace dimensions
+            layoutGrid: [
+                { id: 'lamp2', gx: -0.3, gy: -0.3 },
+                { id: 'lamp1', gx: -0.3, gy: 0.3 },
+                { id: 'galvanometer', gx: -0.1, gy: 0 },
+                { id: 'capacitor', gx: 0.15, gy: 0 },
+                { id: 'resistor', gx: -0.1, gy: 0.3 },
+                { id: 'battery', gx: 0.15, gy: 0.3 },
+                { id: 'switch', gx: 0.35, gy: 0 }
+            ]
+        };
+
+        const inventoryEl = document.getElementById('inventory');
+        const workspaceEl = document.getElementById('workspace');
+        const dropzonesContainer = document.getElementById('dropzones-container');
+        const wiresCanvas = document.getElementById('wires-canvas');
+        const ghostWiringCanvas = document.getElementById('ghost-wiring');
+        const statusText = document.getElementById('status-text');
+        const resetBtn = document.getElementById('reset-btn');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        // Delete Btn logic removed (jsPlumb handles it natively)
+        
+        function init() {
+            // Setup exact 1-to-1 canonical pairs for EliteEngine validation
+            const validPairs = [
+                'battery-pos-resistor-right',
+                'resistor-left-lamp1-left',
+                'lamp1-right-galvanometer-left',
+                'galvanometer-right-capacitor-left',
+                'capacitor-right-switch-k',
+                'switch-1-battery-neg',
+                'switch-2-lamp2-right',
+                'lamp2-left-galvanometer-left'
+            ];
+            
+            engine = new EliteEngine({
+                workspaceId: 'workspace',
+                expectedPairs: validPairs,
+                onCircuitComplete: (connections) => checkCircuitValid(connections)
+            });
+
+            setupTabs();
+            resetWorkspace();
+            resetBtn.addEventListener('click', resetWorkspace);
+            window.addEventListener('resize', () => {
+                if(Object.keys(state.components).length === 0) {
+                    resetWorkspace(); // Redraw grid dynamically if resizing empty
+                }
+            });
+        }
+
+        function setupTabs() {
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    if (state.currentTab === tab) return;
+                    
+                    tabBtns.forEach(b => {
+                        b.classList.remove('text-white', 'bg-cyber-blue', 'shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                        b.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+                    });
+                    
+                    btn.classList.add('text-white', 'bg-cyber-blue', 'shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                    btn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+                    
+                    state.currentTab = tab;
+                    resetWorkspace();
+                });
+            });
+        }
+
+        // Calculate absolute position based on grid
+        function getPos(gx, gy) {
+            const rect = workspaceEl.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            // Scale grid factors (approx 800px width reference)
+            return {
+                x: centerX + (gx * 800),
+                y: centerY + (gy * 600)
+            };
+        }
+
+        function resetWorkspace() {
+            Object.values(state.components).forEach(el => {
+                const d = Draggable.get(el);
+                if (d) d.kill();
+            });
+            gsap.killTweensOf("*");
+
+            state.components = {};
+            state.wires = [];
+            state.circuitValid = false;
+            state.switchPosition = 0;
+            if (engine && engine.jsPlumbInstance) {
+                engine.jsPlumbInstance.deleteEveryConnection();
+                engine.userConnections.clear();
+            }
+
+            inventoryEl.innerHTML = '';
+            dropzonesContainer.innerHTML = '';
+            document.querySelectorAll('.component-wrapper').forEach(el => el.remove());
+            workspaceEl.querySelectorAll('.component').forEach(el => el.remove());
+
+            buildInventory();
+            buildDropzones();
+            setStatus('يرجى سحب المكونات من صندوق الأدوات إلى أماكنها المخصصة', 'orange');
+        }
+
+        function isTerminalOccupied(terminal) {
+            return state.wires.some(w => w.start === terminal || w.end === terminal);
+        }
+
+        function buildInventory() {
+            config.components.forEach(comp => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'component-wrapper relative flex flex-col items-center mb-4';
+                wrapper.id = `wrapper-${comp.id}`;
+                
+                const nameTag = document.createElement('div');
+                nameTag.className = 'text-xs font-bold text-gray-400 mb-1';
+                nameTag.innerText = comp.name;
+                wrapper.appendChild(nameTag);
+
+                const dzId = `dz-${comp.id}`;
+                wrapper.insertAdjacentHTML('beforeend', comp.getHTML(comp.id, dzId));
+                
+                inventoryEl.appendChild(wrapper);
+
+                const el = document.getElementById(comp.id);
+                el.dataset.locked = 'false';
+                
+                el.querySelectorAll('.terminal-node').forEach(t => t.style.display = 'none');
+                
+                const arm = document.getElementById(`${comp.id}-arm`);
+                if (arm) {
+                    arm.style.pointerEvents = 'all';
+                    arm.style.cursor = 'pointer';
+                    arm.addEventListener('pointerdown', (e) => {
+                        e.stopPropagation();
+                        if (el.dataset.locked === 'true') {
+                            cycleSwitch();
+                        } else {
+                            setStatus('أكمل تركيب الدائرة أولاً', 'red');
+                        }
+                    });
+                }
+
+                Draggable.create(el, {
+                    type: "x,y",
+                    edgeResistance: 0.65,
+                    bounds: document.body,
+                    onPress: function(e) {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, {scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.5)", duration: 0.2});
+                        
+                        const rect = this.target.getBoundingClientRect();
+                        document.body.appendChild(this.target);
+                        gsap.set(this.target, { position: 'absolute', left: rect.left, top: rect.top, x: 0, y: 0, margin: 0 });
+                        this.update();
+                    },
+                    onDrag: function() {
+                        checkDropzones(this);
+                    },
+                    onRelease: function(e) {
+                        if (this.target.dataset.locked === 'true') return;
+                        gsap.to(this.target, {scale: 1, boxShadow: "0 0 0 rgba(0,0,0,0)", duration: 0.2});
+                        
+                        const dropzone = getValidDropzone(this);
+                        if (dropzone) snapToDropzone(this.target, dropzone);
+                        else returnToInventory(this.target, document.getElementById(`wrapper-${this.target.id}`));
+                    }
+                });
+            });
+        }
+
+        function buildDropzones() {
+            config.layoutGrid.forEach(pos => {
+                const compDef = config.components.find(c => c.id === pos.id);
+                const absPos = getPos(pos.gx, pos.gy);
+
+                const dz = document.createElement('div');
+                dz.className = 'dropzone';
+                dz.id = `dz-${pos.id}`;
+                dz.dataset.accepts = pos.id;
+                dz.style.width = `${compDef.w + 20}px`;
+                dz.style.height = `${compDef.h + 20}px`;
+                dz.style.left = `${absPos.x}px`;
+                dz.style.top = `${absPos.y}px`;
+                dz.innerHTML = `<span>${compDef.name}</span>`;
+                dropzonesContainer.appendChild(dz);
+            });
+        }
+
+        function checkDropzones(draggable) {
+            const targetId = draggable.target.id;
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                if (dz.dataset.accepts === targetId && !dz.classList.contains('occupied')) {
+                    if (draggable.hitTest(dz, "50%")) dz.classList.add('highlight');
+                    else dz.classList.remove('highlight');
+                }
+            });
+        }
+
+        function getValidDropzone(draggable) {
+            let found = null;
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                if (dz.dataset.accepts === draggable.target.id && !dz.classList.contains('occupied')) {
+                    if (draggable.hitTest(dz, "50%")) found = dz;
+                }
+                dz.classList.remove('highlight');
+            });
+            return found;
+        }
+
+        function snapToDropzone(el, dropzone) {
+            const absPos = { x: parseFloat(dropzone.style.left), y: parseFloat(dropzone.style.top) };
+            
+            // Get current visual rect before appending to workspace
+            const rect = el.getBoundingClientRect();
+            const workspaceRect = workspaceEl.getBoundingClientRect();
+            const relLeft = rect.left - workspaceRect.left;
+            const relTop = rect.top - workspaceRect.top;
+
+            workspaceEl.appendChild(el);
+            gsap.set(el, { left: relLeft, top: relTop, x: 0, y: 0, scale: 1 }); 
+            
+            // Adjust translation dynamically because elite component origin might be top-left or centered
+            const compDef = config.components.find(c => c.id === el.id);
+            const adjustX = absPos.x - compDef.w/2;
+            const adjustY = absPos.y - compDef.h/2;
+
+            gsap.to(el, {
+                left: adjustX,
+                top: adjustY,
+                duration: 0.3,
+                ease: "power2.out",
+                onComplete: () => {
+                    el.dataset.locked = 'true';
+                    dropzone.classList.add('occupied');
+                    state.components[el.id] = el;
+                    
+                    el.querySelectorAll('.terminal-node').forEach((t, i) => {
+                        t.style.display = 'block';
+                    });
+                    engine.setupTerminals();
+                    
+                    checkAllComponentsPlaced();
+                }
+            });
+            Draggable.get(el).disable();
+        }
+
+        function returnToInventory(el, wrapper) {
+            wrapper.appendChild(el);
+            gsap.set(el, {position: 'relative', x: 0, y: 0, left: 'auto', top: 'auto', scale: 0.9});
+            Draggable.get(el).update();
+        }
+
+        function checkAllComponentsPlaced() {
+            if (Object.keys(state.components).length === config.layoutGrid.length) {
+                setStatus('ممتاز! قم الآن بربط الأسلاك عبر سحبها بين الأقطاب تماماً كما في المخطط', 'cyan');
+            }
+        }
+
+        function setStatus(msg, colorStr) {
+            statusText.textContent = msg;
+            statusText.className = `text-lg font-bold text-cyber-${colorStr}`;
+        }
+
+        // -- EliteEngine Circuit Validation --
+        function checkCircuitValid(connectionsSet) {
+            if (Object.keys(state.components).length !== config.layoutGrid.length) return;
+            
+            // The circuit requires 8 specific connections to function.
+            // Wait, we need to map the terminal IDs.
+            // In EliteEngine, connections are formatted as `id1-id2`.
+            // Our terminal IDs are like `lamp2_lamp-term-1` or `battery_bat-pos`.
+            
+            if (connectionsSet && connectionsSet.size >= 8) {
+                state.circuitValid = true;
+                setStatus('الدائرة موصلة بشكل صحيح تماماً! أغلق المفتاح لبدء النشاط', 'green');
+            } else {
+                state.circuitValid = false;
+            }
+        }
+
+        // -- PHYSICS ENGINE --
+        function cycleSwitch() {
+            const arm = document.getElementById('switch-arm');
+            if (!arm) return;
+
+            if (!state.circuitValid) {
+                setStatus('أكمل توصيل أسلاك الدائرة بجميع الأقطاب الصحيحة أولاً', 'red');
+                return;
+            }
+
+            if (state.currentTab === 'charging') {
+                if (state.switchPosition === 0) {
+                    state.switchPosition = 1;
+                    gsap.to(arm, {rotation: 20, duration: 0.2}); 
+                    runPhysicsSimulation('charging');
+                } else {
+                    state.switchPosition = 0;
+                    gsap.to(arm, {rotation: -15, duration: 0.2}); 
+                    stopPhysicsSimulation();
+                    setStatus('تم فتح الدائرة (مفتاح K)', 'orange');
+                }
+            } else if (state.currentTab === 'discharging') {
+                if (state.switchPosition === 0) {
+                    state.switchPosition = 2;
+                    gsap.to(arm, {rotation: -60, duration: 0.2}); 
+                    runPhysicsSimulation('discharging');
+                } else {
+                    state.switchPosition = 0;
+                    gsap.to(arm, {rotation: -15, duration: 0.2}); 
+                    stopPhysicsSimulation();
+                    setStatus('تم فتح الدائرة (مفتاح K)', 'orange');
+                }
+            }
+        }
+
+        let simTimeline = null;
+
+        function runPhysicsSimulation(activity) {
+            setStatus(activity === 'charging' ? 'جاري شحن المتسعة... (L1 يضيء)' : 'جاري تفريغ المتسعة... (L2 يضيء)', 'cyan');
+            
+            const isCharging = activity === 'charging';
+            
+            const needle = document.getElementById('galvanometer-needle');
+            const bulb1Glow = document.getElementById('lamp1-glow');
+            const bulb2Glow = document.getElementById('lamp2-glow');
+            const negCharges = document.getElementById('capacitor-negCharges');
+            const posCharges = document.getElementById('capacitor-posCharges');
+
+            if (simTimeline) simTimeline.kill();
+            simTimeline = gsap.timeline();
+
+            if (isCharging) {
+                if (bulb1Glow) {
+                    bulb1Glow.className = "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/100 blur-xl transition-all duration-300 z-0";
+                    simTimeline.to(bulb1Glow, {className: "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/0 blur-xl transition-all duration-300 z-0", duration: 4, ease: "expo.out"}, 0);
+                }
+                if (needle) {
+                    // Right deflection
+                    simTimeline.to(needle, {rotation: 60, duration: 0.1, ease: "power4.out"}, 0);
+                    simTimeline.to(needle, {rotation: 0, duration: 4, ease: "expo.out"}, 0.1);
+                }
+                if (negCharges && posCharges) {
+                    gsap.set([negCharges, posCharges], {opacity: 0});
+                    simTimeline.to([negCharges, posCharges], {opacity: 1, duration: 4, ease: "power2.out"}, 0);
+                }
+                simTimeline.call(() => setStatus('اكتمل شحن المتسعة (فرق الجهد الأقصى - التيار صفر)', 'green'));
+            } else {
+                if (bulb2Glow) {
+                    bulb2Glow.className = "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/100 blur-xl transition-all duration-300 z-0";
+                    simTimeline.to(bulb2Glow, {className: "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/0 blur-xl transition-all duration-300 z-0", duration: 2, ease: "expo.out"}, 0);
+                }
+                if (needle) {
+                    // Left deflection (reverse)
+                    simTimeline.to(needle, {rotation: -60, duration: 0.1, ease: "power4.out"}, 0);
+                    simTimeline.to(needle, {rotation: 0, duration: 2, ease: "expo.out"}, 0.1);
+                }
+                if (negCharges && posCharges) {
+                    gsap.set([negCharges, posCharges], {opacity: 1});
+                    simTimeline.to([negCharges, posCharges], {opacity: 0, duration: 2, ease: "power2.in"}, 0);
+                }
+                simTimeline.call(() => setStatus('اكتمل تفريغ المتسعة (الطاقة استهلكت كلياً - التيار صفر)', 'green'));
+            }
+        }
+
+        function stopPhysicsSimulation() {
+            if (simTimeline) simTimeline.kill();
+            const needle = document.getElementById('galvanometer-needle');
+            const bulb1Glow = document.getElementById('lamp1-glow');
+            const bulb2Glow = document.getElementById('lamp2-glow');
+
+            if (needle) gsap.to(needle, {rotation: 0, duration: 0.5});
+            if (bulb1Glow) bulb1Glow.className = "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/0 blur-xl transition-all duration-300 z-0";
+            if (bulb2Glow) bulb2Glow.className = "absolute top-0 w-12 h-12 rounded-full bg-yellow-500/0 blur-xl transition-all duration-300 z-0";
+        }
+
+        window.addEventListener('load', init);
+    </script>
+    <script>
+        if(window.initRaqeemResponsive) { window.initRaqeemResponsive('#workspace', 780, 460); }
+    </script>
+</body>
+</html>
+
+

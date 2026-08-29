@@ -94,8 +94,8 @@ body {
 /* Terminal Nodes */
 .terminal-node {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: rgba(0, 210, 255, 0.4);
     border: 2px solid #00d2ff;
@@ -103,6 +103,27 @@ body {
     z-index: 20;
     box-shadow: 0 0 5px #00d2ff;
     touch-action: none;
+    cursor: crosshair;
+}
+
+/* 44px Invisible Touch Hitbox for Fingers and Mobile */
+.terminal-node::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    cursor: crosshair;
+}
+
+.terminal-node.terminal-active-source {
+    background: #facc15;
+    border-color: #ffffff;
+    box-shadow: 0 0 14px #facc15;
+    transform: translate(-50%, -50%) scale(1.4);
+    animation: pulseGlow 1s infinite;
 }
 
 .terminal-node.connected {
@@ -130,8 +151,6 @@ body {
 }
 
 .workspace-area {
-    width: 100%;
-    height: 600px;
     background: radial-gradient(circle at center, #111e32 0%, #05080f 100%);
     border-radius: 20px;
     position: relative;
@@ -201,5 +220,103 @@ body {
 .wire-delete-badge:hover circle {
     fill: #dc2626;
     r: 12px;
+}
+
+/* =========================================================================
+   RESPONSIVE AUTO-SCALER & LANDSCAPE ORIENTATION HINT
+   ========================================================================= */
+.workspace-scaler-wrapper {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    transition: height 0.2s ease-out;
+}
+
+.workspace-scaler-wrapper .workspace-area {
+    flex-shrink: 0;
+    margin: 0;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Floating Landscape Hint Banner */
+.raqeem-landscape-hint {
+    display: none;
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto 12px auto;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 182, 212, 0.15));
+    border: 1px solid rgba(0, 210, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 210, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 8px 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 40;
+    animation: pulseHintBorder 3s infinite ease-in-out;
+}
+
+@keyframes pulseHintBorder {
+    0%, 100% { border-color: rgba(0, 210, 255, 0.3); }
+    50% { border-color: rgba(0, 210, 255, 0.8); box-shadow: 0 0 15px rgba(0, 210, 255, 0.25); }
+}
+
+.raqeem-landscape-hint .hint-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+.raqeem-landscape-hint .rotate-icon {
+    font-size: 15px;
+    color: #00d2ff;
+    animation: rotateIconHint 2.5s infinite ease-in-out;
+}
+
+@keyframes rotateIconHint {
+    0%, 20% { transform: rotate(0deg); }
+    50%, 70% { transform: rotate(90deg); color: #ffe082; }
+    90%, 100% { transform: rotate(0deg); color: #00d2ff; }
+}
+
+.raqeem-landscape-hint .hint-btn {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.raqeem-landscape-hint .hint-btn:active {
+    transform: scale(0.95);
+}
+
+/* Only display hint on mobile/tablet portrait views */
+@media (max-width: 768px) and (orientation: portrait) {
+    .raqeem-landscape-hint {
+        display: flex;
+    }
+}
+
+@media (orientation: landscape) {
+    .raqeem-landscape-hint {
+        display: none !important;
+    }
 }
 
