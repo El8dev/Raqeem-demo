@@ -19,7 +19,8 @@ class EliteComponents {
                 const leftPerc = (t.x / w) * 100;
                 const topPerc = (t.y / h) * 100;
                 const maxConnsAttr = t.maxConnections ? `data-max-connections="${t.maxConnections}"` : '';
-                terminalsHTML += `<div class="terminal-node" id="${t.id}" ${maxConnsAttr} style="left: ${leftPerc}%; top: ${topPerc}%;"></div>`;
+                const dirAttr = t.direction ? `data-direction="${t.direction}"` : '';
+                terminalsHTML += `<div class="terminal-node" id="${t.id}" ${maxConnsAttr} ${dirAttr} style="left: ${leftPerc}%; top: ${topPerc}%;"></div>`;
             });
         }
 
@@ -35,46 +36,62 @@ class EliteComponents {
         const svg = `
         <svg viewBox="0 0 70 60" class="w-full h-full overflow-visible">
             <defs>
-              <linearGradient id="batBody" x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient id="batBody" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#1e293b" />
-                <stop offset="30%" stop-color="#0f172a" />
+                <stop offset="20%" stop-color="#334155" />
+                <stop offset="50%" stop-color="#0f172a" />
+                <stop offset="80%" stop-color="#334155" />
                 <stop offset="100%" stop-color="#020617" />
               </linearGradient>
-              <linearGradient id="batTop" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#ef4444" />
-                <stop offset="50%" stop-color="#b91c1c" />
-                <stop offset="100%" stop-color="#7f1d1d" />
+              <linearGradient id="batTopStrip" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f59e0b" />
+                <stop offset="20%" stop-color="#fbbf24" />
+                <stop offset="50%" stop-color="#d97706" />
+                <stop offset="80%" stop-color="#fbbf24" />
+                <stop offset="100%" stop-color="#b45309" />
               </linearGradient>
-              <linearGradient id="batNeg" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#3b82f6" />
-                <stop offset="50%" stop-color="#1d4ed8" />
-                <stop offset="100%" stop-color="#1e3a8a" />
-              </linearGradient>
-              <linearGradient id="brass" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ffe082" />
-                <stop offset="40%" stop-color="#d97706" />
-                <stop offset="100%" stop-color="#78350f" />
+              <linearGradient id="metalContact" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#94a3b8" />
+                <stop offset="50%" stop-color="#f1f5f9" />
+                <stop offset="100%" stop-color="#64748b" />
               </linearGradient>
             </defs>
-            <rect x="0" y="5" width="70" height="55" rx="6" fill="rgba(0,0,0,0.5)" filter="blur(2px)"/>
-            <rect x="0" y="8" width="70" height="52" rx="6" fill="url(#batBody)" stroke="#334155" stroke-width="1.5" />
-            <path d="M 2 8 L 33 8 L 33 16 L 2 16 Z" fill="url(#batNeg)" />
-            <path d="M 37 8 L 68 8 L 68 16 L 37 16 Z" fill="url(#batTop)" />
-            <text x="17" y="15" fill="#bfdbfe" font-size="10" font-weight="black" text-anchor="middle">-</text>
-            <text x="53" y="15" fill="#fecaca" font-size="10" font-weight="black" text-anchor="middle">+</text>
-            <ellipse cx="15" cy="8" rx="6" ry="3.5" fill="url(#brass)" stroke="#451a03" stroke-width="0.75" />
-            <rect x="12" y="1" width="6" height="7" fill="url(#brass)" stroke="#451a03" stroke-width="0.5" />
-            <circle cx="15" cy="1" r="3.2" fill="#fbbf24" />
-            <ellipse cx="55" cy="8" rx="6" ry="3.5" fill="url(#brass)" stroke="#451a03" stroke-width="0.75" />
-            <rect x="52" y="1" width="6" height="7" fill="url(#brass)" stroke="#451a03" stroke-width="0.5" />
-            <circle cx="55" cy="1" r="3.2" fill="#fbbf24" />
-            <text x="35" y="32" fill="#fde047" font-size="9" font-weight="black" font-family="Outfit" text-anchor="middle" letter-spacing="1">ELITE</text>
-            <text x="35" y="44" fill="#e2e8f0" font-size="8" font-weight="bold" font-family="Outfit" text-anchor="middle">12V CELL</text>
+            <!-- Shadow -->
+            <rect x="-4" y="10" width="78" height="54" rx="6" fill="rgba(0,0,0,0.5)" filter="blur(4px)"/>
+            
+            <!-- Main Body (Dark Metallic) -->
+            <rect x="0" y="8" width="70" height="52" rx="4" fill="url(#batBody)" stroke="#020617" stroke-width="1.5" />
+            
+            <!-- Gold Top Strip -->
+            <rect x="0" y="8" width="70" height="14" rx="4" fill="url(#batTopStrip)" />
+            <rect x="0" y="18" width="70" height="4" fill="#d97706" />
+            
+            <!-- Terminals Blocks -->
+            <path d="M 6 4 L 26 4 L 26 12 L 6 12 Z" fill="url(#metalContact)" stroke="#475569" stroke-width="1"/>
+            <path d="M 44 4 L 64 4 L 64 12 L 44 12 Z" fill="url(#metalContact)" stroke="#475569" stroke-width="1"/>
+            
+            <!-- Positive/Negative markers -->
+            <circle cx="16" cy="18" r="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+            <text x="16" y="21" fill="#f8fafc" font-size="10" font-weight="black" font-family="Outfit" text-anchor="middle">-</text>
+            
+            <circle cx="54" cy="18" r="6" fill="#7f1d1d" stroke="#ef4444" stroke-width="1"/>
+            <text x="54" y="21" fill="#fecaca" font-size="10" font-weight="black" font-family="Outfit" text-anchor="middle">+</text>
+            
+            <!-- Metallic Knobs -->
+            <rect x="12" y="0" width="8" height="4" rx="1" fill="url(#metalContact)" stroke="#334155" stroke-width="1" />
+            <rect x="50" y="0" width="8" height="4" rx="1" fill="url(#metalContact)" stroke="#334155" stroke-width="1" />
+            
+            <!-- Brand Text & Details -->
+            <text x="35" y="38" fill="#f8fafc" font-size="12" font-weight="900" font-family="Outfit" text-anchor="middle" letter-spacing="2">EL8</text>
+            <text x="35" y="48" fill="#94a3b8" font-size="8" font-weight="bold" font-family="Outfit" text-anchor="middle" letter-spacing="1">12V MAX PRO</text>
+            
+            <!-- Bottom highlight -->
+            <path d="M 2 58 L 68 58" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-linecap="round"/>
         </svg>
         `;
         const terminals = [
-            { id: `${id}-neg`, x: 15, y: 8 },
-            { id: `${id}-pos`, x: 55, y: 8 }
+            { id: `${id}-neg`, x: 16, y: 8 },
+            { id: `${id}-pos`, x: 54, y: 8 }
         ];
         return this.createWrapper(id, 'battery', x, y, 70, 60, targetZone, svg, terminals);
     }
@@ -189,8 +206,8 @@ class EliteComponents {
         <div class="absolute" id="${id}-needle" style="left: 54px; top: 36px; width: 2px; height: 38px; background: #ef4444; transform-origin: bottom center; transform: rotate(0deg); box-shadow: 0 0 5px rgba(239,68,68,0.8); z-index: 15; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
         `;
         const terminals = [
-            { id: `${id}-left`, x: 30, y: 89, maxConnections: 2 },
-            { id: `${id}-right`, x: 80, y: 89, maxConnections: 2 }
+            { id: `${id}-left`, x: 30, y: 89, maxConnections: 2, direction: 'bottom' },
+            { id: `${id}-right`, x: 80, y: 89, maxConnections: 2, direction: 'bottom' }
         ];
         return this.createWrapper(id, 'galvanometer', x, y, 110, 90, targetZone, svg, terminals);
     }
@@ -198,78 +215,143 @@ class EliteComponents {
     static getSwitch(id, x, y, targetZone, isTwoNode = false) {
         const labelHTML = ``;
 
+        // ── Realistic 3-terminal knife switch ──
         const svg3 = `
         ${labelHTML}
         <svg viewBox="0 0 80 100" class="w-full h-full overflow-visible">
             <defs>
-              <linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#5c4033" />
-                <stop offset="50%" stop-color="#3d2b1f" />
-                <stop offset="100%" stop-color="#261c13" />
+              <!-- Bakelite base -->
+              <linearGradient id="bkl-${id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#2d1f0e"/>
+                <stop offset="50%" stop-color="#1a1108"/>
+                <stop offset="100%" stop-color="#0f0b04"/>
               </linearGradient>
-              <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#ea580c" />
-                <stop offset="50%" stop-color="#f97316" />
-                <stop offset="100%" stop-color="#c2410c" />
+              <!-- Brass contacts -->
+              <linearGradient id="brass-${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d4a017"/>
+                <stop offset="40%" stop-color="#c8960c"/>
+                <stop offset="100%" stop-color="#8b6508"/>
               </linearGradient>
+              <!-- Metal blade -->
+              <linearGradient id="blade-${id}" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#94a3b8"/>
+                <stop offset="40%" stop-color="#e2e8f0"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </linearGradient>
+              <!-- Screw -->
+              <radialGradient id="screw-${id}" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#d4a017"/>
+                <stop offset="100%" stop-color="#78350f"/>
+              </radialGradient>
             </defs>
-            <rect x="0" y="0" width="80" height="100" rx="6" fill="url(#woodGrad)" stroke="#1a110b" stroke-width="1.5" />
-            
-            <rect x="6" y="6" width="12" height="12" fill="url(#copper)" stroke="#9a3412" stroke-width="0.5" />
-            <circle cx="12" cy="12" r="2.5" fill="#fca5a5" />
-            
-            <rect x="6" y="76" width="12" height="12" fill="url(#copper)" stroke="#9a3412" stroke-width="0.5" />
-            <circle cx="12" cy="82" r="2.5" fill="#93c5fd" />
-            
-            <rect x="62" y="41" width="12" height="12" fill="url(#copper)" stroke="#9a3412" stroke-width="0.5" />
-            <circle cx="68" cy="47" r="3" fill="#94a3b8" stroke="#000" stroke-width="0.5" />
-            
-            <text x="22" y="16" fill="#f87171" font-size="7" font-weight="black" font-family="Outfit">1</text>
-            <text x="22" y="86" fill="#60a5fa" font-size="7" font-weight="black" font-family="Outfit">2</text>
-            <text x="56" y="50" fill="#fbbf24" font-size="8.5" font-weight="black" font-family="Outfit">K</text>
+
+            <!-- Bakelite base plate (Rounded Rectangle) -->
+            <rect x="2" y="2" width="76" height="96" rx="20" fill="url(#bkl-${id})" stroke="#3d2a10" stroke-width="1.5"/>
+            <!-- Subtle grain lines on base -->
+            <line x1="20" y1="2" x2="20" y2="98" stroke="rgba(255,200,100,0.05)" stroke-width="1"/>
+            <line x1="60" y1="2" x2="60" y2="98" stroke="rgba(255,200,100,0.05)" stroke-width="1"/>
+
+            <!-- === Contact Block 1 (top, terminal 1) === -->
+            <!-- Metal post -->
+            <rect x="6" y="7" width="14" height="22" rx="2" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.75"/>
+            <!-- Post shine -->
+            <rect x="8" y="9" width="4" height="16" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <!-- Screw head on top -->
+            <circle cx="13" cy="10" r="4" fill="url(#screw-${id})" stroke="#5a3a08" stroke-width="0.5"/>
+            <line x1="10" y1="10" x2="16" y2="10" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <line x1="13" y1="7" x2="13" y2="13" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <!-- Terminal binding post -->
+            <circle cx="13" cy="24" r="3.5" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.5"/>
+            <text x="24" y="19" fill="#d4a017" font-size="7" font-weight="bold" font-family="Outfit">1</text>
+
+            <!-- === Contact Block 2 (bottom, terminal 2) === -->
+            <rect x="6" y="71" width="14" height="22" rx="2" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.75"/>
+            <rect x="8" y="73" width="4" height="16" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <circle cx="13" cy="80" r="4" fill="url(#screw-${id})" stroke="#5a3a08" stroke-width="0.5"/>
+            <line x1="10" y1="80" x2="16" y2="80" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <line x1="13" y1="77" x2="13" y2="83" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <circle cx="13" cy="76" r="3.5" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.5"/>
+            <text x="24" y="86" fill="#d4a017" font-size="7" font-weight="bold" font-family="Outfit">2</text>
+
+            <!-- === Pivot Block (right, terminal K) === -->
+            <rect x="58" y="43" width="16" height="14" rx="2" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.75"/>
+            <circle cx="66" cy="46" r="3" fill="url(#screw-${id})" stroke="#5a3a08" stroke-width="0.5"/>
+            <line x1="63" y1="46" x2="69" y2="46" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <line x1="66" y1="43" x2="66" y2="49" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+            <circle cx="66" cy="53" r="3.5" fill="url(#brass-${id})" stroke="#6b4c0a" stroke-width="0.5"/>
+            <text x="47" y="52" fill="#d4a017" font-size="8" font-weight="black" font-family="Outfit">K</text>
         </svg>
-        <div class="switch-arm absolute" id="${id}-arm" style="left: 12px; top: 44px; width: 56px; height: 6px; transform-origin: 56px 3px; transform: rotate(-15deg); background: linear-gradient(180deg, #ea580c, #c2410c); border: 0.5px solid #7c2d12; border-radius: 1px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
-            <div class="absolute" style="left: -12px; top: -4px; width: 12px; height: 14px; background: linear-gradient(180deg, #1e293b, #0f172a); border: 1.5px solid #020617; border-radius: 3px; box-shadow: 1px 1px 4px rgba(0,0,0,0.655);"></div>
+        <!-- The metal blade arm -->
+        <div class="switch-arm absolute" id="${id}-arm" style="left: 20px; top: 46px; width: 48px; height: 7px; transform-origin: 48px 3.5px; transform: rotate(-15deg); background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 40%, #94a3b8 100%); border: 0.75px solid #64748b; border-radius: 1.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.5); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
+            <!-- Pivot knob at left end -->
+            <div class="absolute" style="left: -9px; top: -5px; width: 11px; height: 17px; background: radial-gradient(ellipse at 30% 30%, #d4a017, #8b6508); border: 1.5px solid #5a3a08; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: 0 2px 5px rgba(0,0,0,0.7);"></div>
         </div>
         `;
 
+        // ── Realistic 2-terminal knife switch ──
         const svg2 = `
         ${labelHTML}
         <svg viewBox="0 0 80 100" class="w-full h-full overflow-visible">
             <defs>
-              <linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#5c4033" />
-                <stop offset="50%" stop-color="#3d2b1f" />
-                <stop offset="100%" stop-color="#261c13" />
+              <linearGradient id="bkl2-${id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b"/>
+                <stop offset="50%" stop-color="#0f172a"/>
+                <stop offset="100%" stop-color="#020617"/>
               </linearGradient>
-              <linearGradient id="copper" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#ea580c" />
-                <stop offset="50%" stop-color="#f97316" />
-                <stop offset="100%" stop-color="#c2410c" />
+              <linearGradient id="brass2-${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#eab308"/>
+                <stop offset="50%" stop-color="#ca8a04"/>
+                <stop offset="100%" stop-color="#854d0e"/>
               </linearGradient>
+              <radialGradient id="screw2-${id}" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="100%" stop-color="#a16207"/>
+              </radialGradient>
+              <filter id="shadow-${id}" x="-10%" y="-10%" width="130%" height="130%">
+                <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.6"/>
+              </filter>
             </defs>
-            <rect x="0" y="0" width="80" height="100" rx="6" fill="url(#woodGrad)" stroke="#1a110b" stroke-width="1.5" />
-
-            <rect x="6" y="41" width="12" height="12" fill="url(#copper)" stroke="#9a3412" stroke-width="0.5" />
-            <circle cx="12" cy="47" r="2.5" fill="#fca5a5" />
+            <!-- Shadow for base -->
+            <rect x="2" y="36" width="76" height="32" rx="16" fill="rgba(0,0,0,0.5)" filter="blur(4px)"/>
             
-            <rect x="62" y="41" width="12" height="12" fill="url(#copper)" stroke="#9a3412" stroke-width="0.5" />
-            <circle cx="68" cy="47" r="3" fill="#94a3b8" stroke="#000" stroke-width="0.5" />
+            <!-- Base Plate (Horizontal Pill) -->
+            <rect x="2" y="34" width="76" height="32" rx="16" fill="url(#bkl2-${id})" stroke="#334155" stroke-width="1.5"/>
+            <!-- Inner Bevel -->
+            <rect x="4" y="36" width="72" height="28" rx="14" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
             
-            <text x="56" y="50" fill="#fbbf24" font-size="8.5" font-weight="black" font-family="Outfit">K</text>
+            <!-- Contact 1 (left) -->
+            <rect x="5" y="42" width="16" height="16" rx="2" fill="url(#brass2-${id})" stroke="#713f12" stroke-width="1" filter="url(#shadow-${id})"/>
+            <rect x="7" y="44" width="4" height="12" rx="1" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="13" cy="48" r="3.5" fill="url(#screw2-${id})" stroke="#422006" stroke-width="0.5"/>
+            <line x1="10" y1="48" x2="16" y2="48" stroke="#422006" stroke-width="1"/>
+            <line x1="13" y1="45" x2="13" y2="51" stroke="#422006" stroke-width="1"/>
+            
+            <!-- Contact K (right) -->
+            <rect x="57" y="42" width="18" height="16" rx="2" fill="url(#brass2-${id})" stroke="#713f12" stroke-width="1" filter="url(#shadow-${id})"/>
+            <rect x="59" y="44" width="4" height="12" rx="1" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="66" cy="48" r="3.5" fill="url(#screw2-${id})" stroke="#422006" stroke-width="0.5"/>
+            <line x1="63" y1="48" x2="69" y2="48" stroke="#422006" stroke-width="1"/>
+            <line x1="66" y1="45" x2="66" y2="51" stroke="#422006" stroke-width="1"/>
+            
+            <!-- Details -->
+            <text x="40" y="75" fill="#eab308" font-size="10" font-weight="900" font-family="Outfit" text-anchor="middle" letter-spacing="2">SW-1</text>
         </svg>
-        <div class="switch-arm absolute" id="${id}-arm" style="left: 12px; top: 44px; width: 56px; height: 6px; transform-origin: 56px 3px; transform: rotate(-30deg); background: linear-gradient(180deg, #ea580c, #c2410c); border: 0.5px solid #7c2d12; border-radius: 1px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
-            <div class="absolute" style="left: -12px; top: -4px; width: 12px; height: 14px; background: linear-gradient(180deg, #1e293b, #0f172a); border: 1.5px solid #020617; border-radius: 3px; box-shadow: 1px 1px 4px rgba(0,0,0,0.655);"></div>
+        <!-- The metal blade arm -->
+        <div class="switch-arm absolute" id="${id}-arm" style="left: 20px; top: 44px; width: 48px; height: 10px; transform-origin: 46px 5px; transform: rotate(-30deg); background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 50%, #64748b 100%); border: 1px solid #334155; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.8); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
+            <div style="position:absolute; left:6px; top:50%; transform:translateY(-50%); width:4px; height:4px; border-radius:50%; background:#94a3b8; box-shadow: inset 0 1px 1px #fff, 0 1px 1px #000;"></div>
+            <div style="position:absolute; left:22px; top:50%; transform:translateY(-50%); width:4px; height:4px; border-radius:50%; background:#94a3b8; box-shadow: inset 0 1px 1px #fff, 0 1px 1px #000;"></div>
+            <!-- Pivot Handle (Red) -->
+            <div class="absolute" style="left: -12px; top: -4px; width: 14px; height: 18px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: 1.5px solid #7f1d1d; border-radius: 50%; box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.4);"></div>
         </div>
         `;
 
         const terminals = isTwoNode ? [
-            { id: `${id}-1`, x: 12, y: 47 },
-            { id: `${id}-k`, x: 68, y: 47 }
+            { id: `${id}-1`, x: 13, y: 48 },
+            { id: `${id}-k`, x: 66, y: 48 }
         ] : [
-            { id: `${id}-1`, x: 12, y: 12 },
-            { id: `${id}-k`, x: 68, y: 47 },
-            { id: `${id}-2`, x: 12, y: 82 }
+            { id: `${id}-1`, x: 13, y: 18 },
+            { id: `${id}-k`, x: 66, y: 50 },
+            { id: `${id}-2`, x: 13, y: 82 }
         ];
 
         return this.createWrapper(id, 'switch-container', x, y, 80, 100, targetZone, isTwoNode ? svg2 : svg3, terminals);
@@ -472,7 +554,7 @@ class EliteComponents {
 
     static getRing(id, x, y, targetZone) {
         const svg = `
-        <svg width="220" height="220" viewBox="0 0 200 200" overflow="visible" style="display:block;">
+        <svg width="200" height="200" viewBox="0 0 200 200" overflow="visible" style="display:block;">
             <defs>
                 <radialGradient id="ws-rg-iron" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#64748b"/>
@@ -503,12 +585,99 @@ class EliteComponents {
         </svg>
         `;
         const terminals = [
-            { id: `${id}-p1`, x: 6, y: 78 },
-            { id: `${id}-p2`, x: 6, y: 122 },
-            { id: `${id}-s1`, x: 194, y: 78 },
-            { id: `${id}-s2`, x: 194, y: 122 }
+            { id: `${id}-p1`, x: 6, y: 78, direction: 'left' },
+            { id: `${id}-p2`, x: 6, y: 122, direction: 'left' },
+            { id: `${id}-s1`, x: 194, y: 78, direction: 'right' },
+            { id: `${id}-s2`, x: 194, y: 122, direction: 'right' }
         ];
         return this.createWrapper(id, 'ring', x, y, 220, 220, targetZone, svg, terminals);
+    }
+
+    static getFaradayRing(id, x, y, targetZone) {
+        const svg = `
+        <svg width="200" height="200" viewBox="0 0 200 200" overflow="visible" style="display:block;">
+          <defs>
+            <radialGradient id="ws-rg-iron-${id}" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#64748b"/>
+              <stop offset="70%" stop-color="#475569"/>
+              <stop offset="100%" stop-color="#1e293b"/>
+            </radialGradient>
+            <linearGradient id="ws-pri-wire-${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f87171"/>
+              <stop offset="50%" stop-color="#ef4444"/>
+              <stop offset="100%" stop-color="#991b1b"/>
+            </linearGradient>
+            <linearGradient id="ws-sec-wire-${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#60a5fa"/>
+              <stop offset="50%" stop-color="#3b82f6"/>
+              <stop offset="100%" stop-color="#1e40af"/>
+            </linearGradient>
+            <filter id="ws-rf-${id}"><feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#000" flood-opacity=".65"/></filter>
+            <filter id="ws-flux-glow-${id}"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00d2ff" flood-opacity=".9"/></filter>
+            <filter id="ws-wire-shadow-${id}"><feDropShadow dx="1" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity=".5"/></filter>
+          </defs>
+
+          <!-- ── 1. BACK WIRE STRANDS (BEHIND THE CORE) ── -->
+          <g class="pri-back-loops" stroke="#7f1d1d" stroke-width="4" stroke-linecap="round" fill="none">
+            <path d="M 52 74 C 42 79, 28 83, 19 86"/>
+            <path d="M 47 88 C 38 94, 25 98, 18 100"/>
+            <path d="M 47 102 C 37 108, 25 112, 19 114"/>
+            <path d="M 52 116 C 42 122, 29 126, 23 128"/>
+          </g>
+
+          <g class="sec-back-loops" stroke="#1e3a8a" stroke-width="4" stroke-linecap="round" fill="none">
+            <path d="M 148 74 C 158 79, 172 83, 181 86"/>
+            <path d="M 153 88 C 162 94, 175 98, 182 100"/>
+            <path d="M 153 102 C 163 108, 175 112, 181 114"/>
+            <path d="M 148 116 C 158 122, 171 126, 177 128"/>
+          </g>
+
+          <!-- ── 2. IRON RING CORE (MIDDLE LAYER) ── -->
+          <circle id="ring-iron-core-${id}" cx="100" cy="100" r="68" fill="none" stroke="url(#ws-rg-iron-${id})" stroke-width="28" filter="url(#ws-rf-${id})"/>
+          <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="54" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+
+          <!-- Flux lines group -->
+          <g id="flux-group" opacity="0">
+            <circle id="flux-c1-${id}" cx="100" cy="100" r="58" fill="none" stroke="#00d2ff" stroke-width="2" stroke-dasharray="12 8" filter="url(#ws-flux-glow-${id})"/>
+            <circle id="flux-c2-${id}" cx="100" cy="100" r="68" fill="none" stroke="#00d2ff" stroke-width="2.5" stroke-dasharray="16 9" filter="url(#ws-flux-glow-${id})"/>
+            <circle id="flux-c3-${id}" cx="100" cy="100" r="78" fill="none" stroke="#00d2ff" stroke-width="2" stroke-dasharray="20 10" filter="url(#ws-flux-glow-${id})"/>
+          </g>
+
+          <text x="100" y="104" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="12" font-family="Outfit" font-weight="700">Fe Core</text>
+
+          <!-- ── 3. FRONT WIRE STRANDS (WRAPPED IN FRONT OF CORE) ── -->
+          <g class="pri-front-loops" stroke="url(#ws-pri-wire-${id})" stroke-width="5" stroke-linecap="round" fill="none" filter="url(#ws-wire-shadow-${id})">
+            <path d="M 22 72 C 34 71, 46 72, 52 74"/>
+            <path d="M 19 86 C 30 85, 42 86, 47 88"/>
+            <path d="M 18 100 C 29 99, 41 100, 47 102"/>
+            <path d="M 19 114 C 30 113, 42 114, 48 116"/>
+            <path d="M 22 128 C 34 127, 46 127, 52 130"/>
+          </g>
+
+          <circle id="anc-ring-p1-${id}" cx="22" cy="72" r="6" fill="#ef4444" stroke="#ffe082" stroke-width="1.5"/>
+          <circle id="anc-ring-p2-${id}" cx="22" cy="128" r="6" fill="#ef4444" stroke="#ffe082" stroke-width="1.5"/>
+
+          <g class="sec-front-loops" stroke="url(#ws-sec-wire-${id})" stroke-width="5" stroke-linecap="round" fill="none" filter="url(#ws-wire-shadow-${id})">
+            <path d="M 178 72 C 166 71, 154 72, 148 74"/>
+            <path d="M 181 86 C 170 85, 158 86, 153 88"/>
+            <path d="M 182 100 C 171 99, 159 100, 153 102"/>
+            <path d="M 181 114 C 170 113, 158 114, 152 116"/>
+            <path d="M 178 128 C 166 127, 154 127, 148 130"/>
+          </g>
+
+          <circle id="anc-ring-s1-${id}" cx="178" cy="72" r="6" fill="#3b82f6" stroke="#ffe082" stroke-width="1.5"/>
+          <circle id="anc-ring-s2-${id}" cx="178" cy="128" r="6" fill="#3b82f6" stroke="#ffe082" stroke-width="1.5"/>
+        </svg>`;
+
+        const terminals = [
+            { id: `${id}-p1`, x: 22, y: 72, direction: 'left' },
+            { id: `${id}-p2`, x: 22, y: 128, direction: 'left' },
+            { id: `${id}-s1`, x: 178, y: 72, direction: 'right' },
+            { id: `${id}-s2`, x: 178, y: 128, direction: 'right' }
+        ];
+
+        return this.createWrapper(id, 'faraday-ring ring-wrapper', x, y, 200, 200, targetZone, svg, terminals);
     }
 
     static getMagnet(id, x, y, targetZone) {

@@ -23,14 +23,14 @@
                 extend: {
                     colors: {
                         cyber: {
-                            off: '#07090e',
-                            on: '#0f131a',
-                            panel: '#0d1420',
-                            border: 'rgba(0, 210, 255, 0.2)',
-                            gold: '#ffe082',
-                            orange: '#ff9f43',
-                            cyan: '#00d2ff',
-                            green: '#10b981',
+                            off: '#090617',
+                            on: '#120b2e',
+                            panel: '#251758',
+                            border: 'rgba(117, 82, 255, 0.25)',
+                            gold: '#facc15',
+                            orange: '#ff7e67',
+                            cyan: '#7552FF',
+                            green: '#2ecc71',
                             purple: '#a855f7',
                             red: '#ef4444'
                         }
@@ -54,7 +54,7 @@
         }
 
         body {
-            background-color: #07090e;
+            background-color: #090617;
             color: #e2e8f0;
             font-family: 'Tajawal', sans-serif;
             overflow: hidden;
@@ -63,13 +63,17 @@
         }
 
         .workspace-area {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, #0c182b 0%, #050810 100%);
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #f8f9fb !important;
+            background-image:
+                linear-gradient(rgba(117,82,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(117,82,255,0.08) 1px, transparent 1px) !important;
+            background-size: 30px 30px !important;
             border-radius: 12px;
             position: relative;
-            border: 2px solid rgba(0, 210, 255, 0.25);
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(117, 82, 255, 0.25);
+            box-shadow: inset 0 2px 20px rgba(117, 82, 255, 0.05), 0 4px 24px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
@@ -106,8 +110,8 @@
         /* Toolbox Card Item */
         .toolbox-card {
             width: 135px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(0, 210, 255, 0.2);
+            background: rgba(37, 23, 88, 0.7);
+            border: 1px solid rgba(117, 82, 255, 0.25);
             border-radius: 10px;
             padding: 8px 6px;
             display: flex;
@@ -119,14 +123,14 @@
         }
 
         .toolbox-card:hover {
-            border-color: rgba(0, 210, 255, 0.5);
+            border-color: rgba(117, 82, 255, 0.6);
             transform: translateY(-2px);
         }
 
         .toolbox-card-title {
             font-size: 0.72rem;
             font-weight: 700;
-            color: #94a3b8;
+            color: #c4b5fd;
             text-align: center;
         }
 
@@ -144,9 +148,9 @@
 
         /* Canvas Containers */
         .canvas-container {
-            background: #040711;
+            background: #090617;
             border-radius: 10px;
-            border: 1px solid rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(117, 82, 255, 0.25);
             padding: 4px;
             overflow: hidden;
         }
@@ -158,8 +162,8 @@
             align-items: center;
             width: 100%;
             padding: 8px 20px;
-            background-color: #090e17;
-            border-top: 1px solid rgba(0, 210, 255, 0.2);
+            background-color: #120b2e;
+            border-top: 1px solid rgba(117, 82, 255, 0.25);
             flex-shrink: 0;
             z-index: 40;
             height: 70px;
@@ -187,13 +191,13 @@
         }
 
         .formulas-modal {
-            background: linear-gradient(135deg, #0d1420, #080d18);
-            border: 1px solid rgba(0, 210, 255, 0.4);
+            background: linear-gradient(135deg, #251758, #120b2e);
+            border: 1px solid rgba(117, 82, 255, 0.4);
             border-radius: 20px;
             padding: 24px;
             width: 95%;
             max-width: 600px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 210, 255, 0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(117, 82, 255, 0.25);
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -1068,21 +1072,21 @@
             const p1Y = centerY - pipe1Height / 2;
 
             // Pipe 1 Background Container
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-            ctx.strokeStyle = 'rgba(168, 85, 247, 0.4)';
+            ctx.fillStyle = 'rgba(241, 245, 249, 1.0)';
+            ctx.strokeStyle = 'rgba(117, 82, 255, 0.4)';
             ctx.lineWidth = 1.5;
             drawRoundedRect(ctx, p1X, p1Y, pipe1Width, pipe1Height, 14);
             ctx.fill();
             ctx.stroke();
 
             // Top Header: "1) التيار الحقيقي — يتذبذب"
-            ctx.fillStyle = '#f8fafc';
+            ctx.fillStyle = '#251758';
             ctx.font = 'bold 12px Tajawal, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('1) التيار الحقيقي — يتذبذب', p1X + pipe1Width / 2, p1Y - 10);
 
             // Bottom Subtext: "موجود فعلاً بالسلك"
-            ctx.fillStyle = '#94a3b8';
+            ctx.fillStyle = '#64748b';
             ctx.font = 'bold 11px Tajawal, sans-serif';
             ctx.fillText('موجود فعلاً بالسلك', p1X + pipe1Width / 2, p1Y + pipe1Height + 18);
 
@@ -1091,10 +1095,10 @@
                 const Imax = parseFloat(imaxSlider.value);
                 const waveAmp = Math.min(pipe1Height * 0.38, (Imax / 10) * (pipe1Height * 0.38));
 
-                ctx.strokeStyle = '#c084fc';
+                ctx.strokeStyle = '#7552FF';
                 ctx.lineWidth = 3;
                 ctx.setLineDash([6, 6]);
-                ctx.shadowColor = '#a855f7';
+                ctx.shadowColor = '#7552FF';
                 ctx.shadowBlur = 12;
 
                 ctx.beginPath();
@@ -1111,13 +1115,13 @@
                 ctx.setLineDash([]);
             } else {
                 // Static faint preview sine line
-                ctx.strokeStyle = 'rgba(168, 85, 247, 0.25)';
+                ctx.strokeStyle = 'rgba(117, 82, 255, 0.35)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([4, 4]);
                 ctx.beginPath();
                 for (let x = p1X + 8; x <= p1X + pipe1Width - 8; x += 2) {
                     const normT = (x - p1X) / pipe1Width;
-                    const y = centerY - Math.sin(normT * 2 * 2 * Math.PI) * 15;
+                    const y = centerY - Math.sin(normT * 2.0 * 2 * Math.PI) * (pipe1Height * 0.25);
                     if (x === p1X + 8) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
@@ -1132,8 +1136,8 @@
             const p2Y = centerY - pipe2Height / 2;
 
             // Pipe 2 Background Container (Dashed border matching attached layout)
-            ctx.fillStyle = 'rgba(6, 78, 59, 0.2)';
-            ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
             ctx.lineWidth = 1.5;
             ctx.setLineDash([5, 5]);
             drawRoundedRect(ctx, p2X, p2Y, pipe2Width, pipe2Height, 14);
@@ -1142,13 +1146,13 @@
             ctx.setLineDash([]);
 
             // Top Header: "2) منظوره الفعّال — ثابت"
-            ctx.fillStyle = '#f8fafc';
+            ctx.fillStyle = '#064e3b';
             ctx.font = 'bold 12px Tajawal, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('2) منظوره الفعّال — ثابت', p2X + pipe2Width / 2, p2Y - 10);
 
             // Bottom Subtext: "تمثيل مكافئ (إطار منقّط)"
-            ctx.fillStyle = '#6ee7b7';
+            ctx.fillStyle = '#047857';
             ctx.font = 'bold 11px Tajawal, sans-serif';
             ctx.fillText('تمثيل مكافئ (إطار منقّط)', p2X + pipe2Width / 2, p2Y + pipe2Height + 18);
 
@@ -1167,7 +1171,7 @@
                 ctx.shadowBlur = 0;
                 ctx.setLineDash([]);
             } else {
-                ctx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
+                ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([6, 6]);
                 ctx.beginPath();
@@ -1180,7 +1184,7 @@
             // -------------------------------------------------------------
             // SECTION 3 (RIGHT NODE LOAD LABEL): "توهج حقيقي"
             // -------------------------------------------------------------
-            ctx.fillStyle = state.circuitValid ? '#fde047' : '#94a3b8';
+            ctx.fillStyle = state.circuitValid ? '#b45309' : '#64748b';
             ctx.font = 'bold 11px Tajawal, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('توهج حقيقي', xNode3, centerY + 52);

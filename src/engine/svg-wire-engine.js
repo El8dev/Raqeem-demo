@@ -48,7 +48,7 @@ class SVGWireEngine {
             svg.style.width = '100%';
             svg.style.height = '100%';
             svg.style.pointerEvents = 'none';
-            svg.style.zIndex = '5';
+            svg.style.zIndex = '25';
             this.container.appendChild(svg);
         }
         this.svg = svg;
@@ -61,6 +61,9 @@ class SVGWireEngine {
                 <filter id="wire-glow" x="-20%" y="-20%" width="140%" height="140%">
                     <feGaussianBlur stdDeviation="3" result="blur" />
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                <filter id="wire-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/>
                 </filter>
             `;
             this.svg.appendChild(defs);
@@ -268,6 +271,8 @@ class SVGWireEngine {
             return term.getAttribute('data-direction');
         }
         const id = ((typeof term === 'string' ? term : term.id) || '').toLowerCase();
+        if (id.includes('p1') || id.includes('p2') || id.includes('ring-p')) return 'left';
+        if (id.includes('s1') || id.includes('s2') || id.includes('ring-s')) return 'right';
         if (id.startsWith('bat-') || id.includes('top') || id.includes('pos') || id.includes('neg')) return 'top';
         if (id.includes('bottom') || id.includes('bot')) return 'bottom';
         if (id.includes('left') || id.endsWith('-1')) return 'left';
@@ -420,16 +425,30 @@ class SVGWireEngine {
 
         const candidates = [];
 
-        // Candidate A: Horizontal Exit -> Vertical Entry (e.g. Switch 'left' to Battery 'top')
+        // Candidate A: Horizontal Exit -> Vertical Entry (e.g. Switch 'left' to Battery 'top', or Ring 'right' to Galv 'bottom')
         if ((dir1 === 'left' || dir1 === 'right') && (dir2 === 'top' || dir2 === 'bottom')) {
-            candidates.push([p1, stub1, { x: stub1.x, y: stub2.y }, stub2, p2]);
-            candidates.push([p1, stub1, { x: stub2.x, y: stub1.y }, stub2, p2]);
+            if (dir2 === 'bottom') {
+                const underY = Math.max(y1, y2) + 20;
+                candidates.push([p1, stub1, { x: stub1.x, y: underY }, { x: x2, y: underY }, p2]);
+                candidates.push([p1, { x: x1, y: underY }, { x: x2, y: underY }, p2]);
+            } else {
+                candidates.push([p1, { x: x1, y: y2 }, p2]);
+                candidates.push([p1, stub1, { x: stub1.x, y: stub2.y }, stub2, p2]);
+                candidates.push([p1, stub1, { x: stub1.x, y: y2 }, p2]);
+            }
         }
 
-        // Candidate B: Vertical Exit -> Horizontal Entry (e.g. Battery 'top' to Switch 'left')
+        // Candidate B: Vertical Exit -> Horizontal Entry (e.g. Battery 'top' to Ring 'p1', or Galv 'bottom' to Ring 's1')
         if ((dir1 === 'top' || dir1 === 'bottom') && (dir2 === 'left' || dir2 === 'right')) {
-            candidates.push([p1, stub1, { x: stub2.x, y: stub1.y }, stub2, p2]);
-            candidates.push([p1, stub1, { x: stub1.x, y: stub2.y }, stub2, p2]);
+            if (dir1 === 'bottom') {
+                const underY = Math.max(y1, y2) + 20;
+                candidates.push([p1, stub1, { x: x1, y: underY }, { x: stub2.x, y: underY }, stub2, p2]);
+                candidates.push([p1, { x: x1, y: underY }, { x: x2, y: underY }, p2]);
+            } else {
+                candidates.push([p1, { x: x1, y: y2 }, p2]);
+                candidates.push([p1, stub1, { x: stub1.x, y: y2 }, p2]);
+                candidates.push([p1, stub1, { x: stub2.x, y: stub1.y }, stub2, p2]);
+            }
         }
 
         // Candidate C: Both Top Exit (e.g. Battery 'top' to C1 'top')
@@ -444,6 +463,27 @@ class SVGWireEngine {
             const botY = Math.max(stub1.y, stub2.y, y1, y2);
             candidates.push([p1, { x: x1, y: botY }, { x: x2, y: botY }, p2]);
             candidates.push([p1, stub1, { x: stub1.x, y: botY }, { x: stub2.x, y: botY }, stub2, p2]);
+        }
+
+        // Candidate D2: Both Left Exit
+        if (dir1 === 'left' && dir2 === 'left') {
+            const minX = Math.min(stub1.x, stub2.x, x1, x2) - 25;
+            candidates.push([p1, stub1, { x: minX, y: stub1.y }, { x: minX, y: stub2.y }, stub2, p2]);
+            candidates.push([p1, { x: minX, y: y1 }, { x: minX, y: y2 }, p2]);
+        }
+
+        // Candidate D3: Both Right Exit
+        if (dir1 === 'right' && dir2 === 'right') {
+            const maxX = Math.max(stub1.x, stub2.x, x1, x2) + 25;
+            candidates.push([p1, stub1, { x: maxX, y: stub1.y }, { x: maxX, y: stub2.y }, stub2, p2]);
+            candidates.push([p1, { x: maxX, y: y1 }, { x: maxX, y: y2 }, p2]);
+        }
+
+        // Candidate D4: Opposite Facing Horizontal (Left <-> Right)
+        if ((dir1 === 'left' && dir2 === 'right') || (dir1 === 'right' && dir2 === 'left')) {
+            const hMidX = (stub1.x + stub2.x) / 2;
+            candidates.push([p1, stub1, { x: hMidX, y: stub1.y }, { x: hMidX, y: stub2.y }, stub2, p2]);
+            candidates.push([p1, stub1, { x: stub1.x, y: (y1 + y2) / 2 }, { x: stub2.x, y: (y1 + y2) / 2 }, stub2, p2]);
         }
 
         // Candidate E: Directional Exit Straight to Target Axis
@@ -539,10 +579,11 @@ class SVGWireEngine {
         visiblePath.setAttribute('d', pathD);
         visiblePath.setAttribute('fill', 'none');
         visiblePath.setAttribute('stroke', color);
-        visiblePath.setAttribute('stroke-width', '4');
+        visiblePath.setAttribute('stroke-width', '5');
         visiblePath.setAttribute('stroke-linecap', 'round');
         visiblePath.setAttribute('stroke-linejoin', 'round');
         visiblePath.setAttribute('class', 'user-wire');
+        visiblePath.setAttribute('filter', 'url(#wire-shadow)');
         visiblePath.style.transition = 'stroke 0.2s, filter 0.2s';
         
         // Midpoint delete badge
@@ -588,7 +629,7 @@ class SVGWireEngine {
         };
         g.onpointerleave = () => {
             visiblePath.setAttribute('stroke', wireObj.isActive ? this.activeWireColor : color);
-            if (!wireObj.isActive) visiblePath.removeAttribute('filter');
+            if (!wireObj.isActive) visiblePath.setAttribute('filter', 'url(#wire-shadow)');
             delBtn.style.opacity = '0';
         };
         
@@ -667,11 +708,32 @@ class SVGWireEngine {
         if (!requiredPairs || !requiredPairs.length) return;
         
         requiredPairs.forEach(pair => {
-            const [srcId, tgtId, color] = Array.isArray(pair) ? pair : [pair.source, pair.target, pair.color];
-            const srcEl = document.getElementById(srcId);
-            const tgtEl = document.getElementById(tgtId);
-            if (srcEl && tgtEl) {
-                this.connect(srcEl, tgtEl, { color });
+            let srcId, tgtId, color;
+            if (Array.isArray(pair)) {
+                [srcId, tgtId, color] = pair;
+            } else if (typeof pair === 'object' && pair !== null) {
+                srcId = pair.source || pair.from || pair[0];
+                tgtId = pair.target || pair.to || pair[1];
+                color = pair.color;
+            } else if (typeof pair === 'string') {
+                const terminals = Array.from(document.querySelectorAll('.terminal-node, .elite-terminal')).map(t => t.id);
+                for (const t1 of terminals) {
+                    if (pair.startsWith(t1)) {
+                        const rest = pair.slice(t1.length).replace(/^[_-]+/, '');
+                        if (terminals.includes(rest)) {
+                            srcId = t1;
+                            tgtId = rest;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (srcId && tgtId) {
+                const srcEl = document.getElementById(srcId);
+                const tgtEl = document.getElementById(tgtId);
+                if (srcEl && tgtEl) {
+                    this.connect(srcEl, tgtEl, { color });
+                }
             }
         });
     }
@@ -685,7 +747,7 @@ class SVGWireEngine {
                 w.visiblePath.classList.add('wire-flowing');
             } else {
                 w.visiblePath.setAttribute('stroke', w.color);
-                w.visiblePath.removeAttribute('filter');
+                w.visiblePath.setAttribute('filter', 'url(#wire-shadow)');
                 w.visiblePath.classList.remove('wire-flowing');
             }
         });

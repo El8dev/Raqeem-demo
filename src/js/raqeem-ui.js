@@ -232,11 +232,26 @@
       var self = this;
       document.addEventListener('visibilitychange', function () {
         self.paused = document.hidden;
-        if (!self.paused) self.tick();
+        if (!self.paused && self.heroOn) self.tick();
       });
     },
 
-    setHero: function (on) { this.heroOn = on; },
+    setHero: function (on) {
+      this.heroOn = on;
+      if (on && !this.paused) {
+        this.tick();
+      } else {
+        if (this._raf) {
+          cancelAnimationFrame(this._raf);
+          this._raf = 0;
+        }
+        var cv = $('#atmos-canvas');
+        if (cv) {
+          var ctx = cv.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, cv.width, cv.height);
+        }
+      }
+    },
 
     /* --- the network field ---------------------------------------------
      * Drawn, not photographed. A background mesh has to be faint AND finely
@@ -365,9 +380,9 @@
     tick: function () {
       if (this._raf) cancelAnimationFrame(this._raf);
       var self = this;
-      if (REDUCED) { if (self._drawParticles) self._drawParticles(); return; }
+      if (REDUCED || !self.heroOn) { if (self._drawParticles) self._drawParticles(); return; }
       (function loop() {
-        if (self.paused) return;
+        if (self.paused || !self.heroOn) { self._raf = 0; return; }
         if (self._drawParticles) self._drawParticles();
         self._raf = requestAnimationFrame(loop);
       })();
@@ -637,12 +652,17 @@
         if (c._hidden !== false) { c.style.visibility = ''; c._hidden = false; }
 
         var p = this.place(d);
-        c.style.transform =
+        var tr =
           'translate3d(' + p.x.toFixed(1) + 'px,' + p.lift.toFixed(1) + 'px,' + p.z.toFixed(1) + 'px)' +
           ' rotateY(' + p.rot.toFixed(2) + 'deg)' +
           ' scale(' + p.scale.toFixed(3) + ')';
-        c.style.opacity = p.opacity.toFixed(3);
-        c.style.zIndex = String(1000 - Math.round(ad * 10));
+        if (c._tr !== tr) { c.style.transform = tr; c._tr = tr; }
+
+        var op = p.opacity.toFixed(3);
+        if (c._op !== op) { c.style.opacity = op; c._op = op; }
+
+        var zi = String(1000 - Math.round(ad * 10));
+        if (c._zi !== zi) { c.style.zIndex = zi; c._zi = zi; }
 
         /* depth-of-field bucket — written only when it actually changes */
         var bucket = ad < .55 ? '0' : ad < 1.55 ? '1' : '2';
@@ -663,7 +683,10 @@
       }
       if (this._raf) return;
       var self = this;
-      var step = function () {
+      var last = performance.now();
+      var step = function (now) {
+        var dt = Math.min(34, now - last);
+        last = now;
         var diff = self.target - self.fi;
         if (Math.abs(diff) < 0.002) {
           self.fi = self.target;
@@ -672,7 +695,8 @@
           self.settle();
           return;
         }
-        self.fi += diff * 0.28;
+        var factor = 1 - Math.exp(-14 * (dt / 1000));
+        self.fi += diff * factor;
         self.depth(self.fi);
         self._raf = requestAnimationFrame(step);
       };
@@ -738,9 +762,6 @@
       if (opts.instant || REDUCED) { this.apply(i, false); return; }
 
       if (moved && !opts.fromDrag) {
-        var dir = i > from ? 1 : -1;
-        this.warpBurst(dir);
-        this.sparks(dir);
         this.microLabel('label_switching');
       }
       this.apply(i, true);
@@ -869,7 +890,8 @@
     bindDrag: function () {
       var self = this;
       var DRAG_MIN = 6;
-      var id = null, armed = false, x0 = 0, dx = 0, vx = 0, lastX = 0, lastT = 0, base = 0;
+      var id = null, armed = false, x0 = 0, y0 = 0, dx = 0, vx = 0, lastX = 0, lastT = 0, base = 0;
+      var moveRaf = 0;
 
       this.viewport.addEventListener('pointerdown', function (e) {
         if (e.button != null && e.button !== 0) return;
@@ -878,15 +900,21 @@
         armed = true;
         self.dragging = false;          /* not a drag until it moves */
         base = self.idx;
-        x0 = lastX = e.clientX; lastT = performance.now(); dx = 0; vx = 0;
+        x0 = lastX = e.clientX; y0 = e.clientY; lastT = performance.now(); dx = 0; vx = 0;
       });
 
       this.viewport.addEventListener('pointermove', function (e) {
         if (!armed || e.pointerId !== id) return;
         dx = e.clientX - x0;
+        var dy = e.clientY - y0;
 
         if (!self.dragging) {
           if (Math.abs(dx) < DRAG_MIN) return;   /* still a click, leave it alone */
+          /* Disambiguate vertical page scrolling from horizontal carousel dragging */
+          if (Math.abs(dy) > Math.abs(dx) * 1.1) {
+            armed = false;
+            return;
+          }
           self.dragging = true;
           if (self._raf) { cancelAnimationFrame(self._raf); self._raf = 0; }
           self.viewport.classList.add('is-dragging');
@@ -896,17 +924,24 @@
         var now = performance.now(), dt = now - lastT;
         if (dt > 8) { vx = (e.clientX - lastX) / dt; lastX = e.clientX; lastT = now; }
 
-        /* the stack follows the finger in real time, fractionally */
-        var fi = base - (dx / self.dragUnit) * self.dirSign;
-        fi = clamp(fi, -.4, self.cards.length - 1 + .4);
-        self.fi = fi;
-        self.target = fi;
-        self.depth(fi);
+        /* RAF-throttled to avoid layout thrashing on high-frequency pointer polling */
+        if (!moveRaf) {
+          moveRaf = requestAnimationFrame(function () {
+            moveRaf = 0;
+            if (!armed || !self.dragging) return;
+            var fi = base - (dx / self.dragUnit) * self.dirSign;
+            fi = clamp(fi, -.4, self.cards.length - 1 + .4);
+            self.fi = fi;
+            self.target = fi;
+            self.depth(fi);
+          });
+        }
       });
 
       function end(e) {
         if (!armed || (e && e.pointerId !== id)) return;
         armed = false;
+        if (moveRaf) { cancelAnimationFrame(moveRaf); moveRaf = 0; }
         if (!self.dragging) return;     /* a tap — let the click through */
 
         self.dragging = false;

@@ -16,15 +16,15 @@
         }
 
         :root {
-            --bg: #07090e;
-            --panel: #111823;
-            --border: rgba(0, 210, 255, 0.18);
-            --cyan: #00d2ff;
-            --orange: #ff9f43;
+            --bg: #090617;
+            --panel: #251758;
+            --border: rgba(117, 82, 255, 0.25);
+            --cyan: #7552FF;
+            --orange: #ff7e67;
             --red: #ef4444;
-            --blue: #3b82f6;
+            --blue: #5A46DA;
             --green: #2ecc71;
-            --gold: #ffe082;
+            --gold: #facc15;
             --purple: #a855f7;
             --text: #e2e8f0;
         }
@@ -49,8 +49,8 @@
             width: 50px;
             height: 50px;
             border-radius: 12px;
-            background: rgba(10, 16, 26, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(37, 23, 88, 0.65);
+            border: 1px solid rgba(117, 82, 255, 0.3);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
@@ -62,9 +62,9 @@
         }
 
         .drawer-toggle:hover {
-            background: rgba(0, 210, 255, 0.12);
+            background: rgba(117, 82, 255, 0.2);
             transform: scale(1.07);
-            box-shadow: 0 0 18px rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 18px rgba(117, 82, 255, 0.3);
         }
 
         /* ── SLIDE-OUT DRAWER ── */
@@ -77,8 +77,8 @@
             z-index: 10000;
             transform: translateX(-100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #080c14;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: #120b2e;
+            border-right: 1px solid rgba(117, 82, 255, 0.25);
             box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6);
             padding: 20px;
             display: flex;
@@ -93,7 +93,7 @@
         .drawer-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 9998;
             opacity: 0;
             pointer-events: none;
@@ -141,12 +141,12 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            background: rgba(0, 210, 255, 0.05);
+            background: rgba(117, 82, 255, 0.08);
             transition: background 0.2s;
         }
 
         .drawer-chapter-header:hover {
-            background: rgba(0, 210, 255, 0.08);
+            background: rgba(117, 82, 255, 0.15);
         }
 
         .drawer-chapter-label {
@@ -172,7 +172,7 @@
         .drawer-submenu {
             max-height: 1000px;
             overflow: hidden;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.25);
             transition: max-height 0.4s ease-in-out;
         }
 
@@ -186,7 +186,7 @@
             gap: 8px;
             padding: 10px 16px;
             font-size: 0.8rem;
-            color: var(--cyan);
+            color: #c4b5fd;
             text-decoration: none;
             border-bottom: 1px solid rgba(255,255,255,0.02);
             transition: all 0.2s;
@@ -197,13 +197,13 @@
         }
 
         .drawer-submenu a:hover {
-            background: rgba(0, 210, 255, 0.1);
+            background: rgba(117, 82, 255, 0.15);
             color: #fff;
             padding-right: 22px;
         }
 
         .drawer-submenu a.current {
-            background: rgba(0, 210, 255, 0.08);
+            background: rgba(117, 82, 255, 0.18);
             color: #fff;
             font-weight: 700;
             border-right: 3px solid var(--cyan);
@@ -298,11 +298,16 @@
         #vacuum-chamber {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(16, 32, 54, 0.82) 0%, rgba(7, 10, 18, 0.96) 100%);
+            background-color: #f8f9fb !important;
+            background-image:
+                linear-gradient(rgba(117,82,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(117,82,255,0.08) 1px, transparent 1px) !important;
+            background-size: 30px 30px !important;
             border-radius: 14px;
-            border: 1.5px solid rgba(0, 210, 255, 0.22);
+            border: 1px solid rgba(117, 82, 255, 0.25);
             position: relative;
             overflow: hidden;
+            box-shadow: inset 0 2px 20px rgba(117, 82, 255, 0.05), 0 4px 24px rgba(0,0,0,0.3);
         }
 
         @keyframes pulse-filament {
@@ -316,7 +321,7 @@
             right: 16px;
             font-size: 0.65rem;
             font-weight: 700;
-            color: rgba(0, 210, 255, 0.3);
+            color: rgba(117, 82, 255, 0.6);
             text-transform: uppercase;
             letter-spacing: 0.12em;
             font-family: 'Outfit', sans-serif;
@@ -410,22 +415,22 @@
         .injector-body { user-select: none; -webkit-user-select: none;
             width: 46px;
             height: 76px;
-            background: linear-gradient(160deg, #1e293b, #0a101a);
-            border: 1.5px solid rgba(0, 210, 255, 0.35);
+            background: linear-gradient(160deg, #251758, #120b2e);
+            border: 1.5px solid rgba(117, 82, 255, 0.4);
             border-right: none;
             border-radius: 8px 0 0 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,210,255,0.1), inset 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,0,0,0.5);
         }
 
         .injector-nozzle {
             width: 16px;
             height: 30px;
-            background: linear-gradient(to right, #1e293b, #0f172a);
-            border: 1.5px solid rgba(0, 210, 255, 0.3);
+            background: linear-gradient(to right, #251758, #120b2e);
+            border: 1.5px solid rgba(117, 82, 255, 0.4);
             border-left: none;
             border-radius: 0 5px 5px 0;
         }
@@ -437,7 +442,7 @@
             transform: translateX(-50%);
             font-size: 0.58rem;
             font-weight: 700;
-            color: rgba(0,210,255,0.45);
+            color: #7552FF;
             white-space: nowrap;
             font-family: 'Outfit', sans-serif;
         }
@@ -458,14 +463,14 @@
 
         .toolbox::-webkit-scrollbar { width: 4px; }
         .toolbox::-webkit-scrollbar-track { background: transparent; }
-        .toolbox::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.15); border-radius: 2px; }
+        .toolbox::-webkit-scrollbar-thumb { background: rgba(117, 82, 255, 0.3); border-radius: 2px; }
 
         .toolbox-title {
             text-align: center;
             font-size: 1rem;
             font-weight: 800;
             color: var(--cyan);
-            text-shadow: 0 0 12px rgba(0, 210, 255, 0.5);
+            text-shadow: 0 0 12px rgba(117, 82, 255, 0.5);
             border-bottom: 1px solid rgba(255, 255, 255, 0.07);
             padding-bottom: 11px;
             line-height: 1.5;
@@ -543,15 +548,15 @@
         }
 
         .btn-fire {
-            background: linear-gradient(135deg, rgba(0,210,255,0.18), rgba(0,210,255,0.06));
-            color: var(--cyan);
-            border: 1px solid rgba(0,210,255,0.4);
-            box-shadow: 0 0 14px rgba(0,210,255,0.12);
+            background: linear-gradient(135deg, rgba(117, 82, 255, 0.25), rgba(90, 70, 218, 0.1));
+            color: #d8b4fe;
+            border: 1px solid rgba(117, 82, 255, 0.45);
+            box-shadow: 0 0 14px rgba(117, 82, 255, 0.18);
         }
 
         .btn-fire:hover:not(:disabled) {
-            background: linear-gradient(135deg, rgba(0,210,255,0.3), rgba(0,210,255,0.12));
-            box-shadow: 0 0 26px rgba(0,210,255,0.3);
+            background: linear-gradient(135deg, rgba(117, 82, 255, 0.4), rgba(90, 70, 218, 0.2));
+            box-shadow: 0 0 26px rgba(117, 82, 255, 0.35);
             transform: translateY(-2px);
         }
 
@@ -584,7 +589,7 @@
         .info-card .card-title {
             font-size: 0.7rem;
             font-weight: 700;
-            color: rgba(0,210,255,0.7);
+            color: rgba(117, 82, 255, 0.9);
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -613,7 +618,7 @@
         /* Scrollbar global */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(117, 82, 255, 0.3); border-radius: 3px; }
 
         /* CSS Animations */
         @keyframes field-drift {
@@ -655,9 +660,9 @@
             <i class="fa-solid fa-xmark"></i> إغلاق القائمة
         </button>
         <a href="../index.html?showMenu=true"
-            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 20px; padding: 10px; border-radius: 10px; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); color: #00d2ff; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s;"
-            onmouseover="this.style.background='rgba(0, 210, 255, 0.18)'"
-            onmouseout="this.style.background='rgba(0, 210, 255, 0.08)'">
+            style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 20px; padding: 10px; border-radius: 10px; background: rgba(117, 82, 255, 0.1); border: 1px solid rgba(117, 82, 255, 0.3); color: #c4b5fd; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s;"
+            onmouseover="this.style.background='rgba(117, 82, 255, 0.22)'"
+            onmouseout="this.style.background='rgba(117, 82, 255, 0.1)'">
             <i class="fa-solid fa-house"></i> القائمة الرئيسية
         </a>
         <div class="drawer-chapter">
@@ -669,13 +674,9 @@
                 <i class="fa-solid fa-chevron-down drawer-chapter-arrow" id="ch-arrow"></i>
             </div>
             <div class="drawer-submenu" id="ch-submenu">
-                <a href="induction.html">
+                <a href="faraday_experiment.html">
                     <i class="fa-solid fa-ring"></i>
-                    <span>نشاط فراداي المنهجي</span>
-                </a>
-                <a href="induction_coils.html">
-                    <i class="fa-solid fa-magnet"></i>
-                    <span>نشاط الحث الكهرومغناطيسي</span>
+                    <span>تجربة حلقة فراداي</span>
                 </a>
                 <a href="fields_effect.html" class="current">
                     <i class="fa-solid fa-atom"></i>
@@ -694,7 +695,7 @@
             <div class="topbar">
                 <div class="page-title">حركة الجسيمات المشحونة في المجالات</div>
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <a href="../index.html?showMenu=true" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 210, 255, 0.06); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 10px; color: var(--cyan); font-size: 0.8rem; font-weight: 700; padding: 7px 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 210, 255, 0.15)'" onmouseout="this.style.background='rgba(0, 210, 255, 0.06)'">
+                    <a href="../index.html?showMenu=true" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(117, 82, 255, 0.1); border: 1px solid rgba(117, 82, 255, 0.25); border-radius: 10px; color: var(--cyan); font-size: 0.8rem; font-weight: 700; padding: 7px 14px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(117, 82, 255, 0.2)'" onmouseout="this.style.background='rgba(117, 82, 255, 0.1)'">
                         <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i> التجارب الرئيسية
                     </a>
                     <span id="mode-badge" class="mode-badge idle">
@@ -724,23 +725,23 @@
                     <svg id="field-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;">
                         <defs>
                             <radialGradient id="crt-glow" cx="50%" cy="50%" r="70%">
-                                <stop offset="0%" stop-color="rgba(16, 32, 54, 0.82)" />
-                                <stop offset="100%" stop-color="rgba(7, 10, 18, 0.96)" />
+                                <stop offset="0%" stop-color="rgba(255, 255, 255, 0.6)" />
+                                <stop offset="100%" stop-color="rgba(238, 242, 255, 0.3)" />
                             </radialGradient>
                             <linearGradient id="e-field-glow" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(239, 68, 68, 0.18)" />
-                                <stop offset="100%" stop-color="rgba(59, 130, 246, 0.18)" />
+                                <stop offset="0%" stop-color="rgba(239, 68, 68, 0.12)" />
+                                <stop offset="100%" stop-color="rgba(59, 130, 246, 0.12)" />
                             </linearGradient>
                             <radialGradient id="b-field-glow" cx="50%" cy="50%" r="60%">
-                                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.22)" />
-                                <stop offset="100%" stop-color="rgba(7, 10, 18, 0)" />
+                                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.15)" />
+                                <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
                             </radialGradient>
                             <marker id="arrow-e" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-                                <path d="M0,0 L8,4 L0,8 Z" fill="rgba(255,159,67,0.7)"/>
+                                <path d="M0,0 L8,4 L0,8 Z" fill="#ea580c"/>
                             </marker>
                         </defs>
                         <!-- CRT Glass Envelope -->
-                        <path id="crt-glass-envelope" fill="url(#crt-glow)" stroke="rgba(0, 210, 255, 0.28)" stroke-width="2.5" style="filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.12));" />
+                        <path id="crt-glass-envelope" fill="url(#crt-glow)" stroke="rgba(117, 82, 255, 0.35)" stroke-width="2" style="filter: drop-shadow(0 2px 8px rgba(117, 82, 255, 0.15));" />
                         
                         <g id="field-halos"></g>
                         <g id="e-lines"></g>
@@ -1151,12 +1152,12 @@
                     g.style.animation = `x-pulse 2.2s ease-in-out ${delay}s infinite`;
 
                     const circ = ns('circle');
-                    setAttr(circ, { cx, cy, r: sz + 2.5, fill: 'none', stroke: 'rgba(59,130,246,0.12)', 'stroke-width': '0.9' });
+                    setAttr(circ, { cx, cy, r: sz + 2.5, fill: 'none', stroke: 'rgba(59,130,246,0.3)', 'stroke-width': '1.0' });
                     g.appendChild(circ);
 
                     [[cx-sz, cy-sz, cx+sz, cy+sz], [cx+sz, cy-sz, cx-sz, cy+sz]].forEach(([x1_pt, y1_pt, x2_pt, y2_pt]) => {
                         const l = ns('line');
-                        setAttr(l, { x1: x1_pt, y1: y1_pt, x2: x2_pt, y2: y2_pt, stroke: 'rgba(147,197,253,0.4)', 'stroke-width': '1.4', 'stroke-linecap': 'round' });
+                        setAttr(l, { x1: x1_pt, y1: y1_pt, x2: x2_pt, y2: y2_pt, stroke: '#2563eb', 'stroke-width': '1.8', 'stroke-linecap': 'round' });
                         g.appendChild(l);
                     });
 
@@ -1168,7 +1169,7 @@
             setAttr(lbl, {
                 x: deflEnd - 45, y: topBound + 24,
                 'font-size': '11', 'font-family': 'Outfit,sans-serif',
-                'font-weight': '700', fill: 'rgba(147,197,253,0.5)'
+                'font-weight': '700', fill: '#1d4ed8'
             });
             lbl.textContent = 'B (X)';
             bSymbols.appendChild(lbl);

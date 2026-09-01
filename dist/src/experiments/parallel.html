@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ربط المتسعات على التوازي | مختبر الفيزياء الافتراضي</title>
     <link rel="stylesheet" href="../fonts/google-fonts.css">
     <link rel="stylesheet" href="../libs/fontawesome.min.css">
@@ -10,26 +10,39 @@
     <script src="../libs/Draggable.min.js"></script>
     <script src="../engine/svg-wire-engine.js"></script>
     <link rel="stylesheet" href="../libs/tailwind.css">
+    <link rel="stylesheet" href="../css/raqeem-experiment.css">
     <script>
         window.tailwind = window.tailwind || {}; window.tailwind.config = {
-            theme: { extend: { colors: { cyber: { off: '#07090e', on: '#0f131a', panel: '#111823', border: 'rgba(0, 210, 255, 0.2)', gold: '#ffe082', orange: '#ff9f43', cyan: '#00d2ff', green: '#2ecc71', red: '#ef4444', blue: '#3b82f6' } }, fontFamily: { ar: ['Tajawal', 'sans-serif'], en: ['Outfit', 'sans-serif'] } } }
+            theme: { extend: { colors: { cyber: { off: '#090617', on: '#150E33', panel: '#251758', border: 'rgba(117, 82, 255, 0.3)', gold: '#ffe082', orange: '#ff9f43', cyan: '#7552FF', green: '#2ecc71', red: '#ef4444', blue: '#5A46DA' } }, fontFamily: { ar: ['Tajawal', 'sans-serif'], en: ['Outfit', 'sans-serif'] } } }
         }
     </script>
     <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };</script>
     <script id="MathJax-script" async src="../libs/mathjax/tex-chtml.js"></script>
     <style>
-        :root { --bg-color: #080c14; --panel-bg: #111823; --accent-blue: #3b82f6; --accent-orange: #ff9f43; --text-color: #e2e8f0; --success-green: #2ecc71; --neon-red: #ef4444; --neon-yellow: #facc15; }
-        .workspace-area { width: 780px; height: 460px; background: radial-gradient(circle at center, #111e32 0%, #05080f 100%); border-radius: 20px; position: relative; overflow: hidden; border: 2px solid rgba(0, 210, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.85); }
+        :root { --bg-color: #090617; --panel-bg: #251758; --accent-blue: #5A46DA; --accent-orange: #ff7e67; --text-color: #e2e8f0; --success-green: #2ecc71; --neon-red: #ef4444; --neon-yellow: #facc15; --cyber-orange: #ff7e67; }
+        
+        /* Workspace */
+        .workspace-area {
+            width: 100% !important; height: 100% !important; min-height: 500px !important;
+            background-color: #f8f9fb !important;
+            background-image:
+                linear-gradient(rgba(117,82,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(117,82,255,0.08) 1px, transparent 1px) !important;
+            background-size: 30px 30px !important;
+            border-radius: 12px; position: relative; overflow: hidden;
+            border: 1px solid rgba(117,82,255,0.25);
+            box-shadow: inset 0 2px 20px rgba(117,82,255,0.05), 0 4px 24px rgba(0,0,0,0.3);
+        }
         .component { position: absolute; z-index: 10; user-select: none; cursor: grab; }
         .component:active { cursor: grabbing; }
-        .drop-zone { position: absolute; border: 2px dashed transparent; border-radius: 8px; background: transparent; z-index: 1; transition: all 0.3s; }
-        .drop-zone.highlight { border-color: rgba(0, 210, 255, 0.8); background: rgba(0, 210, 255, 0.15); box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); animation: pulse-drop 1.5s infinite; }
-        @keyframes pulse-drop { 0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } 50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.9); border-color: rgba(0, 210, 255, 1); } 100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } }
+        .drop-zone { position: absolute; border: 2px dashed rgba(117, 82, 255, 0.4) !important; border-radius: 8px; background: rgba(117, 82, 255, 0.05) !important; z-index: 1; transition: all 0.3s; }
+        .drop-zone.highlight { border-color: rgba(117, 82, 255, 0.9) !important; background: rgba(117, 82, 255, 0.2) !important; box-shadow: 0 0 15px rgba(117, 82, 255, 0.5) !important; animation: pulse-drop 1.5s infinite !important; }
+        @keyframes pulse-drop { 0% { box-shadow: 0 0 5px rgba(117, 82, 255, 0.3); } 50% { box-shadow: 0 0 20px rgba(117, 82, 255, 0.8); } 100% { box-shadow: 0 0 5px rgba(117, 82, 255, 0.3); } }
         .drop-zone.active { opacity: 0; pointer-events: none; }
         svg.wires-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
-        .terminal-node { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: rgba(0, 210, 255, 0.4); border: 2px solid #00d2ff; transform: translate(-50%, -50%); cursor: crosshair; z-index: 20; display: none; transition: transform 0.2s, background 0.2s; }
+        .terminal-node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: rgba(117, 82, 255, 0.3); border: 2px solid #7552FF; transform: translate(-50%, -50%); cursor: crosshair; z-index: 20; display: none; transition: transform 0.2s, background 0.2s; box-shadow: 0 0 6px rgba(117,82,255,0.5); }
         #workspace .component.placed .terminal-node, #workspace .elite-component.placed .terminal-node { display: block; }
-        .terminal-node:hover, .terminal-node.hovered { background: rgba(0, 210, 255, 1); transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 10px #00d2ff; }
+        .terminal-node:hover, .terminal-node.hovered { background: rgba(117, 82, 255, 1); transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 10px #7552FF; }
         .terminal-node.connected { background: #2ecc71; border-color: #fff; box-shadow: 0 0 8px #2ecc71; cursor: default; }
         .user-wire { transition: filter 0.3s, stroke 0.3s; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } 50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: translate(-50%, -50%) scale(1.5); } 100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } }
@@ -40,43 +53,103 @@
     <script src="../engine/elite-components.js"></script>
     <script src="../engine/elite-engine.js"></script>
 </head>
-<body class="bg-[#07090e] font-ar text-slate-200 min-h-screen p-2 md:p-6 flex flex-col items-center justify-start relative overflow-x-hidden">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,210,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,210,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
+<body class="exp-layout-sidebar-v2">
 
-    <header class="w-full max-w-[850px] flex justify-between items-center mb-3 z-10 gap-2">
-        <div class="elite-logo-container group select-none cursor-pointer flex items-center gap-2.5 bg-black/40 border border-white/5 px-3 py-1.5 rounded-xl backdrop-blur-md shadow-lg" onclick="window.location.reload();">
-            <div class="relative elite-logo-card transition-all duration-500 ease-out" style="width: 32px; height: 32px; transform-style: preserve-3d;">
-                <div class="absolute inset-0 bg-cyan-500/10 rounded-lg blur-md"></div>
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_6px_rgba(0,210,255,0.4)]">
-                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#00d2ff" stroke-width="5" stroke-linejoin="round" />
-                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(11, 17, 28, 0.9)" stroke="#ffe082" stroke-width="3" stroke-linejoin="round" />
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="exp-sidebar-v2" style="position: relative; z-index: 9999; overflow: visible !important;">
+        <!-- Logo -->
+        <div class="exp-sidebar-v2-header">
+            <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="window.location.reload();">
+                <svg viewBox="0 0 100 100" style="width:32px; height:32px; flex-shrink:0;">
+                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#7552FF" stroke-width="5" stroke-linejoin="round" />
+                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(9,6,23,0.95)" stroke="#ffb347" stroke-width="3" stroke-linejoin="round" />
                     <path d="M40,36 H60 M40,49 H55 M40,62 H60 M40,36 V62" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
+                <div>
+                    <div style="font-size:0.7rem; font-weight:900; color:#fff; font-family:'Outfit',sans-serif; letter-spacing:0.1em;">ELITE</div>
+                    <div style="font-size:0.55rem; color:rgba(117,82,255,0.8); letter-spacing:0.05em;">الفريق البرمجي</div>
+                </div>
             </div>
-            <div class="flex flex-col text-right font-bold leading-tight">
-                <span class="text-xs tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-extrabold uppercase" style="font-family: 'Outfit', sans-serif;">ELITE</span>
-                <span class="text-[7px] text-cyan-400/80 tracking-widest font-ar">الفريق البرمجي</span>
+            <div class="exp-sidebar-v2-title">ربط المتسعات على التوازي</div>
+        </div>
+
+        <!-- Step Banner -->
+        <div class="exp-sidebar-v2-banner" id="stepBanner">
+            الخطوة 1: اسحب القطع الأربعة ووضعها في أماكنها المحددة لتجميع الدائرة.
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn-auto-wire" style="justify-content:center;" onclick="autoConnectCircuit()">
+                <i class="fa-solid fa-bolt"></i> <span>توصيل تلقائي</span>
+            </button>
+            <button class="btn-reset" style="justify-content:center;" onclick="resetLab()">
+                <i class="fa-solid fa-rotate-right"></i> <span>إعادة تعيين</span>
+            </button>
+        </div>
+
+        <div class="exp-sidebar-v2-section-title" style="margin-top: 15px;">عناصر الدائرة</div>
+        <div id="elite-components-container" style="display: flex; flex-direction: column; align-items: stretch; gap: 10px; overflow: visible !important; padding-bottom: 20px; padding-left: 10px; padding-right: 10px;">
+            
+            <!-- Battery Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">بطارية (E)</div>
+                <div id="bat-card-body" style="min-height: 40px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Switch Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">مفتاح (K)</div>
+                <div id="sw-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Capacitor C1 Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">متسعة C1</div>
+                <div id="comp-c1-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Capacitor C2 Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">متسعة C2</div>
+                <div id="comp-c2-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Wires Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">أسلاك توصيل</div>
+                <svg viewBox="0 0 80 30" style="width:100%;height:28px;">
+                    <path d="M5 15 Q 20 5 40 15 Q 60 25 75 15" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="5" cy="15" r="3" fill="#7c3aed"/>
+                    <circle cx="75" cy="15" r="3" fill="#7c3aed"/>
+                </svg>
             </div>
         </div>
 
-        <h1 class="text-base md:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400 text-center">ربط المتسعات على التوازي</h1>
-
-        <a href="../index.html?showMenu=true" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 bg-black/60 border border-white/5 hover:border-cyan-400/40 text-slate-300 hover:text-white backdrop-blur-md shadow-lg" id="back-btn">
-            <i class="fa-solid fa-chevron-right text-cyan-400 text-[10px]"></i> <span>القائمة</span>
+        <!-- Back to Menu -->
+        <a href="../index.html?showMenu=true" class="exp-back-btn-td" id="back-btn" style="justify-content:center; margin-top:4px;">
+            <i class="fa-solid fa-house" style="color:var(--cyan);"></i> <span>القائمة الرئيسية</span>
         </a>
-    </header>
+    </aside>
 
-    <div class="w-full max-w-[850px] bg-gradient-to-r from-slate-900 via-cyber-panel to-slate-900 text-cyan-300 py-2.5 px-4 rounded-xl mb-3 font-bold text-xs md:text-sm border border-cyan-500/20 shadow-lg text-center transition-all duration-500" id="stepBanner">
-        الخطوة 1: انقر أو اسحب القطع لتثبيتها في الدائرة (البطارية، المفتاح، المتسعتان C1 و C2).
-    </div>
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="exp-main-v2">
+        <!-- Topbar -->
+        <div class="exp-main-v2-topbar">
+            <h1 style="font-size:0.95rem; font-weight:900; color:#fff;">ربط المتسعات على التوازي</h1>
+            <div class="flex items-center gap-2">
+                <a href="../index.html?showMenu=true" class="exp-btn-v2" style="text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-house"></i> الرئيسية
+                </a>
+            </div>
+        </div>
 
-    <main class="w-full max-w-[850px] bg-slate-950/90 border border-white/10 rounded-2xl p-2.5 md:p-4 shadow-2xl backdrop-blur-md flex flex-col gap-3 relative z-10">
-        <div class="workspace-scaler-wrapper rounded-xl">
-            <div class="workspace-area relative mx-auto" id="workspace" data-base-width="780" data-base-height="460" style="width: 780px; height: 460px;">
-                <div class="absolute bottom-0 left-0 w-full h-[125px] border-t-2 border-dashed border-cyan-500/30 bg-slate-900/60 backdrop-blur-md rounded-b-[18px] pointer-events-none z-0">
-                    <div class="absolute -top-3 right-4 bg-slate-950/90 border border-cyan-500/40 px-2.5 py-0.5 rounded-full text-cyan-400 font-bold text-[10px] tracking-wider flex items-center gap-1 shadow-md"><i class="fa-solid fa-toolbox text-[10px]"></i> صندوق الأدوات (انقر أو اسحب)</div>
-                </div>
-                <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+        <!-- Workspace + Conclusion -->
+        <div class="exp-main-v2-workspace" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+            <div style="flex:1; position:relative; overflow:hidden; min-height:0; display: flex;">
+                <div class="workspace-area" id="workspace" style="flex: 1; width: 100% !important; height: 100% !important;">
 
                 <svg style="position: absolute; width: 0; height: 0;">
                   <defs>
@@ -85,7 +158,7 @@
                       <stop offset="40%" stop-color="#d97706" />
                       <stop offset="100%" stop-color="#78350f" />
                     </linearGradient>
-                    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
                       <stop offset="0%" stop-color="#5c4033" />
                       <stop offset="50%" stop-color="#3d2b1f" />
                       <stop offset="100%" stop-color="#261c13" />
@@ -103,111 +176,116 @@
                   </defs>
                 </svg>
 
-                <svg class="wires-layer" id="wiresLayer"></svg>
+                <svg class="wires-layer" id="wiresLayer">
+                    <defs>
+                        <filter id="glowOrange" filterUnits="userSpaceOnUse" x="-100" y="-100" width="1200" height="1200">
+                          <feGaussianBlur stdDeviation="3" result="blur" />
+                          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                    </defs>
+                </svg>
 
-                <!-- Drop Zones -->
-                <div class="drop-zone" id="zone-battery" style="left: 60px; top: 65px; width: 70px; height: 60px;"></div>
-                <div class="drop-zone" id="zone-switchK" style="left: 60px; top: 185px; width: 80px; height: 100px;"></div>
-                <div class="drop-zone" id="zone-c1" style="left: 280px; top: 55px; width: 140px; height: 125px;"></div>
-                <div class="drop-zone" id="zone-c2" style="left: 520px; top: 55px; width: 140px; height: 125px;"></div>
+                <!-- Drop Zones (Positions calculated dynamically via layoutCircuit) -->
+                <div class="drop-zone" id="zone-battery" style="width: 70px; height: 60px;"></div>
+                <div class="drop-zone" id="zone-switchK" style="width: 80px; height: 100px;"></div>
+                <div class="drop-zone" id="zone-c1" style="width: 140px; height: 130px;"></div>
+                <div class="drop-zone" id="zone-c2" style="width: 140px; height: 130px;"></div>
 
-                <!-- Components on shelf -->
-                <div id="elite-components-container"></div>
-                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="left: 380px; top: 325px; width: 140px; height: 125px;">
-                    <div class="relative w-full h-full overflow-visible">
-                        <div id="c1-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 15px; left: 10px; width: 120px;"></div>
-                        <div id="c1-top-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="top: 10px; left: 10px; width: 120px;"></div>
+                <!-- Capacitor C1 -->
+                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="width: 140px; height: 130px;">
+                    <div style="position: relative; width: 100%; height: 100%; overflow: visible;">
+                        <!-- Top Plate (Metallic) -->
+                        <div style="position: absolute; top: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #f1f5f9 0%, #94a3b8 40%, #475569 100%); box-shadow: 0 5px 8px -1px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.8); border-bottom: 2px solid #334155;">
+                            <div id="c1-pos-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#ef4444; font-weight:black; font-size:14px; text-shadow:0 0 4px rgba(239,68,68,0.9);">
+                                <span>+</span><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span>
+                            </div>
+                        </div>
+                        <!-- Bottom Plate (Metallic) -->
+                        <div style="position: absolute; bottom: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 60%, #334155 100%); box-shadow: 0 -3px 8px -1px rgba(0,0,0,0.6), inset 0 -2px 3px rgba(255,255,255,0.6); border-top: 2px solid #334155;">
+                            <div id="c1-neg-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#3b82f6; font-weight:black; font-size:16px; text-shadow:0 0 4px rgba(59,130,246,0.9); margin-top:-2px;">
+                                <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                            </div>
+                        </div>
                         
-                        <div id="c1-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c1-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="bottom: 28px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
-                        <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                        <!-- Dielectric Glass/Air Gap -->
+                        <div style="position: absolute; top: 32px; bottom: 32px; left: 24px; right: 24px; border-radius: 2px; opacity: 0.3; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px); border-left: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3);"></div>
+                        
+                        <!-- Dynamic Field Lines -->
+                        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" id="c1-field"></svg>
+                        
+                        <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 50%; top: 17%;"></div>
+                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 50%; top: 83%;"></div>
                     </div>
                 </div>
 
-                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="left: 580px; top: 325px; width: 140px; height: 125px;">
-                    <div class="relative w-full h-full overflow-visible">
-                        <div id="c2-bottom-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="bottom: 15px; left: 10px; width: 120px;"></div>
-                        <div id="c2-top-plate" class="absolute h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="top: 10px; left: 10px; width: 120px;"></div>
+                <!-- Capacitor C2 -->
+                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="width: 140px; height: 130px;">
+                    <div style="position: relative; width: 100%; height: 100%; overflow: visible;">
+                        <!-- Top Plate (Metallic) -->
+                        <div style="position: absolute; top: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #f1f5f9 0%, #94a3b8 40%, #475569 100%); box-shadow: 0 5px 8px -1px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.8); border-bottom: 2px solid #334155;">
+                            <div id="c2-pos-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#ef4444; font-weight:black; font-size:14px; text-shadow:0 0 4px rgba(239,68,68,0.9);">
+                                <span>+</span><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span>
+                            </div>
+                        </div>
+                        <!-- Bottom Plate (Metallic) -->
+                        <div style="position: absolute; bottom: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 60%, #334155 100%); box-shadow: 0 -3px 8px -1px rgba(0,0,0,0.6), inset 0 -2px 3px rgba(255,255,255,0.6); border-top: 2px solid #334155;">
+                            <div id="c2-neg-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#3b82f6; font-weight:black; font-size:16px; text-shadow:0 0 4px rgba(59,130,246,0.9); margin-top:-2px;">
+                                <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                            </div>
+                        </div>
                         
-                        <div id="c2-pos-charges" class="absolute flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="top: 23px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c2-neg-charges" class="absolute flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="bottom: 28px; left: 20px; width: 100px; text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
-                        <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                        <!-- Dielectric Glass/Air Gap -->
+                        <div style="position: absolute; top: 32px; bottom: 32px; left: 24px; right: 24px; border-radius: 2px; opacity: 0.3; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px); border-left: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3);"></div>
+                        
+                        <!-- Dynamic Field Lines -->
+                        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" id="c2-field"></svg>
+                        
+                        <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 50%; top: 17%;"></div>
+                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 50%; top: 83%;"></div>
                     </div>
                 </div>
+
 
                 <!-- Concept Layer -->
                 <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[15]" id="conceptLayer">
                     <g id="area-vis" style="opacity: 0; transition: opacity 0.5s;">
-                        <rect id="area-box" x="260" y="45" width="420" height="145" rx="10" fill="rgba(6, 182, 212, 0.04)" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6 4" />
-                        <path id="top-bridge" d="M 400 70 L 530 70" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="4 4" />
-                        <path id="bottom-bridge" d="M 400 165 L 530 165" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="4 4" />
+                        <rect id="area-box" x="340" y="140" width="410" height="150" rx="8" fill="rgba(6, 182, 212, 0.05)" stroke="#06b6d4" stroke-width="2" stroke-dasharray="8 6" />
+                        <path id="top-bridge" d="M 480 165 L 610 165" stroke="#06b6d4" stroke-width="3" stroke-dasharray="5 5" />
+                        <path id="bottom-bridge" d="M 480 265 L 610 265" stroke="#06b6d4" stroke-width="3" stroke-dasharray="5 5" />
+                        <text id="area-text" x="545" y="130" fill="#22d3ee" font-size="14" font-weight="bold" font-family="Tajawal" text-anchor="middle">المساحة السطحية المتقابلة تزداد (A = A₁ + A₂) ➔ السعة تزداد</text>
                     </g>
                     <!-- E-field groups for both capacitors -->
                     <g id="e-field-lines-c1" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
                     <g id="e-field-lines-c2" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
                 </svg>
-
-                <!-- Floating Concept Tag -->
-                <div id="parallel-concept-tag" class="absolute left-1/2 -translate-x-1/2 bg-slate-950/90 border border-cyan-500/40 px-3 py-1 rounded-full text-cyan-300 font-bold text-xs shadow-lg backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500 flex items-center gap-2 z-20" style="top: 240px;">
-                    <i class="fa-solid fa-arrows-left-right text-cyan-400"></i>
-                    <span>المساحة السطحية المتقابلة تزداد ($A = A_1 + A_2$) ⟵ السعة المكافئة تزداد</span>
-                </div>
                 
-            </div>
-        </div>
-    
-        <!-- Compact Sleek Conclusion Strip -->
-        <div class="conclusion-panel bg-slate-900/80 border border-emerald-500/30 rounded-xl p-3 shadow-lg hidden transition-all duration-500" id="conclusion">
-            <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs mb-2">
-                <i class="fa-solid fa-circle-check text-emerald-400"></i>
-                <span>قوانين ربط المتسعات على التوازي:</span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
-                <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-emerald-400 font-extrabold">⚡ الجهد متساوٍ:</span>
-                    <span>$V_{total} = V_1 = V_2$</span>
-                </div>
-                <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-cyan-400 font-extrabold">🔋 الشحنة تتجزأ:</span>
-                    <span>$Q_{total} = Q_1 + Q_2$</span>
-                </div>
-                <div class="bg-black/40 border border-emerald-500/20 rounded-lg p-2 flex items-center gap-2 text-slate-200">
-                    <span class="text-amber-400 font-extrabold">📈 السعة تزداد:</span>
-                    <span>$C_{eq} = C_1 + C_2$</span>
                 </div>
             </div>
-        </div>
 
-        <div class="flex flex-wrap items-center justify-center gap-3 mt-1">
-            <button class="btn-auto-wire py-2 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2 text-xs" id="autoConnectBtn" onclick="autoConnectCircuit()">
-                <i class="fa-solid fa-bolt"></i> <span>توصيل تلقائي</span>
-            </button>
-            <button class="btn-reset py-2 px-6 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-extrabold rounded-xl shadow-lg shadow-red-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2 text-xs" id="resetBtn" onclick="resetLab()">
-                <i class="fa-solid fa-rotate-right"></i> <span>إعادة تعيين</span>
-            </button>
+
         </div>
-    </main>
+    </div>
 
     <script>
         const EPSILON_0 = 8.854;
         let V_bat = 10.0;
         let A1 = 200; let A2 = 200;
+        let k1 = 1.0; let k2 = 1.0;
+        let insertionPercent1 = 0; let insertionPercent2 = 0;
         let isSwitchClosed = false;
         let trappedCharge = null;
+        let visualWidth1 = 80; let visualWidth2 = 80;
 
         function autoConnectCircuit() {
-            // Auto place all components first if any unplaced
             const unplaced = document.querySelectorAll('.elite-component:not(.placed)');
-            if (unplaced.length > 0 && window.engine) {
-                unplaced.forEach(comp => {
-                    const targetId = comp.getAttribute("data-target");
-                    const dropZone = targetId ? document.getElementById(targetId) : null;
-                    if (dropZone) {
-                        window.engine.snapComponent(comp, dropZone);
-                    }
-                });
+            if (unplaced.length > 0) {
+                const banner = document.getElementById('stepBanner');
+                if (banner) {
+                    banner.innerText = 'يرجى سحب القطع الأربعة من صندوق الأدوات إلى أماكنها المحددة أولاً قبل التوصيل!';
+                    banner.style.color = 'var(--neon-yellow)';
+                    gsap.fromTo(banner, { scale: 1.04 }, { scale: 1, duration: 0.3 });
+                }
+                return;
             }
 
             if (!window.engine || !window.engine.wireEngine) return;
@@ -222,15 +300,13 @@
                 ['c1-bottom', 'c2-bottom']
             ];
 
-            setTimeout(() => {
-                pairs.forEach(([srcId, tgtId]) => {
-                    const srcEl = document.getElementById(srcId);
-                    const tgtEl = document.getElementById(tgtId);
-                    if (srcEl && tgtEl) {
-                        window.engine.wireEngine.connect(srcEl, tgtEl);
-                    }
-                });
-            }, 250);
+            pairs.forEach(([srcId, tgtId]) => {
+                const srcEl = document.getElementById(srcId);
+                const tgtEl = document.getElementById(tgtId);
+                if (srcEl && tgtEl) {
+                    window.engine.wireEngine.connect(srcEl, tgtEl);
+                }
+            });
         }
 
         function resetLab() {
@@ -247,31 +323,139 @@
             document.querySelectorAll('.connected').forEach(el => el.classList.remove('connected'));
             document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
             
-            document.getElementById('stepBanner').innerText = 'الخطوة 1: انقر أو اسحب القطع لتثبيتها في الدائرة (البطارية، المفتاح، المتسعتان C1 و C2).';
+            document.getElementById('stepBanner').innerText = 'الخطوة 1: قم بسحب القطع الأربعة من صندوق العناصر بالأسفل ووضعها في أماكنها المحددة لتجميع الدائرة.';
             document.getElementById('stepBanner').style.color = 'var(--cyber-orange)';
             
-            document.getElementById('conclusion').classList.add('hidden');
+
+            const conclusionEl = document.getElementById('conclusion');
+            if (conclusionEl) {
+                conclusionEl.classList.add('hidden');
+                conclusionEl.classList.remove('opacity-100');
+            }
             const areaVis = document.getElementById('area-vis');
             if (areaVis) areaVis.style.opacity = 0;
-            const conceptTag = document.getElementById('parallel-concept-tag');
-            if (conceptTag) conceptTag.style.opacity = 0;
             
             const switchArm = document.getElementById('sw-arm');
             if (switchArm) gsap.to(switchArm, { rotation: -30, duration: 0.25 });
 
-            // Reset Components to Toolbox Positions
-            gsap.to('#bat', { left: 60, top: 340, duration: 0.4 });
-            gsap.to('#sw', { left: 200, top: 325, duration: 0.4 });
-            gsap.to('#comp-c1', { left: 380, top: 325, duration: 0.4 });
-            gsap.to('#comp-c2', { left: 580, top: 325, duration: 0.4 });
+            // Move components back to sidebar container
+            ['bat', 'sw', 'comp-c1', 'comp-c2'].forEach(id => {
+                const comp = document.getElementById(id);
+                const wrapper = document.getElementById(id + '-card-body');
+                if (comp && wrapper) {
+                    wrapper.appendChild(comp);
+                    comp.style.position = 'relative';
+                    comp.style.left = '0px';
+                    comp.style.top = '0px';
+                    comp.style.margin = '0';
+                    gsap.set(comp, { clearProps: 'x,y,transform,left,top' });
+                    
+                    comp.style.transformOrigin = 'center center';
+                    if (id.includes('c1') || id.includes('c2')) {
+                        comp.style.transform = 'scale(0.5)';
+                        comp.style.marginBottom = '-50px';
+                        comp.style.marginTop = '-20px';
+                    } else if (id === 'bat') {
+                        comp.style.transform = 'scale(0.7)';
+                        comp.style.marginBottom = '-15px';
+                        comp.style.marginTop = '-15px';
+                    } else {
+                        comp.style.transform = 'scale(0.65)';
+                        comp.style.marginBottom = '-15px';
+                        comp.style.marginTop = '-20px';
+                    }
+                }
+            });
         }
 
         
-        // Generate Elite Components
+        // Dynamic layout calculation based on a single reference point (center)
+        function layoutCircuit() {
+            const ws = document.getElementById('workspace');
+            if (!ws) return;
+            
+            const w = ws.clientWidth || 900;
+            const h = ws.clientHeight || 500;
+            
+            // Single Reference Point: Center of the Workspace
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            // X, Y Offsets relative to center (cx, cy)
+            // Left to right: Battery/Switch -> C1 -> C2
+            const layoutMap = {
+                'zone-battery': { ox: -280, oy: -80, compId: 'bat' },
+                'zone-switchK': { ox: -280, oy: 60, compId: 'sw' },
+                'zone-c1':      { ox: -70,  oy: -65, compId: 'comp-c1' },
+                'zone-c2':      { ox: 180,  oy: -65, compId: 'comp-c2' }
+            };
+            
+            for (const [zoneId, data] of Object.entries(layoutMap)) {
+                // 1. Position the drop zone
+                const zone = document.getElementById(zoneId);
+                if (zone) {
+                    zone.style.left = (cx + data.ox) + 'px';
+                    zone.style.top = (cy + data.oy) + 'px';
+                }
+                
+                // 2. Position the component if it is placed
+                const comp = document.getElementById(data.compId);
+                if (comp && comp.classList.contains('placed')) {
+                    comp.style.left = (cx + data.ox) + 'px';
+                    comp.style.top = (cy + data.oy) + 'px';
+                }
+            }
+            
+            if (window.engine && window.engine.wireEngine) {
+                window.engine.wireEngine.repositionWires();
+            }
+            if (window.isCircuitComplete && typeof renderMolecules === 'function') {
+                renderMolecules();
+            }
+        }
+
+        window.addEventListener('resize', layoutCircuit);
+
+        // Track mouse/touch position globally for cursor-based drag anchoring
+        window._lastMouseX = null;
+        window._lastMouseY = null;
+        document.addEventListener('mousemove', e => { window._lastMouseX = e.clientX; window._lastMouseY = e.clientY; }, { passive: true });
+        document.addEventListener('touchmove', e => { if (e.touches[0]) { window._lastMouseX = e.touches[0].clientX; window._lastMouseY = e.touches[0].clientY; } }, { passive: true });
+        document.addEventListener('touchstart', e => { if (e.touches[0]) { window._lastMouseX = e.touches[0].clientX; window._lastMouseY = e.touches[0].clientY; } }, { passive: true });
+
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('elite-components-container');
-            container.innerHTML += EliteComponents.getBattery('bat', 60, 340, 'zone-battery');
-            container.innerHTML += EliteComponents.getSwitch('sw', 200, 325, 'zone-switchK', true);
+            layoutCircuit();
+            
+            // Create components, place them in sidebar container, and use position: relative
+            let batHTML = EliteComponents.getBattery('bat', 0, 0, 'zone-battery');
+            batHTML = batHTML.replace('style="', 'style="position: relative; transform: scale(0.7); transform-origin: center center; margin-top: -15px; margin-bottom: -15px; ');
+            document.getElementById('bat-card-body').innerHTML += batHTML;
+            
+            let swHTML = EliteComponents.getSwitch('sw', 0, 0, 'zone-switchK', true);
+            swHTML = swHTML.replace('style="', 'style="position: relative; transform: scale(0.65); transform-origin: center center; margin-top: -20px; margin-bottom: -15px; ');
+            document.getElementById('sw-card-body').innerHTML += swHTML;
+            
+            // Move C1 and C2 from workspace to sidebar
+            const c1 = document.getElementById('comp-c1');
+            const c2 = document.getElementById('comp-c2');
+            if (c1) {
+                document.getElementById('comp-c1-card-body').appendChild(c1);
+                c1.style.position = 'relative';
+                c1.style.transform = 'scale(0.5)';
+                c1.style.transformOrigin = 'center center';
+                c1.style.marginBottom = '-50px';
+                c1.style.marginTop = '-20px';
+                c1.style.left = '0px'; c1.style.top = '0px';
+            }
+            if (c2) {
+                document.getElementById('comp-c2-card-body').appendChild(c2);
+                c2.style.position = 'relative';
+                c2.style.transform = 'scale(0.5)';
+                c2.style.transformOrigin = 'center center';
+                c2.style.marginBottom = '-50px';
+                c2.style.marginTop = '-20px';
+                c2.style.left = '0px'; c2.style.top = '0px';
+            }
             
             // Attach switch click handler
             const swEl = document.getElementById('sw');
@@ -285,6 +469,41 @@
             
             const engine = new EliteEngine({
                 workspaceId: 'workspace',
+                disableScaler: true,
+                freeDrop: true,
+                onComponentDragStart: (comp, draggable) => {
+                    const ws = document.getElementById('workspace');
+                    if (comp.parentElement !== ws) {
+                        const wsRect = ws.getBoundingClientRect();
+
+                        // Use cursor position to anchor the component under the mouse
+                        // This avoids any scale mismatch between sidebar and workspace
+                        const mouseX = (window._lastMouseX != null ? window._lastMouseX : wsRect.left + wsRect.width  / 2) - wsRect.left;
+                        const mouseY = (window._lastMouseY != null ? window._lastMouseY : wsRect.top  + wsRect.height / 2) - wsRect.top;
+
+                        // Reparent and hard-reset all transform/scale/margin
+                        ws.appendChild(comp);
+                        comp.style.setProperty('position', 'absolute', 'important');
+                        comp.style.transform = 'none';
+                        comp.style.margin    = '0';
+                        gsap.set(comp, { clearProps: 'transform,margin' });
+
+                        // Center the full-size component on the cursor
+                        const halfW = comp.offsetWidth  / 2;
+                        const halfH = comp.offsetHeight / 2;
+                        const newLeft = mouseX - halfW;
+                        const newTop  = mouseY - halfH;
+
+                        gsap.set(comp, { left: newLeft, top: newTop, x: 0, y: 0 });
+
+                        if (draggable) {
+                            draggable.startLeft = newLeft;
+                            draggable.startTop  = newTop;
+                            draggable.update();
+                        }
+                    }
+                },
+                wireColor: '#1e293b', // Realistic dark wire
                 expectedPairs: [
                     'bat-pos-c1-top',
                     'c1-top-c2-top',
@@ -297,7 +516,7 @@
                         window.isCircuitComplete = true;
                         const stepBanner = document.getElementById('stepBanner');
                         if (stepBanner) {
-                            stepBanner.innerText = 'اكتمل الربط بنجاح! انقر على المفتاح لغلق الدائرة.';
+                            stepBanner.innerText = 'اكتمل الربط! انقر على المفتاح لغلق الدائرة.';
                             stepBanner.style.color = 'var(--success-green)';
                         }
                     } else {
@@ -309,14 +528,85 @@
                     if (placed === 4) {
                         const stepBanner = document.getElementById('stepBanner');
                         if (stepBanner) {
-                            stepBanner.innerText = 'الخطوة 2: تم وضع القطع. ارسم الأسلاك بين النقاط المضيئة لإكمال الدائرة.';
+                            stepBanner.innerText = 'الخطوة 2: تم وضع القطع. ارسم الأسلاك بين النقاط (الدوائر المضيئة) لإكمال الدائرة.';
                             stepBanner.style.color = 'var(--cyber-orange)';
                         }
                     }
                 }
             });
             engine.totalComponents = 4;
+            
+            // Revert scaler wrapper styles that shrink the workspace
+            const wsEl = document.getElementById('workspace');
+            const wrapper = wsEl.closest('.workspace-scaler-wrapper');
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                wrapper.style.height = '100%';
+            }
+            wsEl.style.position = 'relative';
+            wsEl.style.transform = 'none';
+            wsEl.style.left = '0';
+            engine.totalComponents = 4;
             engine.setupTerminals();
+            
+            // Override snapComponent — fully self-contained, no origSnap dependency
+            engine.snapComponent = function(comp, dropZone) {
+                if (!comp || !dropZone || comp.classList.contains('placed')) return;
+
+                const ws = document.getElementById('workspace');
+
+                // 1. Reparent to workspace
+                if (comp.parentElement !== ws) {
+                    ws.appendChild(comp);
+                }
+
+                // 2. Kill any running GSAP tweens to avoid conflicts
+                gsap.killTweensOf(comp);
+
+                // 3. Hard CSS reset — strip any scale/margin/transform from sidebar
+                comp.style.position  = 'absolute';
+                comp.style.margin    = '0';
+                comp.style.transform = 'none';
+
+                // 4. Sync GSAP internal state to zero
+                gsap.set(comp, { x: 0, y: 0, left: 0, top: 0, clearProps: 'transform,margin,scale' });
+
+                // 5. Get drop zone position (offsetLeft/Top = reliable px inside workspace)
+                const targetLeft = dropZone.offsetLeft;
+                const targetTop  = dropZone.offsetTop;
+
+                // 6. Animate to exact drop zone coordinates
+                gsap.to(comp, {
+                    left: targetLeft,
+                    top:  targetTop,
+                    x: 0,
+                    y: 0,
+                    duration: 0.35,
+                    ease: 'back.out(1.4)',
+                    onUpdate: () => { if (engine.wireEngine) engine.wireEngine.repositionWires(); }
+                });
+
+                // 7. Mark drop zone as filled
+                dropZone.classList.add('active');
+                dropZone.classList.remove('highlight');
+                gsap.fromTo(dropZone, { scale: 1.1 }, { scale: 1, duration: 0.3 });
+
+                // 8. Disable dragging and mark as placed
+                const draggableInst = Draggable.get(comp);
+                if (draggableInst) draggableInst.disable();
+                gsap.set(comp, { zIndex: 10 });
+                comp.classList.add('placed');
+
+                // 9. Update placement counter
+                engine.placedCount++;
+                engine.onComponentPlaced(engine.placedCount, engine.totalComponents);
+
+                // 10. Rebind wire terminals now component is inside workspace
+                if (engine.wireEngine && typeof engine.wireEngine.setupTerminals === 'function') {
+                    engine.wireEngine.setupTerminals();
+                }
+            };
+            
             window.engine = engine;
 
             requestAnimationFrame(renderMolecules);
@@ -327,9 +617,11 @@
         function cycleBatteryVolt() {
             voltIdx = (voltIdx + 1) % voltages.length;
             V_bat = voltages[voltIdx];
-            document.querySelector('#bat text:last-child').textContent = V_bat + "V CELL";
-            createSpark(95, 95);
+            const batTextEl = document.querySelector('#bat text:last-child');
+            if (batTextEl) batTextEl.textContent = V_bat + "V CELL";
+            createSpark(135, 200);
         }
+
 
         function handleSwitchClick(eventOrForce) {
             const isForceOpen = eventOrForce === true;
@@ -341,24 +633,28 @@
 
             if (isSwitchClosed) {
                 gsap.to(switchArm, { rotation: 0, duration: 0.25 });
-                createSpark(100, 235);
-                document.getElementById('stepBanner').innerText = "الدائرة مغلقة والبطارية متصلة! يتساوى فرق جهد المتسعتين: V₁ = V₂ = V_total";
+                createSpark(112, 370);
+                document.getElementById('stepBanner').innerText = "الدائرة مغلقة والبطارية متصلة! يتساوى فرق جهد المتسعتين مع جهد المصدر: V₁ = V₂ = V_total";
                 document.getElementById('stepBanner').style.color = 'var(--success-green)';
-                document.getElementById('conclusion').classList.remove('hidden');
+                const conclusionEl2 = document.getElementById('conclusion');
+                if (conclusionEl2) {
+                    conclusionEl2.classList.remove('hidden');
+                    setTimeout(() => conclusionEl2.classList.add('opacity-100'), 50);
+                }
                 
+                // Show Vis
                 document.getElementById('area-vis').style.opacity = 1;
-                const conceptTag = document.getElementById('parallel-concept-tag');
-                if (conceptTag) conceptTag.style.opacity = 1;
                 
             } else {
                 gsap.to(switchArm, { rotation: -30, duration: 0.25 });
                 document.getElementById('stepBanner').innerText = "المفتاح مفتوح. المجموعة معزولة. تظل الشحنة الكلية ثابتة.";
                 document.getElementById('stepBanner').style.color = "var(--accent-orange)";
+                const conclusionEl3 = document.getElementById('conclusion');
+                if (trappedCharge > 5 && (k1 > 1.2 || k2 > 1.2) && conclusionEl3) conclusionEl3.classList.remove('hidden');
                 
+
                 const areaVis = document.getElementById('area-vis');
                 if (areaVis) areaVis.style.opacity = 0;
-                const conceptTag = document.getElementById('parallel-concept-tag');
-                if (conceptTag) conceptTag.style.opacity = 0;
             }
         }
 
@@ -385,8 +681,10 @@
             }
 
             const op1 = Math.min(1, Q1/10); const op2 = Math.min(1, Q2/10);
-            document.getElementById('c1-pos-charges').style.opacity = op1; document.getElementById('c1-neg-charges').style.opacity = op1;
-            document.getElementById('c2-pos-charges').style.opacity = op2; document.getElementById('c2-neg-charges').style.opacity = op2;
+            const c1Pos = document.getElementById('c1-pos-charges'); if (c1Pos) c1Pos.style.opacity = op1;
+            const c1Neg = document.getElementById('c1-neg-charges'); if (c1Neg) c1Neg.style.opacity = op1;
+            const c2Pos = document.getElementById('c2-pos-charges'); if (c2Pos) c2Pos.style.opacity = op2;
+            const c2Neg = document.getElementById('c2-neg-charges'); if (c2Neg) c2Neg.style.opacity = op2;
             
             // Position concept SVG using actual rendered positions
             if (window.isCircuitComplete) {
@@ -394,28 +692,34 @@
                 const c1 = document.getElementById('comp-c1');
                 const c2 = document.getElementById('comp-c2');
                 if (ws && c1 && c2) {
-                    const x1 = parseFloat(c1.style.left) || 0;
-                    const y1 = parseFloat(c1.style.top) || 0;
-                    const x2 = parseFloat(c2.style.left) || 0;
-                    const y2 = parseFloat(c2.style.top) || 0;
-                    const w1 = parseFloat(c1.style.width) || 140;
-                    const h1 = parseFloat(c1.style.height) || 125;
-                    const w2 = parseFloat(c2.style.width) || 140;
+                    const wr = ws.getBoundingClientRect();
+                    const r1 = c1.getBoundingClientRect();
+                    const r2 = c2.getBoundingClientRect();
+                    // Positions relative to workspace
+                    const x1 = r1.left - wr.left;
+                    const y1 = r1.top - wr.top;
+                    const x2 = r2.left - wr.left;
+                    const y2 = r2.top - wr.top;
+                    const w1 = r1.width;
+                    const h1 = r1.height;
+                    const w2 = r2.width;
 
                     // Bounding box around both capacitors
-                    const areaBox = document.getElementById('area-box');
-                    if (areaBox) {
-                        areaBox.setAttribute('x', x1 - 8);
-                        areaBox.setAttribute('y', y1 - 8);
-                        areaBox.setAttribute('width', (x2 + w2) - x1 + 16);
-                        areaBox.setAttribute('height', h1 + 16);
-                    }
+                    document.getElementById('area-box').setAttribute('x', x1 - 10);
+                    document.getElementById('area-box').setAttribute('y', y1 - 10);
+                    document.getElementById('area-box').setAttribute('width', (x2 + w2) - x1 + 20);
+                    document.getElementById('area-box').setAttribute('height', h1 + 20);
 
                     // Bridge lines between the two top plates and two bottom plates
-                    const topBridge = document.getElementById('top-bridge');
-                    if (topBridge) topBridge.setAttribute('d', `M ${x1 + w1} ${y1 + 16} L ${x2} ${y2 + 16}`);
-                    const botBridge = document.getElementById('bottom-bridge');
-                    if (botBridge) botBridge.setAttribute('d', `M ${x1 + w1} ${y1 + h1 - 22} L ${x2} ${y2 + h1 - 22}`);
+                    document.getElementById('top-bridge').setAttribute('d', `M ${x1 + w1} ${y1 + 16} L ${x2} ${y2 + 16}`);
+                    document.getElementById('bottom-bridge').setAttribute('d', `M ${x1 + w1} ${y1 + h1 - 26} L ${x2} ${y2 + h1 - 26}`);
+
+                    // Text label centered below
+                    const textEl = document.getElementById('area-text');
+                    if (textEl) {
+                        textEl.setAttribute('x', (x1 + x2 + w2) / 2);
+                        textEl.setAttribute('y', y1 + h1 + 30);
+                    }
 
                     // E-field animation
                     const eFieldC1 = document.getElementById('e-field-lines-c1');
@@ -427,7 +731,7 @@
                         
                         if (isSwitchClosed) {
                             window.eFieldTime = (window.eFieldTime || 0) + 0.05;
-                            const numLines = 5;
+                            const numLines = 6;
                             
                             function buildFieldLines(cx, cW, cTopY, cBotY) {
                                 let linesHTML = '';
@@ -445,18 +749,20 @@
                                     const waveOffset = Math.sin(window.eFieldTime + i) * 1.5;
                                     const finalControlX = controlX + waveOffset;
                                     
-                                    linesHTML += `<path d="M ${lx} ${cTopY} Q ${finalControlX} ${controlY} ${lx} ${cBotY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5 5" opacity="0.6" />`;
-                                    linesHTML += `<polygon points="${lx-3},${cBotY-6} ${lx+3},${cBotY-6} ${lx},${cBotY}" fill="#3b82f6" opacity="0.8" />`;
+                                    linesHTML += `<path d="M ${lx} ${cTopY} Q ${finalControlX} ${controlY} ${lx} ${cBotY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />`;
+                                    linesHTML += `<polygon points="${lx-4},${cBotY-8} ${lx+4},${cBotY-8} ${lx},${cBotY}" fill="#3b82f6" opacity="0.8" />`;
                                 }
                                 return linesHTML;
                             }
                             
-                            eFieldC1.innerHTML = buildFieldLines(x1 + 10, 100, y1 + 20, y1 + h1 - 22);
-                            eFieldC2.innerHTML = buildFieldLines(x2 + 10, 100, y2 + 20, y2 + h1 - 22);
+                            eFieldC1.innerHTML = buildFieldLines(x1 + 10, 100, y1 + 22, y1 + h1 - 22);
+                            eFieldC2.innerHTML = buildFieldLines(x2 + 10, 100, y2 + 22, y2 + h1 - 22);
                         }
                     }
                 }
             }
+
+
 
             requestAnimationFrame(renderMolecules);
         }
@@ -476,3 +782,5 @@
     </script>
 </body>
 </html>
+
+

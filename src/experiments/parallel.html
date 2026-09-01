@@ -10,26 +10,34 @@
     <script src="../libs/Draggable.min.js"></script>
     <script src="../engine/svg-wire-engine.js"></script>
     <link rel="stylesheet" href="../libs/tailwind.css">
-    <script>
-        window.tailwind = window.tailwind || {}; window.tailwind.config = {
-            theme: { extend: { colors: { cyber: { off: '#07090e', on: '#0f131a', panel: '#111823', border: 'rgba(0, 210, 255, 0.2)', gold: '#ffe082', orange: '#ff9f43', cyan: '#00d2ff', green: '#2ecc71', red: '#ef4444', blue: '#3b82f6' } }, fontFamily: { ar: ['Tajawal', 'sans-serif'], en: ['Outfit', 'sans-serif'] } } }
-        }
-    </script>
+    <link rel="stylesheet" href="../css/raqeem-experiment.css">
+
     <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };</script>
     <script id="MathJax-script" async src="../libs/mathjax/tex-chtml.js"></script>
     <style>
-        :root { --bg-color: #080c14; --panel-bg: #111823; --accent-blue: #3b82f6; --accent-orange: #ff9f43; --text-color: #e2e8f0; --success-green: #2ecc71; --neon-red: #ef4444; --neon-yellow: #facc15; }
-        .workspace-area { width: 900px; height: 480px; background: radial-gradient(circle at center, #111e32 0%, #05080f 100%); border-radius: 20px; position: relative; overflow: hidden; border: 2px solid rgba(0, 210, 255, 0.15); box-shadow: inset 0 0 40px rgba(0,0,0,0.85); }
+        
+        /* Workspace */
+        .workspace-area {
+            width: 100% !important; height: 100% !important; min-height: 500px !important;
+            background-color: #f8f9fb !important;
+            background-image:
+                linear-gradient(rgba(117,82,255,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(117,82,255,0.08) 1px, transparent 1px) !important;
+            background-size: 30px 30px !important;
+            border-radius: 12px; position: relative; overflow: hidden;
+            border: 1px solid rgba(117,82,255,0.25);
+            box-shadow: inset 0 2px 20px rgba(117,82,255,0.05), 0 4px 24px rgba(0,0,0,0.3);
+        }
         .component { position: absolute; z-index: 10; user-select: none; cursor: grab; }
         .component:active { cursor: grabbing; }
-        .drop-zone { position: absolute; border: 2px dashed transparent; border-radius: 8px; background: transparent; z-index: 1; transition: all 0.3s; }
-        .drop-zone.highlight { border-color: rgba(0, 210, 255, 0.8); background: rgba(0, 210, 255, 0.15); box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); animation: pulse-drop 1.5s infinite; }
-        @keyframes pulse-drop { 0% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } 50% { box-shadow: 0 0 20px rgba(0, 210, 255, 0.9); border-color: rgba(0, 210, 255, 1); } 100% { box-shadow: 0 0 5px rgba(0, 210, 255, 0.3); border-color: rgba(0, 210, 255, 0.5); } }
+        .drop-zone { position: absolute; border: 2px dashed rgba(117, 82, 255, 0.4) !important; border-radius: 8px; background: rgba(117, 82, 255, 0.05) !important; z-index: 1; transition: all 0.3s; }
+        .drop-zone.highlight { border-color: rgba(117, 82, 255, 0.9) !important; background: rgba(117, 82, 255, 0.2) !important; box-shadow: 0 0 15px rgba(117, 82, 255, 0.5) !important; animation: pulse-drop 1.5s infinite !important; }
+        @keyframes pulse-drop { 0% { box-shadow: 0 0 5px rgba(117, 82, 255, 0.3); } 50% { box-shadow: 0 0 20px rgba(117, 82, 255, 0.8); } 100% { box-shadow: 0 0 5px rgba(117, 82, 255, 0.3); } }
         .drop-zone.active { opacity: 0; pointer-events: none; }
         svg.wires-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
-        .terminal-node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: rgba(0, 210, 255, 0.4); border: 2px solid #00d2ff; transform: translate(-50%, -50%); cursor: crosshair; z-index: 20; display: none; transition: transform 0.2s, background 0.2s; }
+        .terminal-node { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: rgba(117, 82, 255, 0.3); border: 2px solid #7552FF; transform: translate(-50%, -50%); cursor: crosshair; z-index: 20; display: none; transition: transform 0.2s, background 0.2s; box-shadow: 0 0 6px rgba(117,82,255,0.5); }
         #workspace .component.placed .terminal-node, #workspace .elite-component.placed .terminal-node { display: block; }
-        .terminal-node:hover, .terminal-node.hovered { background: rgba(0, 210, 255, 1); transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 10px #00d2ff; }
+        .terminal-node:hover, .terminal-node.hovered { background: rgba(117, 82, 255, 1); transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 10px #7552FF; }
         .terminal-node.connected { background: #2ecc71; border-color: #fff; box-shadow: 0 0 8px #2ecc71; cursor: default; }
         .user-wire { transition: filter 0.3s, stroke 0.3s; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } 50% { box-shadow: 0 0 20px #facc15, inset 0 0 10px #facc15; background: rgba(250, 204, 21, 0.8); border-color: #fff; transform: translate(-50%, -50%) scale(1.5); } 100% { box-shadow: 0 0 5px #facc15, inset 0 0 5px #facc15; background: rgba(250, 204, 21, 0.4); border-color: #facc15; transform: translate(-50%, -50%) scale(1.2); } }
@@ -40,67 +48,103 @@
     <script src="../engine/elite-components.js"></script>
     <script src="../engine/elite-engine.js"></script>
 </head>
-<body class="bg-[#07090e] font-ar text-slate-200 min-h-screen p-4 md:p-8 flex flex-col items-center justify-start relative overflow-x-hidden">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,210,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,210,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
+<body class="exp-layout-sidebar-v2">
 
-    <header class="w-full max-w-[950px] flex flex-wrap md:flex-nowrap justify-center md:justify-between items-center mb-6 z-10 gap-4">
-        <div class="elite-logo-container group select-none cursor-pointer flex items-center gap-3 bg-black/40 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md shadow-lg" onclick="window.location.reload();">
-            <div class="relative w-8 h-8 elite-logo-card transition-all duration-500 ease-out" style="transform-style: preserve-3d;">
-                <div class="absolute inset-0 bg-cyan-500/10 rounded-xl blur-lg"></div>
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_6px_rgba(0,210,255,0.4)]">
-                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#00d2ff" stroke-width="5" stroke-linejoin="round" />
-                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(11, 17, 28, 0.9)" stroke="#ffe082" stroke-width="3" stroke-linejoin="round" />
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="exp-sidebar-v2" style="position: relative; z-index: 9999; overflow: visible !important;">
+        <!-- Logo -->
+        <div class="exp-sidebar-v2-header">
+            <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="window.location.reload();">
+                <svg viewBox="0 0 100 100" style="width:32px; height:32px; flex-shrink:0;">
+                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#7552FF" stroke-width="5" stroke-linejoin="round" />
+                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(9,6,23,0.95)" stroke="#ffb347" stroke-width="3" stroke-linejoin="round" />
                     <path d="M40,36 H60 M40,49 H55 M40,62 H60 M40,36 V62" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-            </div>
-            <div class="flex flex-col text-right font-bold">
-                <span class="text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-cyan-400 font-extrabold uppercase" style="font-family: 'Outfit', sans-serif;">ELITE</span>
-                <span class="text-[8px] text-cyan-400/80 tracking-widest font-ar">الفريق البرمجي</span>
-            </div>
-        </div>
-
-        <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-cyan-400">ربط المتسعات على التوازي</h1>
-
-        <a href="../index.html?showMenu=true" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 bg-black/60 border border-white/5 hover:border-cyan-400/40 text-slate-300 hover:text-white backdrop-blur-md shadow-lg shadow-black/40" id="back-btn">
-            <i class="fa-solid fa-chevron-right text-cyan-400"></i> <span>القائمة الرئيسية</span>
-        </a>
-    </header>
-
-    <div class="w-full max-w-[950px] bg-gradient-to-r from-slate-900 via-cyber-panel to-slate-900 text-cyber-orange py-4 px-6 rounded-2xl mb-6 font-bold text-sm md:text-base border border-cyber-orange/20 shadow-xl text-center shadow-black/30 transition-all duration-500 ease-in-out" id="stepBanner">
-        الخطوة 1: قم بسحب القطع الأربعة من صندوق العناصر بالأسفل ووضعها في أماكنها المحددة لتجميع الدائرة.
-    </div>
-
-    <main class="w-full max-w-[950px] bg-slate-950/80 border border-white/5 rounded-[28px] p-6 shadow-2xl backdrop-blur-md flex flex-col gap-6 relative z-10">
-        <div class="text-xs font-bold text-slate-400/80 flex items-center gap-2 px-2 -mb-2">
-            <i class="fa-solid fa-screwdriver-wrench text-cyan-400"></i> أدوات التجربة التفاعلية:
-        </div>
-
-        <!-- Interactive Tools Top Bar -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-black/40 border border-white/5 p-4 rounded-2xl">
-            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
-                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">🔋</div>
-                <div class="text-[10px] md:text-xs font-bold text-slate-200">بطارية</div>
-            </div>
-            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
-                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">🔌</div>
-                <div class="text-[10px] md:text-xs font-bold text-slate-200">مفتاح (K)</div>
-            </div>
-            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
-                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-white shadow">||</div>
-                <div class="text-[10px] md:text-xs font-bold text-slate-200">متسعتان (C1, C2)</div>
-            </div>
-            <div class="flex flex-col items-center text-center gap-2 p-2 rounded-xl border border-white/5 bg-white/[0.01]">
-                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-lg shadow">⚡</div>
-                <div class="text-[10px] md:text-xs font-bold text-slate-200">أسلاك توصيل</div>
-            </div>
-        </div>
-
-        <div class="w-full overflow-x-auto rounded-2xl">
-            <div class="workspace-area relative mx-auto" id="workspace">
-                <div class="absolute bottom-0 left-0 w-full h-[140px] border-t-2 border-dashed border-cyan-500/40 bg-slate-900/60 backdrop-blur-md rounded-b-[20px] pointer-events-none z-0">
-                    <div class="absolute -top-3.5 right-6 bg-slate-950/90 border border-cyan-500/40 px-3 py-0.5 rounded-full text-cyan-400 font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-lg shadow-cyan-500/10"><i class="fa-solid fa-toolbox text-[11px]"></i> صندوق الأدوات (Toolbox)</div>
+                <div>
+                    <div style="font-size:0.7rem; font-weight:900; color:#fff; font-family:'Outfit',sans-serif; letter-spacing:0.1em;">ELITE</div>
+                    <div style="font-size:0.55rem; color:rgba(117,82,255,0.8); letter-spacing:0.05em;">الفريق البرمجي</div>
                 </div>
-                <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+            </div>
+            <div class="exp-sidebar-v2-title">ربط المتسعات على التوازي</div>
+        </div>
+
+        <!-- Step Banner -->
+        <div class="exp-sidebar-v2-banner" id="stepBanner">
+            الخطوة 1: اسحب القطع الأربعة ووضعها في أماكنها المحددة لتجميع الدائرة.
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn-auto-wire" style="justify-content:center;" onclick="autoConnectCircuit()">
+                <i class="fa-solid fa-bolt"></i> <span>توصيل تلقائي</span>
+            </button>
+            <button class="btn-reset" style="justify-content:center;" onclick="resetLab()">
+                <i class="fa-solid fa-rotate-right"></i> <span>إعادة تعيين</span>
+            </button>
+        </div>
+
+        <div class="exp-sidebar-v2-section-title" style="margin-top: 15px;">عناصر الدائرة</div>
+        <div id="elite-components-container" style="display: flex; flex-direction: column; align-items: stretch; gap: 10px; overflow: visible !important; padding-bottom: 20px; padding-left: 10px; padding-right: 10px;">
+            
+            <!-- Battery Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">بطارية (E)</div>
+                <div id="bat-card-body" style="min-height: 40px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Switch Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">مفتاح (K)</div>
+                <div id="sw-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Capacitor C1 Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">متسعة C1</div>
+                <div id="comp-c1-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Capacitor C2 Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">متسعة C2</div>
+                <div id="comp-c2-card-body" style="min-height: 50px; display: flex; justify-content: center; align-items: center; overflow: visible;"></div>
+            </div>
+
+            <!-- Wires Card -->
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(117,82,255,0.15);border-radius:10px;padding:6px;text-align:center;">
+                <div style="font-size:0.65rem;font-weight:700;color:#a78bfa;margin-bottom:4px;">أسلاك توصيل</div>
+                <svg viewBox="0 0 80 30" style="width:100%;height:28px;">
+                    <path d="M5 15 Q 20 5 40 15 Q 60 25 75 15" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="5" cy="15" r="3" fill="#7c3aed"/>
+                    <circle cx="75" cy="15" r="3" fill="#7c3aed"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Back to Menu -->
+        <a href="../index.html?showMenu=true" class="exp-back-btn-td" id="back-btn" style="justify-content:center; margin-top:4px;">
+            <i class="fa-solid fa-house" style="color:var(--cyan);"></i> <span>القائمة الرئيسية</span>
+        </a>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="exp-main-v2">
+        <!-- Topbar -->
+        <div class="exp-main-v2-topbar">
+            <h1 style="font-size:0.95rem; font-weight:900; color:#fff;">ربط المتسعات على التوازي</h1>
+            <div class="flex items-center gap-2">
+                <a href="../index.html?showMenu=true" class="exp-btn-v2" style="text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-house"></i> الرئيسية
+                </a>
+            </div>
+        </div>
+
+        <!-- Workspace + Conclusion -->
+        <div class="exp-main-v2-workspace" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+            <div style="flex:1; position:relative; overflow:hidden; min-height:0; display: flex;">
+                <div class="workspace-area" id="workspace" style="flex: 1; width: 100% !important; height: 100% !important;">
 
                 <svg style="position: absolute; width: 0; height: 0;">
                   <defs>
@@ -136,76 +180,66 @@
                     </defs>
                 </svg>
 
-                <!-- Drop Zones -->
-                <div class="drop-zone" id="zone-battery" style="left: 100px; top: 80px; width: 70px; height: 60px;"></div>
-                <div class="drop-zone" id="zone-switchK" style="left: 100px; top: 220px; width: 80px; height: 100px;"></div>
-                <div class="drop-zone" id="zone-c1" style="left: 350px; top: 50px; width: 140px; height: 130px;"></div>
-                <div class="drop-zone" id="zone-c2" style="left: 600px; top: 50px; width: 140px; height: 130px;"></div>
+                <!-- Drop Zones (Positions calculated dynamically via layoutCircuit) -->
+                <div class="drop-zone" id="zone-battery" style="width: 70px; height: 60px;"></div>
+                <div class="drop-zone" id="zone-switchK" style="width: 80px; height: 100px;"></div>
+                <div class="drop-zone" id="zone-c1" style="width: 140px; height: 130px;"></div>
+                <div class="drop-zone" id="zone-c2" style="width: 140px; height: 130px;"></div>
 
-                <!-- Components on shelf -->
-                <div id="elite-components-container"></div>
-                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="left: 450px; top: 350px; width: 140px; height: 130px;">
-                    <div class="relative w-full h-full overflow-visible">
-                        <div id="c1-bottom-plate" class="absolute bottom-[20px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="transform-origin: center;"></div>
-                        <div id="c1-top-plate" class="absolute top-[10px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                <!-- Capacitor C1 -->
+                <div class="elite-component capacitor-wrapper" id="comp-c1" data-target="zone-c1" style="width: 140px; height: 130px;">
+                    <div style="position: relative; width: 100%; height: 100%; overflow: visible;">
+                        <!-- Top Plate (Metallic) -->
+                        <div style="position: absolute; top: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #f1f5f9 0%, #94a3b8 40%, #475569 100%); box-shadow: 0 5px 8px -1px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.8); border-bottom: 2px solid #334155;">
+                            <div id="c1-pos-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#ef4444; font-weight:black; font-size:14px; text-shadow:0 0 4px rgba(239,68,68,0.9);">
+                                <span>+</span><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span>
+                            </div>
+                        </div>
+                        <!-- Bottom Plate (Metallic) -->
+                        <div style="position: absolute; bottom: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 60%, #334155 100%); box-shadow: 0 -3px 8px -1px rgba(0,0,0,0.6), inset 0 -2px 3px rgba(255,255,255,0.6); border-top: 2px solid #334155;">
+                            <div id="c1-neg-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#3b82f6; font-weight:black; font-size:16px; text-shadow:0 0 4px rgba(59,130,246,0.9); margin-top:-2px;">
+                                <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                            </div>
+                        </div>
                         
-                        <div id="c1-pos-charges" class="absolute top-[23px] left-[20px] w-[100px] flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c1-neg-charges" class="absolute bottom-[33px] left-[20px] w-[100px] flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
-                        <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
-                    </div>
-                </div>
-
-                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="left: 650px; top: 350px; width: 140px; height: 130px;">
-                    <div class="relative w-full h-full overflow-visible">
-                        <div id="c2-bottom-plate" class="absolute bottom-[20px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-b-sm border-t border-slate-600 shadow z-10" style="transform-origin: center;"></div>
-                        <div id="c2-top-plate" class="absolute top-[10px] left-[10px] w-[120px] h-3 bg-gradient-to-r from-slate-300 to-slate-500 rounded-t-sm border-b border-slate-600 shadow z-10" style="transform-origin: center;"></div>
+                        <!-- Dielectric Glass/Air Gap -->
+                        <div style="position: absolute; top: 32px; bottom: 32px; left: 24px; right: 24px; border-radius: 2px; opacity: 0.3; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px); border-left: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3);"></div>
                         
-                        <div id="c2-pos-charges" class="absolute top-[23px] left-[20px] w-[100px] flex justify-around text-red-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
-                        <div id="c2-neg-charges" class="absolute bottom-[33px] left-[20px] w-[100px] flex justify-around text-blue-500 font-extrabold text-[13px] opacity-0 select-none pointer-events-none transition-opacity duration-300 z-10" style="text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);"><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span></div>
-                        <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 70px; top: 10px;"></div>
-                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 70px; top: 110px;"></div>
+                        <!-- Dynamic Field Lines -->
+                        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" id="c1-field"></svg>
+                        
+                        <div class="terminal-node" id="c1-top" data-max-connections="2" style="left: 50%; top: 17%;"></div>
+                        <div class="terminal-node" id="c1-bottom" data-max-connections="2" style="left: 50%; top: 83%;"></div>
                     </div>
                 </div>
 
-                <!-- Top Telemetry Ribbon HUD -->
-                <div id="math-hud" class="absolute top-2.5 left-1/2 bg-slate-950/95 border border-cyan-500/40 px-4 py-1.5 rounded-2xl shadow-2xl backdrop-blur-xl z-30 pointer-events-none transition-all duration-500 opacity-0 flex items-center gap-3 whitespace-nowrap select-none" style="direction: rtl; transform: translate(-50%, -12px);">
-                    <!-- Title Badge -->
-                    <div class="flex items-center gap-2 font-bold text-cyan-400 pl-3 border-l border-slate-700/80 text-xs md:text-sm whitespace-nowrap" style="font-family: 'Tajawal', sans-serif;">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                        <span>قوانين التوازي</span>
-                    </div>
-
-                    <!-- Metrics Group -->
-                    <div class="flex items-center gap-2 font-mono text-xs whitespace-nowrap" style="direction: ltr;">
-                        <!-- Inputs Chip -->
-                        <div class="bg-slate-900/90 border border-slate-800 px-2.5 py-1 rounded-lg text-slate-300 flex items-center gap-1.5 whitespace-nowrap">
-                            <span class="text-slate-400 text-[11px]">C₁:</span><span id="hud-c1" class="font-bold text-slate-100">0.00</span>
-                            <span class="text-slate-600">|</span>
-                            <span class="text-slate-400 text-[11px]">C₂:</span><span id="hud-c2" class="font-bold text-slate-100">0.00</span>
-                            <span class="text-[10px] text-slate-400">pF</span>
-                            <span id="hud-vbat" class="hidden">0.00</span>
+                <!-- Capacitor C2 -->
+                <div class="elite-component capacitor-wrapper" id="comp-c2" data-target="zone-c2" style="width: 140px; height: 130px;">
+                    <div style="position: relative; width: 100%; height: 100%; overflow: visible;">
+                        <!-- Top Plate (Metallic) -->
+                        <div style="position: absolute; top: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #f1f5f9 0%, #94a3b8 40%, #475569 100%); box-shadow: 0 5px 8px -1px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.8); border-bottom: 2px solid #334155;">
+                            <div id="c2-pos-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#ef4444; font-weight:black; font-size:14px; text-shadow:0 0 4px rgba(239,68,68,0.9);">
+                                <span>+</span><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span>
+                            </div>
                         </div>
-
-                        <!-- C_eq Chip -->
-                        <div class="bg-slate-900/90 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-emerald-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
-                            <span class="text-emerald-500/80 text-[11px] font-sans font-semibold">C_eq:</span>
-                            <span id="hud-c" class="font-bold text-emerald-300">0.00 pF</span>
+                        <!-- Bottom Plate (Metallic) -->
+                        <div style="position: absolute; bottom: 12px; left: 8px; right: 8px; height: 20px; border-radius: 6px; background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 60%, #334155 100%); box-shadow: 0 -3px 8px -1px rgba(0,0,0,0.6), inset 0 -2px 3px rgba(255,255,255,0.6); border-top: 2px solid #334155;">
+                            <div id="c2-neg-charges" style="opacity:0; display:flex; justify-content:space-evenly; align-items:center; height:100%; color:#3b82f6; font-weight:black; font-size:16px; text-shadow:0 0 4px rgba(59,130,246,0.9); margin-top:-2px;">
+                                <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                            </div>
                         </div>
-
-                        <!-- V_tot Chip -->
-                        <div class="bg-slate-900/90 border border-amber-500/30 px-2.5 py-1 rounded-lg text-amber-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
-                            <span class="text-amber-500/80 text-[11px] font-sans font-semibold">V_tot:</span>
-                            <span id="hud-v" class="font-bold text-amber-300">0.00 V</span>
-                        </div>
-
-                        <!-- Q_tot Chip -->
-                        <div class="bg-slate-900/90 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-cyan-400 flex items-center gap-1.5 whitespace-nowrap shadow-sm">
-                            <span class="text-cyan-500/80 text-[11px] font-sans font-semibold">Q_tot:</span>
-                            <span id="hud-q" class="font-bold text-cyan-300">0.00 pC</span>
-                        </div>
+                        
+                        <!-- Dielectric Glass/Air Gap -->
+                        <div style="position: absolute; top: 32px; bottom: 32px; left: 24px; right: 24px; border-radius: 2px; opacity: 0.3; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px); border-left: 1px solid rgba(255,255,255,0.3); border-right: 1px solid rgba(255,255,255,0.3);"></div>
+                        
+                        <!-- Dynamic Field Lines -->
+                        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" id="c2-field"></svg>
+                        
+                        <div class="terminal-node" id="c2-top" data-max-connections="2" style="left: 50%; top: 17%;"></div>
+                        <div class="terminal-node" id="c2-bottom" data-max-connections="2" style="left: 50%; top: 83%;"></div>
                     </div>
                 </div>
+
 
                 <!-- Concept Layer -->
                 <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-[15]" id="conceptLayer">
@@ -220,29 +254,12 @@
                     <g id="e-field-lines-c2" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"></g>
                 </svg>
                 
+                </div>
             </div>
-        </div>
-    
-        <div class="conclusion-panel bg-emerald-500/[0.04] border border-emerald-500/20 rounded-2xl p-5 shadow-lg shadow-emerald-500/5 hidden transition-all duration-500 ease-in-out" id="conclusion">
-            <div class="conclusion-title text-base font-bold text-emerald-400 flex items-center gap-2 mb-3">
-                <i class="fa-solid fa-circle-check"></i> استنتاج ربط المتسعات على التوازي:
-            </div>
-            <div class="conclusion-text text-sm text-slate-300 leading-relaxed text-justify">
-                <strong>1. تساوي فرق الجهد للمجموعة المربوطة على التوازي:</strong> يكون فرق الجهد عبر كل متسعة متساوياً ويساوي فرق الجهد الكلي للمصدر ($V_{total} = V_1 = V_2$).<br><br>
-                <strong>2. تجزؤ الشحنة الكلية:</strong> الشحنة الكلية للمجموعة تساوي مجموع الشحنات المخزونة في كل متسعة مربوطة على التوازي ($Q_{total} = Q_1 + Q_2$). تتوزع الشحنة طردياً مع السعة ($Q = C \cdot V$).<br><br>
-                <strong>3. زيادة السعة المكافئة للمجموعة:</strong> السعة المكافئة لربط التوازي تكون أكبر من أكبر سعة فردية في المجموعة ($C_{eq} = C_1 + C_2$)، وذلك بسبب زيادة المساحة السطحية المتقابلة للألواح المشتركة للمجموعة.
-            </div>
-        </div>
 
-        <div class="flex flex-wrap items-center justify-center gap-4 mt-2">
-            <button class="btn-auto-wire py-3 px-8 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold rounded-full shadow-lg shadow-cyan-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2" id="autoConnectBtn" onclick="autoConnectCircuit()">
-                <i class="fa-solid fa-bolt"></i> <span>توصيل تلقائي</span>
-            </button>
-            <button class="btn-reset py-3 px-8 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-extrabold rounded-full shadow-lg shadow-red-500/20 transition-all duration-300 transform active:scale-95 flex items-center gap-2" id="resetBtn" onclick="resetLab()">
-                <i class="fa-solid fa-rotate-right"></i> <span>إعادة تعيين الدائرة</span>
-            </button>
+
         </div>
-    </main>
+    </div>
 
     <script>
         const EPSILON_0 = 8.854;
@@ -304,29 +321,136 @@
             document.getElementById('stepBanner').innerText = 'الخطوة 1: قم بسحب القطع الأربعة من صندوق العناصر بالأسفل ووضعها في أماكنها المحددة لتجميع الدائرة.';
             document.getElementById('stepBanner').style.color = 'var(--cyber-orange)';
             
-            document.getElementById('math-hud').classList.add('hidden');
-            document.getElementById('math-hud').style.opacity = 0;
-            document.getElementById('conclusion').classList.add('hidden');
-            document.getElementById('conclusion').classList.remove('opacity-100');
+
+            const conclusionEl = document.getElementById('conclusion');
+            if (conclusionEl) {
+                conclusionEl.classList.add('hidden');
+                conclusionEl.classList.remove('opacity-100');
+            }
             const areaVis = document.getElementById('area-vis');
             if (areaVis) areaVis.style.opacity = 0;
             
             const switchArm = document.getElementById('sw-arm');
             if (switchArm) gsap.to(switchArm, { rotation: -30, duration: 0.25 });
 
-            // Reset Components to Toolbox Positions
-            gsap.to('#bat', { left: 100, top: 380, duration: 0.4 });
-            gsap.to('#sw', { left: 250, top: 360, duration: 0.4 });
-            gsap.to('#comp-c1', { left: 450, top: 350, duration: 0.4 });
-            gsap.to('#comp-c2', { left: 650, top: 350, duration: 0.4 });
+            // Move components back to sidebar container
+            ['bat', 'sw', 'comp-c1', 'comp-c2'].forEach(id => {
+                const comp = document.getElementById(id);
+                const wrapper = document.getElementById(id + '-card-body');
+                if (comp && wrapper) {
+                    wrapper.appendChild(comp);
+                    comp.style.position = 'relative';
+                    comp.style.left = '0px';
+                    comp.style.top = '0px';
+                    comp.style.margin = '0';
+                    gsap.set(comp, { clearProps: 'x,y,transform,left,top' });
+                    
+                    comp.style.transformOrigin = 'center center';
+                    if (id.includes('c1') || id.includes('c2')) {
+                        comp.style.transform = 'scale(0.5)';
+                        comp.style.marginBottom = '-50px';
+                        comp.style.marginTop = '-20px';
+                    } else if (id === 'bat') {
+                        comp.style.transform = 'scale(0.7)';
+                        comp.style.marginBottom = '-15px';
+                        comp.style.marginTop = '-15px';
+                    } else {
+                        comp.style.transform = 'scale(0.65)';
+                        comp.style.marginBottom = '-15px';
+                        comp.style.marginTop = '-20px';
+                    }
+                }
+            });
         }
 
         
-        // Generate Elite Components
+        // Dynamic layout calculation based on a single reference point (center)
+        function layoutCircuit() {
+            const ws = document.getElementById('workspace');
+            if (!ws) return;
+            
+            const w = ws.clientWidth || 900;
+            const h = ws.clientHeight || 500;
+            
+            // Single Reference Point: Center of the Workspace
+            const cx = w / 2;
+            const cy = h / 2;
+            
+            // X, Y Offsets relative to center (cx, cy)
+            // Left to right: Battery/Switch -> C1 -> C2
+            const layoutMap = {
+                'zone-battery': { ox: -280, oy: -80, compId: 'bat' },
+                'zone-switchK': { ox: -280, oy: 60, compId: 'sw' },
+                'zone-c1':      { ox: -70,  oy: -65, compId: 'comp-c1' },
+                'zone-c2':      { ox: 180,  oy: -65, compId: 'comp-c2' }
+            };
+            
+            for (const [zoneId, data] of Object.entries(layoutMap)) {
+                // 1. Position the drop zone
+                const zone = document.getElementById(zoneId);
+                if (zone) {
+                    zone.style.left = (cx + data.ox) + 'px';
+                    zone.style.top = (cy + data.oy) + 'px';
+                }
+                
+                // 2. Position the component if it is placed
+                const comp = document.getElementById(data.compId);
+                if (comp && comp.classList.contains('placed')) {
+                    comp.style.left = (cx + data.ox) + 'px';
+                    comp.style.top = (cy + data.oy) + 'px';
+                }
+            }
+            
+            if (window.engine && window.engine.wireEngine) {
+                window.engine.wireEngine.repositionWires();
+            }
+            if (window.isCircuitComplete && typeof renderMolecules === 'function') {
+                renderMolecules();
+            }
+        }
+
+        window.addEventListener('resize', layoutCircuit);
+
+        // Track mouse/touch position globally for cursor-based drag anchoring
+        window._lastMouseX = null;
+        window._lastMouseY = null;
+        document.addEventListener('mousemove', e => { window._lastMouseX = e.clientX; window._lastMouseY = e.clientY; }, { passive: true });
+        document.addEventListener('touchmove', e => { if (e.touches[0]) { window._lastMouseX = e.touches[0].clientX; window._lastMouseY = e.touches[0].clientY; } }, { passive: true });
+        document.addEventListener('touchstart', e => { if (e.touches[0]) { window._lastMouseX = e.touches[0].clientX; window._lastMouseY = e.touches[0].clientY; } }, { passive: true });
+
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('elite-components-container');
-            container.innerHTML += EliteComponents.getBattery('bat', 100, 380, 'zone-battery');
-            container.innerHTML += EliteComponents.getSwitch('sw', 250, 360, 'zone-switchK', true);
+            layoutCircuit();
+            
+            // Create components, place them in sidebar container, and use position: relative
+            let batHTML = EliteComponents.getBattery('bat', 0, 0, 'zone-battery');
+            batHTML = batHTML.replace('style="', 'style="position: relative; transform: scale(0.7); transform-origin: center center; margin-top: -15px; margin-bottom: -15px; ');
+            document.getElementById('bat-card-body').innerHTML += batHTML;
+            
+            let swHTML = EliteComponents.getSwitch('sw', 0, 0, 'zone-switchK', true);
+            swHTML = swHTML.replace('style="', 'style="position: relative; transform: scale(0.65); transform-origin: center center; margin-top: -20px; margin-bottom: -15px; ');
+            document.getElementById('sw-card-body').innerHTML += swHTML;
+            
+            // Move C1 and C2 from workspace to sidebar
+            const c1 = document.getElementById('comp-c1');
+            const c2 = document.getElementById('comp-c2');
+            if (c1) {
+                document.getElementById('comp-c1-card-body').appendChild(c1);
+                c1.style.position = 'relative';
+                c1.style.transform = 'scale(0.5)';
+                c1.style.transformOrigin = 'center center';
+                c1.style.marginBottom = '-50px';
+                c1.style.marginTop = '-20px';
+                c1.style.left = '0px'; c1.style.top = '0px';
+            }
+            if (c2) {
+                document.getElementById('comp-c2-card-body').appendChild(c2);
+                c2.style.position = 'relative';
+                c2.style.transform = 'scale(0.5)';
+                c2.style.transformOrigin = 'center center';
+                c2.style.marginBottom = '-50px';
+                c2.style.marginTop = '-20px';
+                c2.style.left = '0px'; c2.style.top = '0px';
+            }
             
             // Attach switch click handler
             const swEl = document.getElementById('sw');
@@ -340,6 +464,41 @@
             
             const engine = new EliteEngine({
                 workspaceId: 'workspace',
+                disableScaler: true,
+                freeDrop: true,
+                onComponentDragStart: (comp, draggable) => {
+                    const ws = document.getElementById('workspace');
+                    if (comp.parentElement !== ws) {
+                        const wsRect = ws.getBoundingClientRect();
+
+                        // Use cursor position to anchor the component under the mouse
+                        // This avoids any scale mismatch between sidebar and workspace
+                        const mouseX = (window._lastMouseX != null ? window._lastMouseX : wsRect.left + wsRect.width  / 2) - wsRect.left;
+                        const mouseY = (window._lastMouseY != null ? window._lastMouseY : wsRect.top  + wsRect.height / 2) - wsRect.top;
+
+                        // Reparent and hard-reset all transform/scale/margin
+                        ws.appendChild(comp);
+                        comp.style.setProperty('position', 'absolute', 'important');
+                        comp.style.transform = 'none';
+                        comp.style.margin    = '0';
+                        gsap.set(comp, { clearProps: 'transform,margin' });
+
+                        // Center the full-size component on the cursor
+                        const halfW = comp.offsetWidth  / 2;
+                        const halfH = comp.offsetHeight / 2;
+                        const newLeft = mouseX - halfW;
+                        const newTop  = mouseY - halfH;
+
+                        gsap.set(comp, { left: newLeft, top: newTop, x: 0, y: 0 });
+
+                        if (draggable) {
+                            draggable.startLeft = newLeft;
+                            draggable.startTop  = newTop;
+                            draggable.update();
+                        }
+                    }
+                },
+                wireColor: '#1e293b', // Realistic dark wire
                 expectedPairs: [
                     'bat-pos-c1-top',
                     'c1-top-c2-top',
@@ -371,7 +530,78 @@
                 }
             });
             engine.totalComponents = 4;
+            
+            // Revert scaler wrapper styles that shrink the workspace
+            const wsEl = document.getElementById('workspace');
+            const wrapper = wsEl.closest('.workspace-scaler-wrapper');
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                wrapper.style.height = '100%';
+            }
+            wsEl.style.position = 'relative';
+            wsEl.style.transform = 'none';
+            wsEl.style.left = '0';
+            engine.totalComponents = 4;
             engine.setupTerminals();
+            
+            // Override snapComponent — fully self-contained, no origSnap dependency
+            engine.snapComponent = function(comp, dropZone) {
+                if (!comp || !dropZone || comp.classList.contains('placed')) return;
+
+                const ws = document.getElementById('workspace');
+
+                // 1. Reparent to workspace
+                if (comp.parentElement !== ws) {
+                    ws.appendChild(comp);
+                }
+
+                // 2. Kill any running GSAP tweens to avoid conflicts
+                gsap.killTweensOf(comp);
+
+                // 3. Hard CSS reset — strip any scale/margin/transform from sidebar
+                comp.style.position  = 'absolute';
+                comp.style.margin    = '0';
+                comp.style.transform = 'none';
+
+                // 4. Sync GSAP internal state to zero
+                gsap.set(comp, { x: 0, y: 0, left: 0, top: 0, clearProps: 'transform,margin,scale' });
+
+                // 5. Get drop zone position (offsetLeft/Top = reliable px inside workspace)
+                const targetLeft = dropZone.offsetLeft;
+                const targetTop  = dropZone.offsetTop;
+
+                // 6. Animate to exact drop zone coordinates
+                gsap.to(comp, {
+                    left: targetLeft,
+                    top:  targetTop,
+                    x: 0,
+                    y: 0,
+                    duration: 0.35,
+                    ease: 'back.out(1.4)',
+                    onUpdate: () => { if (engine.wireEngine) engine.wireEngine.repositionWires(); }
+                });
+
+                // 7. Mark drop zone as filled
+                dropZone.classList.add('active');
+                dropZone.classList.remove('highlight');
+                gsap.fromTo(dropZone, { scale: 1.1 }, { scale: 1, duration: 0.3 });
+
+                // 8. Disable dragging and mark as placed
+                const draggableInst = Draggable.get(comp);
+                if (draggableInst) draggableInst.disable();
+                gsap.set(comp, { zIndex: 10 });
+                comp.classList.add('placed');
+
+                // 9. Update placement counter
+                engine.placedCount++;
+                engine.onComponentPlaced(engine.placedCount, engine.totalComponents);
+
+                // 10. Rebind wire terminals now component is inside workspace
+                if (engine.wireEngine && typeof engine.wireEngine.setupTerminals === 'function') {
+                    engine.wireEngine.setupTerminals();
+                }
+            };
+            
             window.engine = engine;
 
             requestAnimationFrame(renderMolecules);
@@ -382,9 +612,11 @@
         function cycleBatteryVolt() {
             voltIdx = (voltIdx + 1) % voltages.length;
             V_bat = voltages[voltIdx];
-            document.querySelector('#bat text:last-child').textContent = V_bat + "V CELL";
+            const batTextEl = document.querySelector('#bat text:last-child');
+            if (batTextEl) batTextEl.textContent = V_bat + "V CELL";
             createSpark(135, 200);
         }
+
 
         function handleSwitchClick(eventOrForce) {
             const isForceOpen = eventOrForce === true;
@@ -399,26 +631,23 @@
                 createSpark(112, 370);
                 document.getElementById('stepBanner').innerText = "الدائرة مغلقة والبطارية متصلة! يتساوى فرق جهد المتسعتين مع جهد المصدر: V₁ = V₂ = V_total";
                 document.getElementById('stepBanner').style.color = 'var(--success-green)';
-                document.getElementById('conclusion').classList.remove('hidden');
-                setTimeout(() => document.getElementById('conclusion').classList.add('opacity-100'), 50);
+                const conclusionEl2 = document.getElementById('conclusion');
+                if (conclusionEl2) {
+                    conclusionEl2.classList.remove('hidden');
+                    setTimeout(() => conclusionEl2.classList.add('opacity-100'), 50);
+                }
                 
-                // Show HUD and Vis
-                const hud = document.getElementById('math-hud');
-                hud.classList.remove('hidden');
-                setTimeout(() => { hud.style.opacity = 1; hud.style.transform = 'translate(-50%, 0)'; }, 50);
+                // Show Vis
                 document.getElementById('area-vis').style.opacity = 1;
                 
             } else {
                 gsap.to(switchArm, { rotation: -30, duration: 0.25 });
                 document.getElementById('stepBanner').innerText = "المفتاح مفتوح. المجموعة معزولة. تظل الشحنة الكلية ثابتة.";
                 document.getElementById('stepBanner').style.color = "var(--accent-orange)";
-                if (trappedCharge > 5 && (k1 > 1.2 || k2 > 1.2)) document.getElementById('conclusion').classList.remove('hidden');
+                const conclusionEl3 = document.getElementById('conclusion');
+                if (trappedCharge > 5 && (k1 > 1.2 || k2 > 1.2) && conclusionEl3) conclusionEl3.classList.remove('hidden');
                 
-                // Hide HUD and Vis
-                const hud = document.getElementById('math-hud');
-                hud.style.opacity = 0;
-                hud.style.transform = 'translate(-50%, -12px)';
-                setTimeout(() => { hud.classList.add('hidden'); }, 500);
+
                 const areaVis = document.getElementById('area-vis');
                 if (areaVis) areaVis.style.opacity = 0;
             }
@@ -447,8 +676,10 @@
             }
 
             const op1 = Math.min(1, Q1/10); const op2 = Math.min(1, Q2/10);
-            document.getElementById('c1-pos-charges').style.opacity = op1; document.getElementById('c1-neg-charges').style.opacity = op1;
-            document.getElementById('c2-pos-charges').style.opacity = op2; document.getElementById('c2-neg-charges').style.opacity = op2;
+            const c1Pos = document.getElementById('c1-pos-charges'); if (c1Pos) c1Pos.style.opacity = op1;
+            const c1Neg = document.getElementById('c1-neg-charges'); if (c1Neg) c1Neg.style.opacity = op1;
+            const c2Pos = document.getElementById('c2-pos-charges'); if (c2Pos) c2Pos.style.opacity = op2;
+            const c2Neg = document.getElementById('c2-neg-charges'); if (c2Neg) c2Neg.style.opacity = op2;
             
             // Position concept SVG using actual rendered positions
             if (window.isCircuitComplete) {
@@ -526,13 +757,7 @@
                 }
             }
 
-            // Update HUD
-            document.getElementById('hud-c1').innerText = C1.toFixed(2);
-            document.getElementById('hud-c2').innerText = C2.toFixed(2);
-            document.getElementById('hud-vbat').innerText = V_bat.toFixed(2);
-            document.getElementById('hud-v').innerText = (isSwitchClosed || trappedCharge !== null) ? V1.toFixed(2) + " V" : "0.00 V";
-            document.getElementById('hud-q').innerText = (isSwitchClosed || trappedCharge !== null) ? Q_total.toFixed(2) + " pC" : "0.00 pC";
-            document.getElementById('hud-c').innerText = C_eq.toFixed(2) + " pF";
+
 
             requestAnimationFrame(renderMolecules);
         }
@@ -552,3 +777,5 @@
     </script>
 </body>
 </html>
+
+

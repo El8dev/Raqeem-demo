@@ -13,13 +13,12 @@
     <script src="../libs/gsap.min.js"></script>
     <!-- Tailwind -->
     <link rel="stylesheet" href="../libs/tailwind.css">
+    <link rel="stylesheet" href="../css/raqeem-experiment.css">
     <link rel="stylesheet" href="../engine/elite-styles.css">
     
     <style>
         body {
             font-family: 'Tajawal', sans-serif;
-            background-color: #07090e;
-            color: #f8fafc;
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
@@ -28,12 +27,12 @@
         .glass-panel {
             background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(117, 82, 255, 0.2);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .workspace-grid {
-            background-color: #07090e;
+            background-color: #090617;
             background-image: 
                 linear-gradient(rgba(0, 210, 255, 0.04) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 210, 255, 0.04) 1px, transparent 1px);
@@ -104,7 +103,7 @@
             }
         }
         .kbd-key.active {
-            background: linear-gradient(to bottom, #00d2ff, #0284c7);
+            background: linear-gradient(to bottom, #7552FF, #0284c7);
             border-bottom-width: 1px;
             transform: translateY(2px);
             color: #ffffff;
@@ -113,28 +112,58 @@
 
         /* Premium Glassy Modal Panel */
         #drawer-backdrop {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(9, 6, 23, 0.82);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             transition: opacity 0.3s ease;
+            z-index: 10000;
+        }
+
+        @media (min-width: 900px) {
+            #drawer-backdrop {
+                right: 380px !important;
+                left: 0 !important;
+            }
         }
 
         #scientific-drawer {
-            background: #090e17;
-            background: linear-gradient(145deg, #0e1726, #070a12);
-            border: 1px solid rgba(0, 210, 255, 0.35);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(0, 210, 255, 0.15);
+            background: linear-gradient(145deg, #180f38, #090617);
+            border: 1px solid rgba(117, 82, 255, 0.4);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(117, 82, 255, 0.3);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
         }
 
         .drawer-card {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(26, 17, 60, 0.75);
+            border: 1px solid rgba(117, 82, 255, 0.22);
             border-radius: 14px;
+        }
+
+        /* Enforce horizontal view on mobile */
+        @media screen and (max-width: 900px) and (orientation: portrait) {
+            body::before {
+                content: "يرجى تدوير الهاتف للوضع الأفقي لأفضل تجربة معملية";
+                position: fixed;
+                inset: 0;
+                background: #090617;
+                color: #fff;
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                font-weight: bold;
+                text-align: center;
+                padding: 2rem;
+            }
+            #raqeem-landscape-hint {
+                display: flex !important;
+                z-index: 1000000;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative pb-6 bg-[#07090e]">
+<body class="exp-layout-sidebar-v2">
 
     <!-- Floating Landscape Hint for Mobile/Tablet Portrait -->
     <div id="raqeem-landscape-hint" class="raqeem-landscape-hint">
@@ -147,134 +176,149 @@
         </button>
     </div>
 
-    <!-- Header -->
-    <header class="w-full max-w-[1400px] mx-auto py-3 px-4 md:px-6 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 z-30">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 p-0.5 shadow-[0_0_15px_rgba(0,210,255,0.4)]">
-                <div class="w-full h-full bg-[#07090e] rounded-[10px] flex items-center justify-center cursor-pointer hover:bg-slate-900 transition" onclick="window.location.reload();">
-                    <i class="fa-solid fa-keyboard text-cyan-400 text-lg"></i>
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="exp-sidebar-v2" style="position: relative; z-index: 9999; overflow: visible !important; min-width: 380px;">
+        <!-- Logo -->
+        <div class="exp-sidebar-v2-header">
+            <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="window.location.reload();">
+                <svg viewBox="0 0 100 100" style="width:32px; height:32px; flex-shrink:0;">
+                    <polygon points="50,5 90,25 90,65 50,95 10,65 10,25" fill="none" stroke="#7552FF" stroke-width="5" stroke-linejoin="round" />
+                    <polygon points="50,15 80,30 80,60 50,82 20,60 20,30" fill="rgba(9,6,23,0.95)" stroke="#ffb347" stroke-width="3" stroke-linejoin="round" />
+                    <path d="M40,36 H60 M40,49 H55 M40,62 H60 M40,36 V62" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div>
+                    <div style="font-size:0.7rem; font-weight:900; color:#fff; font-family:'Outfit',sans-serif; letter-spacing:0.1em;">ELITE</div>
+                    <div style="font-size:0.55rem; color:rgba(117,82,255,0.8); letter-spacing:0.05em;">الفريق البرمجي</div>
                 </div>
             </div>
-            <div>
-                <h1 class="text-lg md:text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-cyan-400">لوحة المفاتيح (الكيبورد)</h1>
-                <p class="text-xs text-cyan-400/90 font-medium">تطبيق عملي: تغير البعد (d) لتوليد الإشارة الكهربائية (d ↓ ← C ↑)</p>
-            </div>
+            <div class="exp-sidebar-v2-title" style="font-size: 0.95rem;">تطبيق المتسعة في لوحة المفاتيح</div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <!-- Open Educational Drawer Button -->
-            <button id="btn-open-drawer" class="cyber-button px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 flex items-center gap-2 border border-cyan-400/40">
-                <i class="fa-solid fa-lightbulb text-yellow-300"></i> <span>💡 كيف يعمل؟ (الشرح العلمي)</span>
+        <!-- Step Banner -->
+        <div class="exp-sidebar-v2-banner" id="stepBanner">
+            تطبيق عملي: تغير البعد (d) يولد الإشارة الكهربائية (d ↓ ← C ↑)
+        </div>
+
+        <div class="exp-sidebar-v2-section-title" style="margin-top: 15px;">لوحة المفاتيح التفاعلية</div>
+        
+        <div style="display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 0 10px 20px 10px;">
+            <!-- 3D Keyboard Base -->
+            <div class="w-full flex justify-center py-2">
+                <div dir="ltr" class="flex flex-col gap-1.5 p-3 bg-slate-900/90 rounded-2xl border-2 border-slate-700 shadow-[0_15px_30px_rgba(0,0,0,0.9)] w-full max-w-[340px]" style="transform: perspective(600px) rotateX(16deg);">
+                    <!-- Row 1 -->
+                    <div class="flex justify-center gap-1">
+                        <div class="kbd-key" data-key="Q">Q</div>
+                        <div class="kbd-key" data-key="W">W</div>
+                        <div class="kbd-key" data-key="E">E</div>
+                        <div class="kbd-key" data-key="R">R</div>
+                        <div class="kbd-key" data-key="T">T</div>
+                        <div class="kbd-key" data-key="Y">Y</div>
+                        <div class="kbd-key" data-key="U">U</div>
+                        <div class="kbd-key" data-key="I">I</div>
+                        <div class="kbd-key" data-key="O">O</div>
+                        <div class="kbd-key" data-key="P">P</div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="flex justify-center gap-1 pl-2">
+                        <div class="kbd-key" data-key="A">A</div>
+                        <div class="kbd-key" data-key="S">S</div>
+                        <div class="kbd-key" data-key="D">D</div>
+                        <div class="kbd-key" data-key="F">F</div>
+                        <div class="kbd-key" data-key="G">G</div>
+                        <div class="kbd-key" data-key="H">H</div>
+                        <div class="kbd-key" data-key="J">J</div>
+                        <div class="kbd-key" data-key="K">K</div>
+                        <div class="kbd-key" data-key="L">L</div>
+                    </div>
+                    <!-- Row 3 -->
+                    <div class="flex justify-center gap-1 pl-4">
+                        <div class="kbd-key" data-key="Z">Z</div>
+                        <div class="kbd-key" data-key="X">X</div>
+                        <div class="kbd-key" data-key="C">C</div>
+                        <div class="kbd-key" data-key="V">V</div>
+                        <div class="kbd-key" data-key="B">B</div>
+                        <div class="kbd-key" data-key="N">N</div>
+                        <div class="kbd-key" data-key="M">M</div>
+                    </div>
+                    <!-- Row 4 -->
+                    <div class="flex justify-center gap-1.5 mt-1">
+                        <div class="kbd-key" style="width: 140px" data-key="SPACE">SPACE</div>
+                        <div class="kbd-key" style="width: 60px; font-size: 10px;" data-key="ENTER">ENTER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big Touch simulation button for mobile -->
+            <button id="btn-press" class="cyber-button w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white font-black text-sm shadow-[0_0_15px_rgba(16,185,129,0.3)] border-b-3 border-emerald-800 active:border-b-0 active:translate-y-0.5 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-hand-pointer text-base"></i> اضغط لمحاكاة النقرة
             </button>
-
-            <!-- Main Menu Button -->
-            <a href="../index.html?showMenu=true" class="cyber-button px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs border border-white/10 shadow flex items-center gap-1.5">
-                <i class="fa-solid fa-chevron-right text-cyan-400 text-[10px]"></i> <span>القائمة الرئيسية</span>
-            </a>
         </div>
-    </header>
 
-    <!-- Dynamic Status & Real-time Physics Banner -->
-    <div class="w-full max-w-[1400px] mx-auto px-4 mb-4 z-20">
-        <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/30 py-2.5 px-4 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-lg">
-            <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-400 text-xs shadow-[0_0_8px_rgba(0,210,255,0.3)]">
-                    <i class="fa-solid fa-microchip"></i>
-                </span>
-                <span id="live-physics-status" class="text-xs md:text-sm font-bold text-slate-200">
-                    حالة السكون: البعد <span class="text-blue-400 font-en font-bold">(d)</span> كبير ← السعة <span class="text-cyan-400 font-en font-bold">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!
-                </span>
-            </div>
-            
-            <div class="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-lg border border-white/5 text-xs font-bold">
-                <span class="text-slate-400">العلاقة:</span>
-                <span class="font-en text-white font-black tracking-wider">C = <span class="text-amber-400">ε₀A</span> / <span class="text-blue-400">d</span></span>
+        <div style="flex:1;"></div>
+
+        <!-- Open Educational Drawer Button -->
+        <button id="btn-open-drawer" class="cyber-button px-4 py-3 mx-2 rounded-xl bg-gradient-to-r from-[#7552FF] via-[#633ee8] to-[#5A46DA] hover:brightness-110 text-white font-bold text-xs shadow-lg shadow-[#7552FF]/25 flex items-center justify-center gap-2 border border-[#7552FF]/50">
+            <i class="fa-solid fa-lightbulb text-yellow-300"></i> <span>💡 كيف يعمل؟ (الشرح العلمي)</span>
+        </button>
+
+        <!-- Back to Menu -->
+        <a href="../index.html?showMenu=true" class="exp-back-btn-td" id="back-btn" style="justify-content:center; margin-top:4px; margin-bottom:10px;">
+            <i class="fa-solid fa-house" style="color:var(--cyan);"></i> <span>القائمة الرئيسية</span>
+        </a>
+    </aside>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="exp-main-v2">
+        <!-- Topbar -->
+        <div class="exp-main-v2-topbar">
+            <h1 style="font-size:0.95rem; font-weight:900; color:#fff;">تطبيق المتسعة: لوحة المفاتيح</h1>
+            <div class="flex items-center gap-2">
+                <a href="../index.html?showMenu=true" class="exp-btn-v2" style="text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-house"></i> الرئيسية
+                </a>
             </div>
         </div>
-    </div>
 
-    <!-- MAIN INTERACTIVE STAGE (100% Full-Width Focus) -->
-    <main class="flex-1 w-full max-w-[1400px] mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4 relative z-10">
-
-        <!-- 1. Realistic 3D Interactive Keyboard (5 cols on Desktop) -->
-        <div class="lg:col-span-5 flex flex-col gap-3">
-            <div class="workspace-grid rounded-2xl p-4 flex flex-col items-center justify-center relative shadow-2xl h-full min-h-[280px]">
-                <div class="text-xs font-bold text-slate-400 flex items-center justify-between w-full mb-3 border-b border-white/5 pb-2">
-                    <span class="flex items-center gap-1.5 text-cyan-400"><i class="fa-solid fa-keyboard"></i> لوحة المفاتيح التفاعلية:</span>
-                    <span class="text-[10px] text-slate-500 font-normal">اضغط من الكيبورد أو انقر</span>
+        <!-- Dynamic Status & Real-time Physics Banner -->
+        <div class="w-full px-4 mb-2 mt-4 z-20">
+            <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-500/30 py-2.5 px-4 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-lg">
+                <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-400 text-xs shadow-[0_0_8px_rgba(0,210,255,0.3)]">
+                        <i class="fa-solid fa-microchip"></i>
+                    </span>
+                    <span id="live-physics-status" class="text-xs md:text-sm font-bold text-slate-200">
+                        حالة السكون: البعد <span class="text-blue-400 font-en font-bold">(d)</span> كبير ← السعة <span class="text-cyan-400 font-en font-bold">(C)</span> منخفضة. اضغط على أي مفتاح لمشاهدة الاستجابة اللحظية!
+                    </span>
                 </div>
-
-                <!-- 3D Keyboard Base -->
-                <div class="w-full flex justify-center py-2">
-                    <div dir="ltr" class="flex flex-col gap-1.5 p-3 bg-slate-900/90 rounded-2xl border-2 border-slate-700 shadow-[0_15px_30px_rgba(0,0,0,0.9)] w-full max-w-[340px]" style="transform: perspective(600px) rotateX(16deg);">
-                        <!-- Row 1 -->
-                        <div class="flex justify-center gap-1">
-                            <div class="kbd-key" data-key="Q">Q</div>
-                            <div class="kbd-key" data-key="W">W</div>
-                            <div class="kbd-key" data-key="E">E</div>
-                            <div class="kbd-key" data-key="R">R</div>
-                            <div class="kbd-key" data-key="T">T</div>
-                            <div class="kbd-key" data-key="Y">Y</div>
-                            <div class="kbd-key" data-key="U">U</div>
-                            <div class="kbd-key" data-key="I">I</div>
-                            <div class="kbd-key" data-key="O">O</div>
-                            <div class="kbd-key" data-key="P">P</div>
-                        </div>
-                        <!-- Row 2 -->
-                        <div class="flex justify-center gap-1 pl-2">
-                            <div class="kbd-key" data-key="A">A</div>
-                            <div class="kbd-key" data-key="S">S</div>
-                            <div class="kbd-key" data-key="D">D</div>
-                            <div class="kbd-key" data-key="F">F</div>
-                            <div class="kbd-key" data-key="G">G</div>
-                            <div class="kbd-key" data-key="H">H</div>
-                            <div class="kbd-key" data-key="J">J</div>
-                            <div class="kbd-key" data-key="K">K</div>
-                            <div class="kbd-key" data-key="L">L</div>
-                        </div>
-                        <!-- Row 3 -->
-                        <div class="flex justify-center gap-1 pl-4">
-                            <div class="kbd-key" data-key="Z">Z</div>
-                            <div class="kbd-key" data-key="X">X</div>
-                            <div class="kbd-key" data-key="C">C</div>
-                            <div class="kbd-key" data-key="V">V</div>
-                            <div class="kbd-key" data-key="B">B</div>
-                            <div class="kbd-key" data-key="N">N</div>
-                            <div class="kbd-key" data-key="M">M</div>
-                        </div>
-                        <!-- Row 4 -->
-                        <div class="flex justify-center gap-1.5 mt-1">
-                            <div class="kbd-key" style="width: 140px" data-key="SPACE">SPACE</div>
-                            <div class="kbd-key" style="width: 60px; font-size: 10px;" data-key="ENTER">ENTER</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Big Touch simulation button for mobile -->
-                <button id="btn-press" class="cyber-button w-full py-3 mt-2 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white font-black text-sm shadow-[0_0_15px_rgba(16,185,129,0.3)] border-b-3 border-emerald-800 active:border-b-0 active:translate-y-0.5 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-hand-pointer text-base"></i> اضغط هنا لمحاكاة نقرة المفتاح
-                </button>
-            </div>
-        </div>
-
-        <!-- 2. Magnified Capacitor Micro-Structure (7 cols on Desktop) -->
-        <div class="lg:col-span-7 flex flex-col gap-3">
-            <div class="workspace-grid rounded-2xl p-4 flex flex-col justify-between relative shadow-2xl h-full min-h-[360px]">
                 
-                <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-2">
-                    <h2 class="text-xs md:text-sm font-bold text-cyan-400 flex items-center gap-2">
-                        <i class="fa-solid fa-microscope text-cyan-400"></i> المقطع العرضي للمفتاح (متسعة متغيرة البعد)
-                    </h2>
-                    <div id="pcb-alert" class="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-400 text-[10px] font-bold text-emerald-400 opacity-0 transform translate-y-1 transition-all duration-200">
-                        ⚡ Signal Detected: [B]
-                    </div>
+                <div class="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-lg border border-white/5 text-xs font-bold">
+                    <span class="text-slate-400">العلاقة:</span>
+                    <span class="font-en text-white font-black tracking-wider">C = <span class="text-amber-400">ε₀A</span> / <span class="text-blue-400">d</span></span>
                 </div>
+            </div>
+        </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center flex-1">
+        <!-- Workspace + Conclusion -->
+        <div class="exp-main-v2-workspace" style="display: flex; flex-direction: column; width: 100%; height: 100%; padding-bottom:10px;">
+            <div style="flex:1; position:relative; overflow:hidden; min-height:0; display: flex;">
+                
+                <!-- 2. Magnified Capacitor Micro-Structure -->
+                <div class="workspace-area flex flex-col justify-between" style="position: relative; width: 100%; height: 100%; padding: 20px; background-color: #f8f9fb; background-image: linear-gradient(rgba(117,82,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(117,82,255,0.08) 1px, transparent 1px); background-size: 30px 30px; border: 1px solid rgba(117,82,255,0.25); border-radius: 16px; box-shadow: inset 0 2px 20px rgba(117,82,255,0.05), 0 4px 24px rgba(0,0,0,0.3); overflow: visible;" id="workspace">
                     
-                    <!-- SVG Key Cross Section (530x260 widescreen viewBox with locked center callouts) -->
-                    <div class="md:col-span-8 w-full h-[240px] md:h-[270px] relative bg-black/60 rounded-xl border border-slate-800 flex items-center justify-center p-1 overflow-hidden">
-                        <svg width="100%" height="100%" viewBox="0 0 530 260" preserveAspectRatio="xMidYMid meet">
+                    <div class="flex items-center justify-between border-b border-black/10 pb-2 mb-4">
+                        <h2 class="text-xs md:text-sm font-bold text-[#7552FF] flex items-center gap-2">
+                            <i class="fa-solid fa-microscope"></i> المقطع العرضي للمفتاح (متسعة متغيرة البعد)
+                        </h2>
+                        <div id="pcb-alert" class="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-400 text-[10px] font-bold text-emerald-700 opacity-0 transform translate-y-1 transition-all duration-200">
+                            ⚡ Signal Detected: [B]
+                        </div>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
+                        
+                        <!-- SVG Key Cross Section -->
+                        <div class="xl:col-span-8 w-full h-[240px] md:h-full relative bg-[#090617] rounded-xl border border-[#3b2b80] flex items-center justify-center p-1 overflow-hidden shadow-2xl min-h-[300px]">
+                            <svg width="100%" height="100%" viewBox="0 0 530 260" preserveAspectRatio="xMidYMid meet">
                             <defs>
                                 <linearGradient id="capTop" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#475569" />
@@ -289,7 +333,7 @@
                                     <stop offset="100%" stop-color="#64748b" />
                                 </linearGradient>
                                 <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-                                    <line x1="0" y1="0" x2="0" y2="8" stroke="#00d2ff" stroke-width="1.5" opacity="0.35"/>
+                                    <line x1="0" y1="0" x2="0" y2="8" stroke="#7552FF" stroke-width="1.5" opacity="0.35"/>
                                 </pattern>
                                 <filter id="pcbGlow" x="-50%" y="-50%" width="200%" height="200%">
                                     <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -323,7 +367,7 @@
                                 </g>
                                 <!-- Vertical Connecting Caliper Line -->
                                 <line id="dist-vert-line" x1="135" y1="86" x2="135" y2="186" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3 3"/>
-                                <text id="distance-label" x="110" y="136" fill="#38bdf8" font-size="12" font-family="Outfit" font-weight="bold" transform="rotate(-90 110 136)" text-anchor="middle">Distance (d)</text>
+                                <text id="distance-label" x="110" y="136" fill="#38bdf8" font-size="12" font-family="Tajawal" font-weight="bold" transform="rotate(-90 110 136)" text-anchor="middle">البعد (d)</text>
                             </g>
 
                             <!-- ================= 2. CENTER: MECHANICAL ASSEMBLY ================= -->
@@ -341,7 +385,7 @@
                                 <rect x="165" y="80" width="130" height="12" rx="3" fill="url(#plateGrad)" stroke="#475569" stroke-width="1.5"/>
                                 
                                 <!-- Negative Charges on Top Plate -->
-                                <g id="top-charges" fill="#00d2ff" font-size="13" font-family="Outfit" font-weight="black">
+                                <g id="top-charges" fill="#7552FF" font-size="13" font-family="Outfit" font-weight="black">
                                     <text x="175" y="90">-</text>
                                     <text x="198" y="90">-</text>
                                     <text x="221" y="90">-</text>
@@ -351,15 +395,15 @@
                                 </g>
 
                                 <!-- Top Plate Anchor Dot -->
-                                <circle cx="295" cy="86" r="3" fill="#00d2ff"/>
+                                <circle cx="295" cy="86" r="3" fill="#7552FF"/>
                             </g>
 
                             <!-- Dynamic Top Leader Line (Connects moving plate to top badge) -->
-                            <line id="top-leader-line" x1="295" y1="86" x2="340" y2="86" stroke="#00d2ff" stroke-width="1.5" stroke-dasharray="3 2" />
+                            <line id="top-leader-line" x1="295" y1="86" x2="340" y2="86" stroke="#7552FF" stroke-width="1.5" stroke-dasharray="3 2" />
 
                             <!-- Flexible Dielectric Spring -->
                             <g id="dielectric-group">
-                                <rect id="dielectric-block" x="185" y="92" width="90" height="88" fill="rgba(0, 210, 255, 0.08)" stroke="#00d2ff" stroke-width="1.2" stroke-dasharray="3 3" rx="3"/>
+                                <rect id="dielectric-block" x="185" y="92" width="90" height="88" fill="rgba(0, 210, 255, 0.08)" stroke="#7552FF" stroke-width="1.2" stroke-dasharray="3 3" rx="3"/>
                                 <rect id="dielectric-pattern" x="185" y="92" width="90" height="88" fill="url(#diagonalHatch)" rx="3"/>
                             </g>
 
@@ -394,7 +438,7 @@
                             <!-- 1. Contact Spark Arc at Base Connection (200, 194) -->
                             <g id="pcb-contact-spark" opacity="0" transform="translate(200, 194)">
                                 <circle id="pcb-spark-ring" r="0" fill="none" stroke="#00f0ff" stroke-width="2" opacity="0.9" />
-                                <path d="M 0 0 L -6 -8 L -2 -3 L -10 -2 L -3 1 L -8 9 L -1 3 L 2 10 L 3 2 L 9 5 L 4 -2 L 10 -7 L 2 -4 Z" fill="#ffffff" stroke="#00d2ff" stroke-width="1.2" filter="url(#sparkGlow)" />
+                                <path d="M 0 0 L -6 -8 L -2 -3 L -10 -2 L -3 1 L -8 9 L -1 3 L 2 10 L 3 2 L 9 5 L 4 -2 L 10 -7 L 2 -4 Z" fill="#ffffff" stroke="#7552FF" stroke-width="1.2" filter="url(#sparkGlow)" />
                                 <circle cx="0" cy="0" r="3.5" fill="#ffffff" filter="url(#sparkGlow)" />
                             </g>
 
@@ -415,7 +459,7 @@
                             <!-- Callout 1: Top Movable Plate -->
                             <g class="callout-group" transform="translate(340, 74)">
                                 <rect width="165" height="24" rx="6" fill="#0b1329" stroke="rgba(0, 210, 255, 0.45)" stroke-width="1.2"/>
-                                <circle cx="12" cy="12" r="3" fill="#00d2ff"/>
+                                <circle cx="12" cy="12" r="3" fill="#7552FF"/>
                                 <text x="88" y="16" text-anchor="middle" fill="#f8fafc" font-size="11" font-family="Tajawal" font-weight="bold">صفيحة علوية (متحركة)</text>
                             </g>
 
@@ -452,117 +496,122 @@
                                 </g>
                             </g>
                         </svg>
+                        </div>
+
+                        <!-- Real-time Dashboard Gauges -->
+                        <div class="xl:col-span-4 flex flex-col gap-4">
+                            
+                            <!-- Distance (d) Gauge -->
+                            <div class="bg-white border border-blue-200 rounded-xl p-4 shadow-sm">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs text-blue-600 font-bold">البعد بين الصفيحتين (d)</span>
+                                    <span id="dist-value" class="text-sm font-black text-blue-600 font-en">100%</span>
+                                </div>
+                                <div class="dash-bar-container" style="background:#e2e8f0; border-color:#cbd5e1;">
+                                    <div id="dist-bar" class="dash-bar-fill" style="width: 100%; background: linear-gradient(90deg, #2563eb, #3b82f6); box-shadow: 0 0 10px rgba(59,130,246,0.4);"></div>
+                                </div>
+                            </div>
+
+                            <!-- Capacitance (C) Gauge -->
+                            <div class="bg-white border border-[#7552FF]/30 rounded-xl p-4 shadow-sm">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs text-[#7552FF] font-bold">سعة المتسعة (C)</span>
+                                    <span id="cap-value" class="text-sm font-black text-[#7552FF] font-en">10%</span>
+                                </div>
+                                <div class="dash-bar-container" style="background:#e2e8f0; border-color:#cbd5e1;">
+                                    <div id="cap-bar" class="dash-bar-fill" style="width: 10%; background: linear-gradient(90deg, #7552FF, #38bdf8); box-shadow: 0 0 10px rgba(117,82,255,0.4);"></div>
+                                </div>
+                            </div>
+
+                            <!-- Electronic Signal Status Card -->
+                            <div class="bg-[#090617] border border-slate-700 rounded-xl p-3 flex flex-col gap-2 shadow-lg mt-2">
+                                <span class="text-[10px] text-slate-400 font-bold">حالة الدائرة الإلكترونية:</span>
+                                <span id="circuit-state-badge" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 text-center">في وضع الاستعداد</span>
+                            </div>
+
+                        </div>
+
                     </div>
-
-                    <!-- Real-time Dashboard Gauges (Right side of cross section) -->
-                    <div class="md:col-span-4 flex flex-col gap-2.5">
-                        
-                        <!-- Distance (d) Gauge -->
-                        <div class="bg-black/60 border border-blue-900/40 rounded-xl p-3">
-                            <div class="flex justify-between items-center mb-1.5">
-                                <span class="text-[11px] text-blue-400 font-bold">البعد بين الصفيحتين (d)</span>
-                                <span id="dist-value" class="text-sm font-black text-blue-300 font-en">100%</span>
-                            </div>
-                            <div class="dash-bar-container">
-                                <div id="dist-bar" class="dash-bar-fill" style="width: 100%; background: linear-gradient(90deg, #2563eb, #3b82f6); box-shadow: 0 0 10px rgba(59,130,246,0.8);"></div>
-                            </div>
-                        </div>
-
-                        <!-- Capacitance (C) Gauge -->
-                        <div class="bg-black/60 border border-cyan-900/40 rounded-xl p-3">
-                            <div class="flex justify-between items-center mb-1.5">
-                                <span class="text-[11px] text-cyan-400 font-bold">سعة المتسعة (C)</span>
-                                <span id="cap-value" class="text-sm font-black text-cyan-300 font-en">10%</span>
-                            </div>
-                            <div class="dash-bar-container">
-                                <div id="cap-bar" class="dash-bar-fill" style="width: 10%; background: linear-gradient(90deg, #00d2ff, #38bdf8); box-shadow: 0 0 10px rgba(0,210,255,0.8);"></div>
-                            </div>
-                        </div>
-
-                        <!-- Electronic Signal Status Card -->
-                        <div class="bg-black/60 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between">
-                            <span class="text-[10px] text-slate-400 font-bold">حالة الدائرة:</span>
-                            <span id="circuit-state-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300">في وضع الاستعداد</span>
-                        </div>
-
-                    </div>
-
                 </div>
-
             </div>
-        </div>
-
-    </main>
-
-    <!-- COLLAPSIBLE EDUCATIONAL DRAWER / MODAL (Premium Glassy Styling) -->
-    <div id="drawer-backdrop" class="fixed inset-0 z-50 pointer-events-none opacity-0 flex items-end md:items-center justify-center p-0 md:p-6">
-        <div id="scientific-drawer" class="w-full max-w-[750px] rounded-t-[28px] md:rounded-[28px] p-6 shadow-2xl transform translate-y-full flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
             
-            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <!-- Footer -->
+            <div class="footer-elite text-center text-[10px] text-slate-500 border-t border-black/5 pt-3 mt-3 flex items-center justify-between mx-4">
+                <span>محاكاة تفاعلية ذكية للتعليم الرقمي.</span>
+                <span>تم تطويره بواسطة <span class="text-[#7552FF] font-bold">فريق ELITE البرمجي © 2026</span></span>
+            </div>
+            
+        </div>
+    </div>
+    <!-- COLLAPSIBLE EDUCATIONAL DRAWER / MODAL (Premium Glassy Styling) -->
+    <div id="drawer-backdrop" class="fixed inset-0 z-50 pointer-events-none opacity-0 flex items-center justify-center p-3 md:p-6">
+        <div id="scientific-drawer" class="w-full max-w-[540px] rounded-[24px] p-5 shadow-2xl transform translate-y-full flex flex-col gap-3 max-h-[85vh] overflow-y-auto">
+            
+            <div class="flex items-center justify-between border-b border-[#7552FF]/20 pb-2.5">
                 <div class="flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 text-sm">
+                    <span class="w-7 h-7 rounded-lg bg-[#7552FF]/20 border border-[#7552FF]/50 flex items-center justify-center text-[#c4b5fd] text-xs shadow-[0_0_8px_rgba(117,82,255,0.4)]">
                         <i class="fa-solid fa-book-open"></i>
                     </span>
                     <div>
-                        <h2 class="text-base md:text-lg font-bold text-white">الشرح الفيزيائي: لوحة مفاتيح الحاسوب</h2>
-                        <p class="text-[11px] text-cyan-400">تطبيق عملي على المتسعة ذات الصفيحتين المتوازيتين (السادس العلمي)</p>
+                        <h2 class="text-sm md:text-base font-bold text-white">الشرح الفيزيائي: لوحة مفاتيح الحاسوب</h2>
+                        <p class="text-[10px] text-[#a78bfa]">تطبيق عملي على المتسعة ذات الصفيحتين المتوازيتين (السادس العلمي)</p>
                     </div>
                 </div>
-                <button id="btn-close-drawer" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
+                <button id="btn-close-drawer" class="w-7 h-7 rounded-full bg-[#251758] hover:bg-[#342078] text-[#c4b5fd] hover:text-white flex items-center justify-center transition text-xs border border-[#7552FF]/30">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
                 
-                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-cyan-400">
-                    <h3 class="font-bold text-cyan-400 flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-[10px]">1</span>
+                <div class="drawer-card p-3 flex flex-col gap-1 border-r-2 border-r-[#7552FF]">
+                    <h3 class="font-bold text-[#c4b5fd] flex items-center gap-1.5 text-xs">
+                        <span class="w-4 h-4 rounded-full bg-[#7552FF]/25 text-[#e0e7ff] flex items-center justify-center text-[10px] font-bold">1</span>
                         التركيب الأساسي
                     </h3>
-                    <p class="text-slate-300 leading-relaxed text-justify">
+                    <p class="text-slate-300 leading-relaxed text-[11px] text-justify">
                         توضع متسعة تحت كل حرف في لوحة المفاتيح، تتكون من صفيحة علوية متحركة وأخرى سفلية ثابتة وبينهما مادة عازلة مرنة تعمل كزنبرك.
                     </p>
                 </div>
 
-                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-amber-400">
-                    <h3 class="font-bold text-amber-400 flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px]">2</span>
+                <div class="drawer-card p-3 flex flex-col gap-1 border-r-2 border-r-amber-400">
+                    <h3 class="font-bold text-amber-300 flex items-center gap-1.5 text-xs">
+                        <span class="w-4 h-4 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-bold">2</span>
                         عند الضغط على المفتاح
                     </h3>
-                    <p class="text-slate-300 leading-relaxed text-justify">
+                    <p class="text-slate-300 leading-relaxed text-[11px] text-justify">
                         يؤدي الضغط إلى تحريك الصفيحة العلوية للأسفل، مما يؤدي إلى <strong class="text-white">نقصان البعد الفاصل (d)</strong> بين الصفيحتين وانضغاط العازل.
                     </p>
                 </div>
 
-                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-cyan-400">
-                    <h3 class="font-bold text-cyan-400 flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-[10px]">3</span>
+                <div class="drawer-card p-3 flex flex-col gap-1 border-r-2 border-r-[#7552FF]">
+                    <h3 class="font-bold text-[#c4b5fd] flex items-center gap-1.5 text-xs">
+                        <span class="w-4 h-4 rounded-full bg-[#7552FF]/25 text-[#e0e7ff] flex items-center justify-center text-[10px] font-bold">3</span>
                         التغير في السعة الكهربائية
                     </h3>
-                    <p class="text-slate-300 leading-relaxed text-justify">
-                        بما أن السعة تتناسب عكسياً مع البعد (<span class="font-en text-cyan-300 font-bold">C ∝ 1/d</span>)، فإن نقصان (<span class="font-en text-blue-300 font-bold">d</span>) يؤدي إلى <strong class="text-white">ازدياد سعة المتسعة</strong> فوراً وبشكل ملحوظ.
+                    <p class="text-slate-300 leading-relaxed text-[11px] text-justify">
+                        بما أن السعة تتناسب عكسياً مع البعد (<span class="font-en text-[#a78bfa] font-bold">C ∝ 1/d</span>)، فإن نقصان (<span class="font-en text-blue-300 font-bold">d</span>) يؤدي إلى <strong class="text-white">ازدياد سعة المتسعة</strong> فوراً.
                     </p>
                 </div>
 
-                <div class="drawer-card p-3.5 flex flex-col gap-1.5 border-r-2 border-r-emerald-400">
-                    <h3 class="font-bold text-emerald-400 flex items-center gap-1.5">
-                        <span class="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">4</span>
+                <div class="drawer-card p-3 flex flex-col gap-1 border-r-2 border-r-emerald-400">
+                    <h3 class="font-bold text-emerald-300 flex items-center gap-1.5 text-xs">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[10px] font-bold">4</span>
                         توليد الإشارة الإلكترونية
                     </h3>
-                    <p class="text-slate-300 leading-relaxed text-justify">
+                    <p class="text-slate-300 leading-relaxed text-[11px] text-justify">
                         تتعرف الدوائر الإلكترونية (PCB) على التغير الحاصل في السعة، فتُرسل نبضة إشارة للحاسوب لتحديد الحرف المطلوب بدقة وسرعة فائقة.
                     </p>
                 </div>
 
             </div>
 
-            <div class="mt-1 p-3 bg-cyan-950/40 border border-cyan-500/30 rounded-xl flex items-center justify-between">
+            <div class="mt-0.5 p-2.5 bg-[#251758]/50 border border-[#7552FF]/30 rounded-xl flex items-center justify-between">
                 <span class="text-slate-300 text-xs">العلاقة الرياضية الأساسية:</span>
-                <span class="font-en text-cyan-400 font-bold text-sm tracking-wider">C = ε₀ · (A / d)</span>
+                <span class="font-en text-[#c4b5fd] font-bold text-xs md:text-sm tracking-wider">C = ε₀ · (A / d)</span>
             </div>
 
-            <button id="btn-close-drawer-bottom" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition border border-white/10">
+            <button id="btn-close-drawer-bottom" class="w-full py-2 rounded-xl bg-gradient-to-r from-[#251758] to-[#180f38] hover:from-[#342078] hover:to-[#251758] text-white font-bold text-xs transition border border-[#7552FF]/30">
                 إغلاق الشرح والعودة للتجربة
             </button>
 
@@ -944,3 +993,5 @@
     </script>
 </body>
 </html>
+
+

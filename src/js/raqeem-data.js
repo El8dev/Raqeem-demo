@@ -82,7 +82,7 @@ window.RAQEEM_DATA = {
         },
         {
           id: 'faraday-ring',
-          href: 'experiments/induction.html',
+          href: 'experiments/faraday_experiment.html',
           icon: 'ring',
           title: { ar: 'تجربة حلقة فراداي', en: "Faraday's Ring Experiment" },
           desc: { ar: 'التجربة التاريخية للحث الكهرومغناطيسي وتوليد التيار المحتث', en: 'The historic mutual-induction experiment' }

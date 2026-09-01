@@ -1,0 +1,484 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مختبر الفيزياء | أنبوبة الأشعة الكاثودية</title>
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07090e;
+            --panel: #111823;
+            --border: rgba(0, 210, 255, 0.18);
+            --cyan: #00d2ff;
+            --orange: #ff9f43;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --green: #2ecc71;
+            --text: #e2e8f0;
+        }
+
+        html, body {
+            user-select: none; -webkit-user-select: none;
+            width: 100%; height: 100%; overflow: hidden;
+            background: var(--bg); color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            display: flex; flex-direction: column;
+        }
+
+        /* ── FLOATING MENU TOGGLE ── */
+        .drawer-toggle {
+            position: fixed; left: 20px; top: 20px; z-index: 9999;
+            width: 50px; height: 50px; border-radius: 12px;
+            background: rgba(10, 16, 26, 0.55); border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+            color: var(--cyan); cursor: pointer; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        .drawer-toggle:hover { background: rgba(0, 210, 255, 0.12); transform: scale(1.07); }
+
+        /* ── SLIDE-OUT DRAWER ── */
+        .drawer {
+            position: fixed; left: 0; top: 0; height: 100%; width: 300px; z-index: 10000;
+            transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #080c14; border-right: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6); padding: 20px; display: flex; flex-direction: column;
+        }
+        .drawer.open { transform: translateX(0); }
+        .drawer-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9998;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+        .drawer-close {
+            align-self: flex-end; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal', sans-serif;
+            font-size: 0.88rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .drawer-submenu a {
+            display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-size: 0.8rem;
+            color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        .drawer-submenu a:hover { background: rgba(0, 210, 255, 0.1); color: #fff; }
+
+        /* ── MAIN LAYOUT ── */
+        .app-container { flex: 1; display: flex; overflow: hidden; position: relative; }
+        
+        .viewport {
+            flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, rgba(16,32,54,0.4) 0%, rgba(7,10,18,0.9) 100%);
+            overflow: hidden;
+        }
+
+        .toolbox {
+            width: 340px; background: rgba(11, 15, 25, 0.85); border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px); padding: 24px; display: flex; flex-direction: column; gap: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 100; overflow-y: auto;
+        }
+
+        .toolbox-title {
+            font-size: 1.4rem; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(0,210,255,0.5);
+            margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;
+        }
+
+        /* ── SVG SIMULATION ── */
+        #crt-svg {
+            width: 800px;
+            height: 1000px;
+            filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.05));
+        }
+
+        .glass-tube {
+            fill: rgba(255, 255, 255, 0.03);
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 3;
+        }
+        
+        .anode {
+            fill: #475569;
+            stroke: #94a3b8;
+            stroke-width: 2;
+        }
+
+        .cathode {
+            fill: #ef4444;
+            filter: drop-shadow(0 0 10px #ef4444);
+        }
+
+        .plate {
+            fill: rgba(255, 255, 255, 0.1);
+            stroke-width: 2;
+        }
+
+        .plate.top { stroke: #ef4444; }
+        .plate.bottom { stroke: #3b82f6; }
+
+        .magnetic-coil {
+            fill: rgba(0, 210, 255, 0.1);
+            stroke: rgba(0, 210, 255, 0.5);
+            stroke-width: 2;
+            stroke-dasharray: 4 2;
+        }
+
+        .beam {
+            fill: none;
+            stroke: var(--cyan);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px var(--cyan)) drop-shadow(0 0 15px var(--cyan));
+            transition: d 0.1s ease-out;
+        }
+
+        .screen {
+            fill: rgba(0, 210, 255, 0.08);
+            stroke: rgba(0, 210, 255, 0.3);
+            stroke-width: 3;
+        }
+
+        .screen-glow {
+            fill: var(--cyan);
+            filter: drop-shadow(0 0 15px var(--cyan)) drop-shadow(0 0 30px var(--cyan));
+            opacity: 0.8;
+            transition: cy 0.1s ease-out, cx 0.1s ease-out;
+        }
+
+        .field-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px; font-weight: bold;
+            fill: #fff;
+        }
+
+        /* ── CONTROLS ── */
+        .control-group { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; }
+        .control-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; font-weight: 700; display: block; display: flex; justify-content: space-between;}
+        
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type=range] { flex: 1; }
+        
+        input[type=range].slider-e { accent-color: #ef4444; }
+        input[type=range].slider-b { accent-color: #00d2ff; }
+
+        .info-card { background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); padding: 15px; border-radius: 12px; margin-top: auto; }
+        .formula { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; text-align: center; margin: 10px 0; letter-spacing: 1px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);}
+        .formula span.e-term { color: #ef4444; }
+        .formula span.b-term { color: #00d2ff; }
+
+        .val-badge { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-family: 'Outfit', monospace; font-size: 0.8rem; }
+    </style>
+    <link rel="stylesheet" href="../css/mobile-enforcer.css">
+</head>
+
+<body>
+
+    <!-- Drawer Toggle -->
+    <div class="drawer-toggle" id="menu-toggle-btn">
+        <i class="fa-solid fa-bars text-xl"></i>
+    </div>
+
+    <!-- Slide-out Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="side-drawer">
+        <button class="drawer-close" id="drawer-close-btn">
+            <i class="fa-solid fa-xmark"></i> إغلاق القائمة
+        </button>
+        <div style="padding: 10px 0;">
+            <a href="../index.html?showMenu=true" style="color:var(--cyan);text-decoration:none;font-weight:bold;display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                <i class="fa-solid fa-house"></i> العودة للرئيسية
+            </a>
+            <h3 style="color:#94a3b8;font-size:0.8rem;margin-bottom:10px;">تجارب أخرى</h3>
+            <div class="drawer-submenu">
+                <a href="fields_effect.html"><i class="fa-solid fa-atom"></i> حركة الجسيمات المشحونة</a>
+                <a href="right_hand_rule.html"><i class="fa-solid fa-hand"></i> قاعدة الكف اليمنى</a>
+                <a href="induction_coils.html"><i class="fa-solid fa-magnet"></i> الحث الكهرومغناطيسي</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Toolbox (Controls) -->
+        <div class="toolbox">
+            <div class="toolbox-title">أنبوبة الأشعة الكاثودية (CRT)</div>
+            
+            <div class="control-group">
+                <span class="control-label">
+                    المجال الكهربائي (E)
+                    <span class="val-badge" id="e-val">0</span>
+                </span>
+                <div class="slider-container">
+                    <i class="fa-solid fa-bolt text-red-500" style="color:#ef4444;"></i>
+                    <input type="range" class="slider-e" id="slider-e" min="-10" max="10" value="0" step="1">
+                </div>
+                <p style="font-size:0.7rem; color:#64748b; margin-top:8px;">ينشأ بين اللوحين، الموجب أعلى والسالب أسفل (عند القيمة الموجبة). القوة الكهربائية تدفع الإلكترون <b>عكس</b> المجال.</p>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">
+                    المجال المغناطيسي (B)
+                    <span class="val-badge" id="b-val">0</span>
+                </span>
+                <div class="slider-container">
+                    <i class="fa-solid fa-magnet text-cyan-400" style="color:#00d2ff;"></i>
+                    <input type="range" class="slider-b" id="slider-b" min="-10" max="10" value="0" step="1">
+                </div>
+                <p style="font-size:0.7rem; color:#64748b; margin-top:8px;">ينشأ من الملفين حول الأنبوبة. حسب قاعدة الكف اليمنى، القوة المغناطيسية على الإلكترون (الشحنة السالبة) تكون عمودية.</p>
+            </div>
+
+            <button onclick="resetFields()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal', sans-serif; transition: 0.2s;">
+                <i class="fa-solid fa-rotate-right"></i> تصفير المجالات (الاتزان)
+            </button>
+
+            <div class="info-card">
+                <h4 style="color:#fff;margin-bottom:8px;font-size:0.9rem;">قوة لورنتز:</h4>
+                <p style="color:#cbd5e1;font-size:0.8rem;line-height:1.6;">
+                    تستثمر أنبوبة الأشعة الكاثودية محصلة القوتين الكهربائية والمغناطيسية (قوة لورنتز) للتحكم في مسار الحزمة الإلكترونية لتسقط في الموقع المطلوب على الشاشة.<br><br>
+                    يمكن موازنة القوتين ليعود الشعاع في خط مستقيم عندما يكون: $F_E = -F_B$.
+                </p>
+                <div class="formula">F<span style="font-size:0.7rem;">Lorentz</span> = <span class="e-term">F<span style="font-size:0.7rem;">E</span></span> + <span class="b-term">F<span style="font-size:0.7rem;">B</span></span></div>
+            </div>
+        </div>
+
+        <!-- Viewport (SVG Scene) -->
+        <div class="viewport">
+            <svg id="crt-svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <!-- E-Field Lines Pattern -->
+                    <pattern id="e-field-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 10,0 L 10,20" stroke="rgba(239, 68, 68, 0.3)" stroke-width="1" stroke-dasharray="2 2" />
+                        <polygon points="8,10 12,10 10,14" fill="rgba(239, 68, 68, 0.4)" id="e-arrow"/>
+                    </pattern>
+                </defs>
+
+                <!-- Glass Tube Outline -->
+                <!-- A classical CRT profile -->
+                <path class="glass-tube" d="M 50,220 L 250,220 C 350,220 400,100 700,100 L 700,400 C 400,400 350,280 250,280 L 50,280 Z" />
+                
+                <!-- Fluorescent Screen -->
+                <path class="screen" d="M 690,100 Q 730,250 690,400 L 710,400 Q 750,250 710,100 Z" />
+
+                <!-- Cathode (Heater & Electron Gun) -->
+                <rect x="55" y="235" width="20" height="30" class="cathode" rx="2" />
+                <line x1="40" y1="240" x2="55" y2="240" stroke="#94a3b8" stroke-width="2"/>
+                <line x1="40" y1="260" x2="55" y2="260" stroke="#94a3b8" stroke-width="2"/>
+
+                <!-- Anodes (Accelerating Plates with hole) -->
+                <rect class="anode" x="120" y="222" width="10" height="25" rx="1"/>
+                <rect class="anode" x="120" y="253" width="10" height="25" rx="1"/>
+                <rect class="anode" x="160" y="222" width="15" height="25" rx="1"/>
+                <rect class="anode" x="160" y="253" width="15" height="25" rx="1"/>
+
+                <!-- Deflection Plates (Electric Field) -->
+                <!-- Top Plate -->
+                <rect class="plate top" x="250" y="195" width="100" height="8" rx="2"/>
+                <text x="300" y="185" class="field-label" fill="#ef4444" text-anchor="middle" id="top-plate-sign">+</text>
+                <!-- Bottom Plate -->
+                <rect class="plate bottom" x="250" y="297" width="100" height="8" rx="2"/>
+                <text x="300" y="325" class="field-label" fill="#3b82f6" text-anchor="middle" id="bottom-plate-sign">-</text>
+
+                <!-- Electric Field Visuals (Opacity controlled by E) -->
+                <rect x="255" y="205" width="90" height="90" fill="url(#e-field-pattern)" id="e-field-region" opacity="0" />
+
+                <!-- Magnetic Coils (Helmholtz setup approx.) -->
+                <ellipse cx="300" cy="250" rx="55" ry="70" class="magnetic-coil" id="mag-coil-back" />
+                <ellipse cx="300" cy="250" rx="55" ry="70" class="magnetic-coil" id="mag-coil-front" opacity="0.6"/>
+                <!-- Magnetic Field Visuals (Dots/Crosses) -->
+                <g id="b-field-region" opacity="0">
+                    <!-- dynamically generated via JS -->
+                </g>
+
+                <!-- Electron Beam Path -->
+                <path id="electron-beam" class="beam" d="M 75,250 L 700,250" />
+                
+                <!-- Screen Impact Glow -->
+                <circle id="impact-glow" class="screen-glow" cx="700" cy="250" r="6" />
+
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        // Drawer Logic
+        const menuToggle = document.getElementById('menu-toggle-btn');
+        const drawerClose = document.getElementById('drawer-close-btn');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        menuToggle.onclick = () => { drawer.classList.add('open'); overlay.classList.add('visible'); }
+        const closeDrawer = () => { drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+        drawerClose.onclick = closeDrawer;
+        overlay.onclick = closeDrawer;
+
+        // Physics Logic
+        const sliderE = document.getElementById('slider-e');
+        const sliderB = document.getElementById('slider-b');
+        const eVal = document.getElementById('e-val');
+        const bVal = document.getElementById('b-val');
+        
+        const beam = document.getElementById('electron-beam');
+        const impactGlow = document.getElementById('impact-glow');
+        const eFieldRegion = document.getElementById('e-field-region');
+        const eArrow = document.getElementById('e-arrow');
+        const bFieldRegion = document.getElementById('b-field-region');
+        const topSign = document.getElementById('top-plate-sign');
+        const botSign = document.getElementById('bottom-plate-sign');
+
+        // Setup Magnetic Field Indicators (grid of crosses or dots)
+        function initBFieldMarkers() {
+            bFieldRegion.innerHTML = '';
+            for(let x = 250; x <= 350; x+=20) {
+                for(let y = 190; y <= 310; y+=20) {
+                    const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    el.setAttribute('x', x);
+                    el.setAttribute('y', y);
+                    el.setAttribute('text-anchor', 'middle');
+                    el.setAttribute('alignment-baseline', 'middle');
+                    el.setAttribute('font-family', 'Outfit');
+                    el.setAttribute('font-weight', 'bold');
+                    el.setAttribute('font-size', '14px');
+                    el.setAttribute('fill', 'rgba(0, 210, 255, 0.8)');
+                    el.classList.add('b-marker');
+                    bFieldRegion.appendChild(el);
+                }
+            }
+        }
+        initBFieldMarkers();
+
+        function updatePhysics() {
+            // E and B are from -10 to 10
+            let E = parseFloat(sliderE.value);
+            let B = parseFloat(sliderB.value);
+
+            eVal.innerText = E;
+            bVal.innerText = B;
+
+            // Update Electric Field Visuals
+            if (E !== 0) {
+                eFieldRegion.setAttribute('opacity', Math.min(Math.abs(E) / 5, 0.8));
+                if (E > 0) {
+                    // + on top, E points DOWN. Arrow points DOWN.
+                    eArrow.setAttribute('points', '8,16 12,16 10,20');
+                    topSign.textContent = '+'; botSign.textContent = '-';
+                    topSign.setAttribute('fill', '#ef4444'); botSign.setAttribute('fill', '#3b82f6');
+                } else {
+                    // + on bottom, E points UP. Arrow points UP.
+                    eArrow.setAttribute('points', '8,4 12,4 10,0');
+                    topSign.textContent = '-'; botSign.textContent = '+';
+                    topSign.setAttribute('fill', '#3b82f6'); botSign.setAttribute('fill', '#ef4444');
+                }
+            } else {
+                eFieldRegion.setAttribute('opacity', 0);
+                topSign.textContent = ''; botSign.textContent = '';
+            }
+
+            // Update Magnetic Field Visuals
+            if (B !== 0) {
+                bFieldRegion.setAttribute('opacity', Math.min(Math.abs(B) / 5, 0.8));
+                const markers = bFieldRegion.querySelectorAll('.b-marker');
+                markers.forEach(m => {
+                    // if B > 0, Field OUT (dots). B < 0, Field IN (crosses).
+                    m.textContent = B > 0 ? '•' : '×';
+                });
+            } else {
+                bFieldRegion.setAttribute('opacity', 0);
+            }
+
+            // Calculate Deflection
+            // F = q(E + v x B)
+            // Electron q = -1. 
+            // Let's define axes: Screen Right is +X. Down is +Y.
+            // Beam moves +X. Velocity v = (vx, 0, 0).
+            // E is along Y. If E > 0 (top +, bot -), E vector is +Y. 
+            // Force from E on electron: FE_y = -q * E_y = -(-1) * E = -E. 
+            // Wait: electron is attracted to positive! Top is +, so electron goes UP (-Y).
+            // So FE_y = -E. (E > 0 means deflection UP).
+            
+            // B field is along Z (into/out of screen). 
+            // Let B > 0 mean OUT OF SCREEN (+Z).
+            // v = +X. B = +Z. v x B = X x Z = -Y.
+            // Force from B on electron: FB_y = q * (v x B)_y = -1 * (-Y) = +Y.
+            // So B > 0 means deflection DOWN (+Y).
+            // Wait, Right Hand Rule: v is RIGHT. B is OUT. Thumb (v x B) is DOWN.
+            // Electron q is negative, so Force is UP (-Y).
+            // Let's re-evaluate:
+            // If B > 0 (OUT), v(RIGHT) x B(OUT) = DOWN. 
+            // Force on negative charge = UP.
+            // So FB_y = -B.
+            // Total Acceleration ay proportional to -(E + B).
+
+            // Let's adjust scaling for good visuals.
+            let a = -(E + B) * 0.8; 
+            
+            const startX = 75;
+            const startY = 250;
+            const plateStartX = 250;
+            const plateEndX = 350;
+            const screenX = 700;
+
+            // Straight line to plates
+            let path = `M ${startX},${startY} L ${plateStartX},${startY} `;
+
+            // Parabolic curve inside plates
+            let exitY = startY;
+            let exitSlope = 0;
+            
+            if (a === 0) {
+                path += `L ${plateEndX},${startY} `;
+                exitY = startY;
+            } else {
+                // y(x) = y0 + 0.5 * a * ((x-x0)/v)^2
+                // We draw it using a quadratic bezier Q:
+                // Start = (plateStartX, startY)
+                // Control Point = ( (plateStartX + plateEndX)/2, startY )
+                // End = ( plateEndX, startY + dy )
+                let dx = (plateEndX - plateStartX);
+                let dy = 0.5 * a * 1; // arbitrary scaling factor for time^2
+                exitY = startY + dy;
+                // Slope dy/dx at exit = a / v^2. 
+                // Let's just geometrically match the quadratic bezier derivative:
+                exitSlope = (dy) / (dx / 2); // derivative at end of Q bezier
+                path += `Q ${plateStartX + dx/2},${startY} ${plateEndX},${exitY} `;
+            }
+
+            // Straight line to screen
+            let dxScreen = screenX - plateEndX;
+            let screenY = exitY + exitSlope * dxScreen;
+
+            // Clamp to screen bounds roughly
+            if (screenY < 110) screenY = 110;
+            if (screenY > 390) screenY = 390;
+            // Recalculate if it hit the tube glass early (approx)
+            // Just let it stop at screenX for visual simplicity
+
+            path += `L ${screenX},${screenY}`;
+            
+            beam.setAttribute('d', path);
+            impactGlow.setAttribute('cy', screenY);
+        }
+
+        window.resetFields = () => {
+            sliderE.value = 0;
+            sliderB.value = 0;
+            updatePhysics();
+        }
+
+        sliderE.oninput = updatePhysics;
+        sliderB.oninput = updatePhysics;
+
+        // Init
+        updatePhysics();
+    </script>
+    <script src="../js/global-drawer.js"></script>
+</body>
+</html>
+

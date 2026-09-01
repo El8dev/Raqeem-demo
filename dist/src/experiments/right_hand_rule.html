@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مختبر الفيزياء | قاعدة الكف اليمنى</title>
+    <link rel="stylesheet" href="../fonts/google-fonts.css">
+    <link rel="stylesheet" href="../libs/fontawesome.min.css">
+    <link rel="stylesheet" href="../libs/tailwind.css">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07090e;
+            --panel: #111823;
+            --border: rgba(0, 210, 255, 0.18);
+            --cyan: #00d2ff;
+            --orange: #ff9f43;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --green: #2ecc71;
+            --text: #e2e8f0;
+        }
+
+        html, body {
+            user-select: none; -webkit-user-select: none;
+            width: 100%; height: 100%; overflow: hidden;
+            background: var(--bg); color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            display: flex; flex-direction: column;
+        }
+
+        /* ── FLOATING MENU TOGGLE ── */
+        .drawer-toggle {
+            position: fixed; left: 20px; top: 20px; z-index: 9999;
+            width: 50px; height: 50px; border-radius: 12px;
+            background: rgba(10, 16, 26, 0.55); border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+            color: var(--cyan); cursor: pointer; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        .drawer-toggle:hover { background: rgba(0, 210, 255, 0.12); transform: scale(1.07); }
+
+        /* ── SLIDE-OUT DRAWER ── */
+        .drawer {
+            position: fixed; left: 0; top: 0; height: 100%; width: 300px; z-index: 10000;
+            transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #080c14; border-right: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6); padding: 20px; display: flex; flex-direction: column;
+        }
+        .drawer.open { transform: translateX(0); }
+        .drawer-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9998;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.visible { opacity: 1; pointer-events: all; }
+        .drawer-close {
+            align-self: flex-end; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal', sans-serif;
+            font-size: 0.88rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .drawer-submenu a {
+            display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-size: 0.8rem;
+            color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        .drawer-submenu a:hover { background: rgba(0, 210, 255, 0.1); color: #fff; }
+
+        /* ── MAIN LAYOUT ── */
+        .app-container { flex: 1; display: flex; overflow: hidden; position: relative; }
+        
+        .viewport {
+            flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, rgba(16,32,54,0.4) 0%, rgba(7,10,18,0.9) 100%);
+            perspective: 1200px;
+        }
+
+        .toolbox {
+            width: 340px; background: rgba(11, 15, 25, 0.85); border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px); padding: 24px; display: flex; flex-direction: column; gap: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 100; overflow-y: auto;
+        }
+
+        .toolbox-title {
+            font-size: 1.4rem; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(0,210,255,0.5);
+            margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;
+        }
+
+        /* ── 3D SCENE ── */
+        .scene {
+            width: 600px; height: 600px; position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) rotateZ(-45deg);
+            transition: transform 0.5s ease-out;
+        }
+
+        .plane {
+            position: absolute; width: 400px; height: 400px;
+            background: rgba(0, 210, 255, 0.05);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            left: 100px; top: 100px;
+            box-shadow: inset 0 0 40px rgba(0,210,255,0.1);
+        }
+
+        .vector {
+            position: absolute; transform-origin: bottom center;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: flex-end;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .vector-line {
+            width: 6px; border-radius: 3px;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .vector-head {
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid currentColor;
+            margin-bottom: -2px;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .vector-label {
+            position: absolute; font-family: 'Outfit', sans-serif;
+            font-size: 24px; font-weight: 800;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* V-Vector (Velocity) */
+        #vec-v {
+            left: 300px; top: 300px; height: 180px;
+            color: #3b82f6;
+            transform: translate(-50%, -100%) rotateX(-90deg) rotateY(90deg); /* Points along X axis */
+        }
+        #vec-v .vector-line { height: 160px; background: currentColor; }
+        #vec-v .vector-label { top: -30px; }
+
+        /* B-Vector (Magnetic Field) */
+        #vec-b {
+            left: 300px; top: 300px; height: 220px;
+            color: #00d2ff;
+            transform: translate(-50%, -100%) rotateX(-90deg); /* Points along Y axis */
+        }
+        #vec-b .vector-line { height: 200px; background: currentColor; }
+        #vec-b .vector-label { top: -30px; }
+
+        /* F-Vector (Magnetic Force) */
+        #vec-f {
+            left: 300px; top: 300px; height: 250px;
+            color: #ef4444;
+            transform: translate(-50%, -100%); /* Points UP (Z axis) */
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), color 0.4s;
+        }
+        #vec-f .vector-line { height: 230px; background: currentColor; width: 10px; border-radius: 5px; box-shadow: 0 0 25px currentColor; }
+        #vec-f .vector-head { border-left-width: 15px; border-right-width: 15px; border-bottom-width: 30px; margin-bottom: -5px; }
+        #vec-f .vector-label { top: -45px; width: max-content; background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 8px; border: 1px solid currentColor; }
+
+        /* Hand Icon */
+        #hand-icon {
+            position: absolute; left: 300px; top: 300px;
+            font-size: 110px; color: rgba(255,255,255,0.4);
+            transform-origin: center bottom;
+            transform: translate(-50%, -100%);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), color 0.4s;
+            z-index: 5;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+        }
+
+        /* Particle */
+        .particle {
+            position: absolute; width: 40px; height: 40px;
+            border-radius: 50%; left: 300px; top: 300px;
+            transform: translate(-50%, -50%) rotateX(-90deg) rotateY(45deg); /* Face camera */
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif; font-weight: bold; font-size: 20px;
+            color: white; box-shadow: 0 0 20px currentColor;
+            z-index: 10; transition: all 0.4s ease;
+        }
+
+        .particle.pos { background: rgba(239, 68, 68, 0.8); border: 2px solid #ef4444; color: #ef4444; }
+        .particle.neg { background: rgba(59, 130, 246, 0.8); border: 2px solid #3b82f6; color: #3b82f6; }
+
+        /* Controls */
+        .control-group { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; }
+        .control-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; font-weight: 700; display: block; }
+        
+        .charge-toggle { display: flex; gap: 10px; }
+        .charge-btn {
+            flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.02); color: #e2e8f0; font-family: 'Tajawal', sans-serif;
+            font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .charge-btn.active.pos { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+        .charge-btn.active.neg { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type=range] { flex: 1; accent-color: var(--cyan); }
+        
+        .info-card { background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); padding: 15px; border-radius: 12px; margin-top: auto; }
+        .formula { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--cyan); text-align: center; margin: 10px 0; letter-spacing: 2px;}
+
+        /* HAND ILLUSTRATION (Simplified SVG) */
+        .hand-container {
+            position: absolute;
+            left: 300px; top: 300px;
+            width: 150px; height: 150px;
+            transform-origin: 0 0;
+            transform: rotateX(-90deg) rotateY(45deg); /* Default face camera */
+            pointer-events: none;
+            opacity: 0.6;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+        }
+
+    </style>
+    <link rel="stylesheet" href="../css/mobile-enforcer.css">
+</head>
+
+<body>
+
+    <!-- Drawer Toggle -->
+    <div class="drawer-toggle" id="menu-toggle-btn">
+        <i class="fa-solid fa-bars text-xl"></i>
+    </div>
+
+    <!-- Slide-out Drawer -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="drawer" id="side-drawer">
+        <button class="drawer-close" id="drawer-close-btn">
+            <i class="fa-solid fa-xmark"></i> إغلاق القائمة
+        </button>
+        <div style="padding: 10px 0;">
+            <a href="../index.html?showMenu=true" style="color:var(--cyan);text-decoration:none;font-weight:bold;display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                <i class="fa-solid fa-house"></i> العودة للرئيسية
+            </a>
+            <h3 style="color:#94a3b8;font-size:0.8rem;margin-bottom:10px;">تجارب أخرى</h3>
+            <div class="drawer-submenu">
+                <a href="fields_effect.html"><i class="fa-solid fa-atom"></i> حركة الجسيمات المشحونة</a>
+                <a href="induction_coils.html"><i class="fa-solid fa-magnet"></i> الحث الكهرومغناطيسي</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Toolbox (Controls) -->
+        <div class="toolbox">
+            <div class="toolbox-title">قاعدة الكف اليمنى</div>
+            
+            <div class="control-group">
+                <span class="control-label">نوع الشحنة (q)</span>
+                <div class="charge-toggle">
+                    <button class="charge-btn pos active" id="btn-pos">
+                        <i class="fa-solid fa-plus"></i> موجبة (+q)
+                    </button>
+                    <button class="charge-btn neg" id="btn-neg">
+                        <i class="fa-solid fa-minus"></i> سالبة (-q)
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">زاوية الكاميرا (للرؤية بوضوح)</span>
+                <div class="slider-container">
+                    <i class="fa-solid fa-camera text-slate-400"></i>
+                    <input type="range" id="cam-angle" min="0" max="360" value="315">
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4 style="color:#fff;margin-bottom:8px;font-size:0.9rem;">كيفية التطبيق:</h4>
+                <p style="color:#cbd5e1;font-size:0.8rem;line-height:1.6;" id="info-text">
+                    <!-- Dynamic text goes here -->
+                </p>
+                <div class="formula">F<span style="font-size:0.7rem;">B</span> = q (v × B)</div>
+            </div>
+        </div>
+
+        <!-- Viewport (3D Scene) -->
+        <div class="viewport">
+            <div class="scene" id="scene">
+                <!-- XY Plane (representing the field plane) -->
+                <div class="plane"></div>
+
+                <!-- Particle at Origin -->
+                <div class="particle pos" id="particle">+</div>
+
+                <!-- Velocity Vector -->
+                <div class="vector" id="vec-v">
+                    <div class="vector-label">v</div>
+                    <div class="vector-head"></div>
+                    <div class="vector-line"></div>
+                </div>
+
+                <!-- Magnetic Field Vector -->
+                <div class="vector" id="vec-b">
+                    <div class="vector-label">B</div>
+                    <div class="vector-head"></div>
+                    <div class="vector-line"></div>
+                </div>
+
+                <!-- Magnetic Force Vector -->
+                <div class="vector" id="vec-f">
+                    <div class="vector-label" id="vec-f-label">F<span style="font-size:12px;">B</span></div>
+                    <div class="vector-head"></div>
+                    <div class="vector-line"></div>
+                </div>
+
+                <!-- Hand Indicator -->
+                <i class="fa-solid fa-hand" id="hand-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drawer Logic
+        const menuToggle = document.getElementById('menu-toggle-btn');
+        const drawerClose = document.getElementById('drawer-close-btn');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        menuToggle.onclick = () => { drawer.classList.add('open'); overlay.classList.add('visible'); }
+        const closeDrawer = () => { drawer.classList.remove('open'); overlay.classList.remove('visible'); }
+        drawerClose.onclick = closeDrawer;
+        overlay.onclick = closeDrawer;
+
+        // Interaction Logic
+        let isPositive = true;
+        const btnPos = document.getElementById('btn-pos');
+        const btnNeg = document.getElementById('btn-neg');
+        const particle = document.getElementById('particle');
+        const vecF = document.getElementById('vec-f');
+        const vecFLabel = document.getElementById('vec-f-label');
+        const handIcon = document.getElementById('hand-icon');
+        const scene = document.getElementById('scene');
+        const camSlider = document.getElementById('cam-angle');
+        const infoText = document.getElementById('info-text');
+
+        function updateForceDirection() {
+            if (isPositive) {
+                // Pointing UP (+Z axis)
+                vecF.style.transform = 'translate(-50%, -100%) rotateZ(0deg)';
+                handIcon.style.transform = 'translate(-50%, -100%) rotateZ(0deg)';
+                handIcon.style.color = 'rgba(239, 68, 68, 0.6)';
+                vecFLabel.innerHTML = 'F<span style="font-size:12px;">B</span>';
+                particle.className = 'particle pos';
+                particle.innerHTML = '+';
+                infoText.innerHTML = `1. ندور أصابع الكف اليمنى من اتجاه السرعة <span style="color:#3b82f6;font-family:Outfit;font-weight:bold;">v</span> نحو اتجاه المجال <span style="color:#00d2ff;font-family:Outfit;font-weight:bold;">B</span>.<br>
+                                      2. يشير الإبهام إلى اتجاه القوة <span style="color:#ef4444;font-family:Outfit;font-weight:bold;">F</span> للشحنة الموجبة.`;
+            } else {
+                // Pointing DOWN (-Z axis) -> rotateZ(180deg)
+                vecF.style.transform = 'translate(-50%, -100%) rotateZ(180deg)';
+                handIcon.style.transform = 'translate(-50%, -100%) rotateZ(180deg)';
+                handIcon.style.color = 'rgba(59, 130, 246, 0.6)';
+                vecFLabel.innerHTML = 'F<span style="font-size:12px;">B</span> (إلى الأسفل)';
+                particle.className = 'particle neg';
+                particle.innerHTML = '-';
+                infoText.innerHTML = `1. ندور أصابع الكف اليمنى من اتجاه السرعة <span style="color:#3b82f6;font-family:Outfit;font-weight:bold;">v</span> نحو اتجاه المجال <span style="color:#00d2ff;font-family:Outfit;font-weight:bold;">B</span>.<br>
+                                      2. بما أن الشحنة سالبة، ينعكس اتجاه القوة <span style="color:#ef4444;font-family:Outfit;font-weight:bold;">F</span> ليصبح <strong>(إلى الأسفل)</strong>.`;
+            }
+            // Trigger camera update to fix label rotations
+            camSlider.oninput({target: camSlider});
+        }
+
+        btnPos.onclick = () => {
+            isPositive = true;
+            btnPos.classList.add('active');
+            btnNeg.classList.remove('active');
+            updateForceDirection();
+        }
+
+        btnNeg.onclick = () => {
+            isPositive = false;
+            btnNeg.classList.add('active');
+            btnPos.classList.remove('active');
+            updateForceDirection();
+        }
+
+        // Camera Rotation Logic
+        camSlider.oninput = (e) => {
+            const rotZ = parseFloat(e.target.value);
+            // The scene is rotated by 60deg on X to look isometric, we rotate Z to view around.
+            scene.style.transform = `rotateX(60deg) rotateZ(${rotZ}deg)`;
+            
+            // Keep particle label facing camera by counter-rotating
+            particle.style.transform = `translate(-50%, -50%) rotateZ(${-rotZ}deg) rotateX(-60deg)`;
+            
+            // Keep vector labels readable (approximate counter-rotation)
+            const labels = document.querySelectorAll('.vector-label');
+            labels.forEach(lbl => {
+                let extraRot = 0;
+                if (lbl.id === 'vec-f-label' && !isPositive) {
+                    extraRot = 180; // Counter the parent's rotateZ(180deg)
+                }
+                lbl.style.transform = `rotateZ(${-rotZ + extraRot}deg)`;
+            });
+        }
+
+        // Init
+        updateForceDirection();
+        camSlider.oninput({target: camSlider});
+    </script>
+    <script src="../js/global-drawer.js"></script>
+</body>
+</html>
+

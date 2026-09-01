@@ -3,8 +3,14 @@
  * High-performance simulation orchestration engine.
  */
 
+// Unified Tailwind Cyber Configuration for General Layout
+window.tailwind = window.tailwind || {}; window.tailwind.config = {
+    theme: { extend: { colors: { cyber: { off: '#090617', on: '#150E33', panel: '#251758', border: 'rgba(117, 82, 255, 0.3)', gold: '#ffe082', orange: '#ff9f43', cyan: '#7552FF', green: '#2ecc71', red: '#ef4444', blue: '#5A46DA' } }, fontFamily: { ar: ['Tajawal', 'sans-serif'], en: ['Outfit', 'sans-serif'] } } }
+};
+
 class EliteEngine {
     constructor(config = {}) {
+        this.config = config;  // store for access in all methods
         this.workspaceId = config.workspaceId || 'workspace';
         this.workspaceEl = typeof this.workspaceId === 'string' 
             ? document.getElementById(this.workspaceId) 
@@ -21,6 +27,7 @@ class EliteEngine {
         
         this._expectedPairs = config.expectedPairs || config.requiredPairs || null;
         this.routingMode = config.routingMode || 'orthogonal';
+        this.layout = config.layout || null;
 
         // Initialize Native SVG Wire Engine
         this.wireEngine = new SVGWireEngine({
@@ -70,7 +77,39 @@ class EliteEngine {
 
         this.initDragAndDrop();
         this.initResponsiveScaler();
+        this.initLayout();
         this.initLandscapeOrientationHint();
+    }
+
+    initLayout() {
+        if (!this.layout) return;
+        this.applyLayout();
+        window.addEventListener('resize', () => this.applyLayout(), { passive: true });
+    }
+
+    applyLayout() {
+        if (!this.layout || !this.workspaceEl) return;
+        const w = this.workspaceEl.clientWidth;
+        const h = this.workspaceEl.clientHeight;
+        
+        if (this.layout.positions) {
+            for (const [id, pos] of Object.entries(this.layout.positions)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    let xPct = pos.x;
+                    let yPct = pos.y;
+                    if (typeof xPct === 'string' && xPct.includes('%')) xPct = parseFloat(xPct) / 100;
+                    if (typeof yPct === 'string' && yPct.includes('%')) yPct = parseFloat(yPct) / 100;
+                    
+                    el.style.left = (w * xPct - el.clientWidth / 2) + 'px';
+                    el.style.top = (h * yPct - el.clientHeight / 2) + 'px';
+                }
+            }
+        }
+        
+        if (this.wireEngine) {
+            this.wireEngine.repositionWires();
+        }
     }
 
     initResponsiveScaler() {
@@ -90,6 +129,10 @@ class EliteEngine {
         const baseHeight = parseFloat(this.workspaceEl.dataset.baseHeight) || (this.workspaceEl.offsetHeight || 500);
 
         const updateScale = () => {
+            if (this.config.disableScaler) {
+                this.scale = 1;
+                return;
+            }
             const containerWidth = wrapper.clientWidth || (wrapper.parentElement ? wrapper.parentElement.clientWidth - 32 : window.innerWidth - 32);
             if (!containerWidth) return;
             const scale = Math.min(1.0, containerWidth / baseWidth);
@@ -106,6 +149,7 @@ class EliteEngine {
             this.workspaceEl.style.transform = `scale(${scale})`;
             
             wrapper.style.height = `${baseHeight * scale}px`;
+            this.scale = scale;
             
             if (this.wireEngine) {
                 this.wireEngine.repositionWires();
@@ -122,8 +166,8 @@ class EliteEngine {
         }, { passive: true });
         window.addEventListener('load', updateScale, { passive: true });
         if (typeof ResizeObserver !== 'undefined') {
-            const ro = new ResizeObserver(() => updateScale());
-            ro.observe(wrapper);
+            let roTimeout; const ro = new ResizeObserver(() => { clearTimeout(roTimeout); roTimeout = setTimeout(updateScale, 20); });
+            // ro.observe(wrapper);
             if (wrapper.parentElement) ro.observe(wrapper.parentElement);
         }
         setTimeout(updateScale, 50);
@@ -225,12 +269,17 @@ class EliteEngine {
 
     snapComponent(comp, dropZone) {
         if (!comp || !dropZone || comp.classList.contains("placed")) return;
-        const targetLeft = parseFloat(dropZone.style.left) || 0;
-        const targetTop = parseFloat(dropZone.style.top) || 0;
+        
+        // The most foolproof alignment method: copy the exact CSS style string 
+        // from the drop zone so the browser renders them identically.
+        const targetLeft = dropZone.style.left || (dropZone.offsetLeft + "px");
+        const targetTop = dropZone.style.top || (dropZone.offsetTop + "px");
         
         gsap.to(comp, {
             left: targetLeft,
             top: targetTop,
+            x: 0,
+            y: 0,
             duration: 0.35,
             ease: "back.out(1.4)",
             onUpdate: () => {
@@ -273,13 +322,17 @@ class EliteEngine {
 
             Draggable.create(comp, {
                 type: "top,left",
-                bounds: `#${engine.workspaceId}`,
+                // bounds removed,
                 edgeResistance: 0.65,
                 onPress: function() {
                     comp._hasDragged = false;
                     this.startLeft = parseFloat(this.target.style.left) || 0;
                     this.startTop = parseFloat(this.target.style.top) || 0;
                     gsap.set(this.target, { zIndex: 9999 });
+                    
+                    if (typeof engine.config.onComponentDragStart === 'function') {
+                        engine.config.onComponentDragStart(this.target, this);
+                    }
                     
                     const targetId = this.target.getAttribute("data-target");
                     if (targetId) {
@@ -320,17 +373,22 @@ class EliteEngine {
 
                     if (isOver && dropZone && !dropZone.classList.contains("active")) {
                         engine.snapComponent(this.target, dropZone);
+                    } else if (engine.config.freeDrop) {
+                        if (typeof engine.config.onComponentFreeDrop === 'function') {
+                            engine.config.onComponentFreeDrop(this.target, this);
+                        }
+                        gsap.set(this.target, { zIndex: 10 });
                     } else {
                         gsap.to(this.target, { 
                             left: this.startLeft, 
                             top: this.startTop, 
-                            duration: 0.4, 
-                            ease: "power2.out",
-                            onUpdate: () => {
-                                if (engine.wireEngine) engine.wireEngine.repositionWires();
-                            }
+                            duration: 0.35, 
+                            ease: "back.out(1.2)" 
                         });
-                        gsap.set(this.target, { zIndex: 10 });
+                        gsap.set(this.target, { zIndex: 10, delay: 0.35 });
+                    }
+                    if (engine.wireEngine) {
+                        engine.wireEngine.repositionWires();
                     }
                 }
             });
@@ -402,8 +460,8 @@ window.initRaqeemResponsive = function(workspaceSelector = '#workspace', baseWid
     }, { passive: true });
     window.addEventListener('load', updateScale, { passive: true });
     if (typeof ResizeObserver !== 'undefined') {
-        const ro = new ResizeObserver(() => updateScale());
-        ro.observe(wrapper);
+        let roTimeout; const ro = new ResizeObserver(() => { clearTimeout(roTimeout); roTimeout = setTimeout(updateScale, 20); });
+        // ro.observe(wrapper);
         if (wrapper.parentElement) ro.observe(wrapper.parentElement);
     }
     setTimeout(updateScale, 50);
@@ -456,3 +514,4 @@ window.initRaqeemResponsive = function(workspaceSelector = '#workspace', baseWid
 };
 
 window.EliteEngine = EliteEngine;
+
