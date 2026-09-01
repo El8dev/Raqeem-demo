@@ -418,9 +418,9 @@
     <div class="flex flex-1 gap-3 p-3 overflow-hidden min-h-0">
 
         <!-- 1. RIGHT PANEL: Dynamic Toolbox (HTML) -->
-        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl" id="toolbox" style="width: 175px; flex-shrink: 0; z-index: 50;">
-            <div class="bg-gradient-to-r from-cyan-950/50 to-transparent border-b border-cyan-500/20 px-3 py-2.5 text-xs font-bold text-cyan-400 flex items-center gap-2">
-                <i class="fa-solid fa-toolbox"></i>
+        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl" id="toolbox" style="width: 175px; flex-shrink: 0; z-index: 50; background: #120b2e; border: 1px solid rgba(117, 82, 255, 0.25);">
+            <div class="border-b px-3 py-2.5 text-xs font-bold flex items-center gap-2" style="background: rgba(117, 82, 255, 0.12); border-color: rgba(117, 82, 255, 0.25); color: #c4b5fd;">
+                <i class="fa-solid fa-toolbox text-purple-400"></i>
                 <span>صندوق الأدوات</span>
             </div>
 
@@ -466,7 +466,7 @@
                     
                     <!-- Battery Wrapper (Visible in DC) -->
                     <div class="component-wrapper" id="wrapper-battery" style="height: 70px; display: flex;">
-                        <div class="elite-component battery overflow-visible" id="battery" data-target="dz-source" style="position:relative; width:70px; height:60px;">
+                        <div class="elite-component battery overflow-visible" id="battery" data-target="dz-source" style="position:relative; width:80px; height:60px;">
                             <svg viewBox="0 0 70 60" class="w-full h-full overflow-visible">
                                 <defs>
                                   <linearGradient id="batBody" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -536,51 +536,82 @@
                                 <text x="40" y="22" fill="#c4b5fd" font-size="8" font-weight="bold" font-family="Outfit" text-anchor="middle">AC ~</text>
                                 <text x="40" y="62" fill="#a855f7" font-size="8" font-weight="bold" font-family="Outfit" text-anchor="middle" id="ac-voltage-lbl">12V</text>
                             </svg>
-                            <div class="terminal-node" id="ac-source-left" style="left: 0%; top: 50%;"></div>
-                            <div class="terminal-node" id="ac-source-right" style="left: 100%; top: 50%;"></div>
+                            <div class="terminal-node" id="ac-source-left" style="left: 12%; top: 50%;"></div>
+                            <div class="terminal-node" id="ac-source-right" style="left: 88%; top: 50%;"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Ammeter -->
+                <!-- 3. Ammeter (Chapter 2 Style Vintage Case) -->
                 <div class="toolbox-card">
                     <span class="toolbox-card-title">أميتر (A)</span>
-                    <div class="component-wrapper" id="wrapper-ammeter" style="height: 80px;">
-                        <div class="elite-component ammeter overflow-visible" id="ammeter" data-target="dz-ammeter" style="position:relative; width:95px; height:80px;">
-                            <div class="w-full h-full bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-slate-600 flex flex-col items-center justify-between p-1 shadow-2xl relative box-border" style="border-radius: 12px;">
-                                <div class="absolute -top-1.5 bg-red-500 rounded-t shadow-[0_0_8px_rgba(239,68,68,0.8)]" style="left: 16px; width: 10px; height: 5px;"></div>
-                                <div class="absolute -top-1.5 bg-purple-500 rounded-t shadow-[0_0_8px_rgba(117,82,255,0.8)]" style="right: 16px; width: 10px; height: 5px;"></div>
-
-                                <div class="gauge-area border-2 border-slate-700 bg-[#f8fafc] relative overflow-hidden flex justify-center items-end shadow-inner box-border" style="width: 82px; height: 44px; border-top-left-radius: 40px; border-top-right-radius: 40px; margin-top: 2px;">
-                                    <svg viewBox="0 0 100 55" class="absolute top-0 left-0 pointer-events-none" style="width: 100%; height: 100%;">
-                                        <path d="M 15,55 A 35 35 0 0 1 85,55" fill="none" stroke="#94a3b8" stroke-width="5" />
-                                        <g transform="translate(50,55)">
-                                            <line x1="0" y1="-32" x2="0" y2="-38" stroke="#0f172a" stroke-width="1.5" transform="rotate(-60)" />
-                                            <text x="-30" y="-12" font-size="7" font-family="Outfit" font-weight="bold" fill="#0f172a" text-anchor="middle">0</text>
-                                            <line x1="0" y1="-32" x2="0" y2="-38" stroke="#0f172a" stroke-width="1.5" transform="rotate(0)" />
-                                            <text x="0" y="-22" font-size="7" font-family="Outfit" font-weight="bold" fill="#0f172a" text-anchor="middle">1.0</text>
-                                            <line x1="0" y1="-32" x2="0" y2="-38" stroke="#dc2626" stroke-width="1.5" transform="rotate(52.5)" />
-                                            <text x="28" y="-8" font-size="7" font-family="Outfit" font-weight="bold" fill="#dc2626" text-anchor="middle">2.0</text>
-                                            <text x="0" y="-12" font-size="9" font-family="Outfit" font-weight="900" fill="#334155" text-anchor="middle">A</text>
-                                        </g>
-                                    </svg>
-                                    <div class="needle absolute bg-red-600 origin-bottom z-10" id="ammeter-needle" style="bottom: 0; left: 50%; width: 2px; height: 35px; transform: translateX(-50%) translateY(-2px) rotate(-60deg); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
-                                        <div class="absolute bg-slate-800 rounded-full border-2 border-slate-300" style="width: 7px; height: 7px; bottom: -3.5px; left: 50%; transform: translateX(-50%);"></div>
-                                    </div>
-                                </div>
-                                <div class="ammeter-digital font-bold text-cyber-green tracking-widest bg-black/80 rounded border border-white/10 text-center" id="ammeter-digital" style="font-size: 9px; padding: 1px 4px; width: 85%;">0.00 A</div>
-                            </div>
-                            <div class="terminal-node" id="ammeter-pos" style="left: 16%; top: 4%;"></div>
-                            <div class="terminal-node" id="ammeter-neg" style="left: 84%; top: 4%;"></div>
+                    <div class="component-wrapper" id="wrapper-ammeter" style="height: 85px;">
+                        <div class="elite-component ammeter overflow-visible" id="ammeter" data-target="dz-ammeter" style="position:relative; width:100px; height:85px;">
+                            <svg viewBox="0 0 110 90" class="w-full h-full overflow-visible">
+                                <defs>
+                                  <linearGradient id="ammCase" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#334155" />
+                                    <stop offset="100%" stop-color="#0f172a" />
+                                  </linearGradient>
+                                  <radialGradient id="ammFace" cx="50%" cy="100%" r="100%">
+                                    <stop offset="0%" stop-color="#f8fafc" />
+                                    <stop offset="85%" stop-color="#f1f5f9" />
+                                    <stop offset="100%" stop-color="#cbd5e1" />
+                                  </radialGradient>
+                                  <linearGradient id="glassShineAmm" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(255,255,255,0.22)" />
+                                    <stop offset="35%" stop-color="rgba(255,255,255,0.05)" />
+                                    <stop offset="40%" stop-color="rgba(255,255,255,0)" />
+                                    <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+                                  </linearGradient>
+                                  <linearGradient id="brassAmm" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#eab308"/>
+                                    <stop offset="50%" stop-color="#ca8a04"/>
+                                    <stop offset="100%" stop-color="#854d0e"/>
+                                  </linearGradient>
+                                </defs>
+                                <rect x="2" y="2" width="106" height="86" rx="10" fill="rgba(0,0,0,0.5)" filter="blur(2px)" />
+                                <rect x="2" y="2" width="106" height="86" rx="10" fill="url(#ammCase)" stroke="#475569" stroke-width="1.5" />
+                                <path d="M 10 52 C 10 25, 100 25, 100 52 Z" fill="url(#ammFace)" stroke="#94a3b8" stroke-width="0.75" />
+                                <rect x="10" y="52" width="90" height="15" fill="url(#ammFace)" />
+                                <path d="M 10 67 L 100 67" stroke="#cbd5e1" stroke-width="1" />
+                                
+                                <!-- Scale ticks & labels -->
+                                <line x1="22" y1="44" x2="25.5" y2="47.5" stroke="#334155" stroke-width="1.5" />
+                                <text x="23" y="40" fill="#0f172a" font-size="7.5" font-weight="black" font-family="Outfit" text-anchor="middle">0</text>
+                                
+                                <line x1="55" y1="30" x2="55" y2="35" stroke="#334155" stroke-width="1.5" />
+                                <text x="55" y="27" fill="#0f172a" font-size="7.5" font-weight="black" font-family="Outfit" text-anchor="middle">1.0</text>
+                                
+                                <line x1="88" y1="44" x2="84.5" y2="47.5" stroke="#dc2626" stroke-width="1.5" />
+                                <text x="87" y="40" fill="#dc2626" font-size="7.5" font-weight="black" font-family="Outfit" text-anchor="middle">2.0</text>
+                                
+                                <text x="55" y="60" fill="#0f172a" font-size="12" font-weight="black" font-family="Outfit" text-anchor="middle">A</text>
+                                
+                                <circle cx="55" cy="72" r="6" fill="#1e293b" stroke="#475569" stroke-width="1" />
+                                <circle cx="55" cy="72" r="2.5" fill="#ef4444" />
+                                
+                                <path d="M 10 52 C 10 25, 100 25, 100 52 Z" fill="url(#glassShineAmm)" pointer-events="none" />
+                                
+                                <!-- Brass Binding Posts: TOP & BOTTOM -->
+                                <rect x="50" y="0" width="10" height="5" rx="1" fill="url(#brassAmm)" stroke="#475569" stroke-width="0.5" />
+                                <rect x="50" y="85" width="10" height="5" rx="1" fill="url(#brassAmm)" stroke="#475569" stroke-width="0.5" />
+                            </svg>
+                            <!-- Needle starting from zero at left (~ -48deg) to 2.0A at right (~ +48deg) -->
+                            <div class="absolute" id="ammeter-needle" style="left: 50%; top: 34px; width: 2px; height: 38px; background: #ef4444; transform-origin: bottom center; transform: translateX(-50%) rotate(-48deg); box-shadow: 0 0 5px rgba(239,68,68,0.8); z-index: 15; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.2);"></div>
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/85 text-emerald-400 font-mono font-bold text-[9px] px-1.5 py-0.2 rounded border border-white/10" id="ammeter-digital">0.00 A</div>
+                            <!-- Terminals: TOP (ammeter-pos) and BOTTOM (ammeter-neg) -->
+                            <div class="terminal-node" id="ammeter-pos" style="left: 50%; top: 2%;"></div>
+                            <div class="terminal-node" id="ammeter-neg" style="left: 50%; top: 98%;"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. Switch -->
+                <!-- 4. Switch (SW-1 Knife Switch) -->
                 <div class="toolbox-card">
                     <span class="toolbox-card-title">مفتاح كهربائي (K)</span>
-                    <div class="component-wrapper" id="wrapper-switch" style="height: 75px;">
-                        <div class="elite-component switch-container overflow-visible cursor-pointer" id="switch" data-target="dz-switch" style="position:relative; width:80px; height:80px;">
+                    <div class="component-wrapper" id="wrapper-switch" style="height: 85px;">
+                        <div class="elite-component switch-container overflow-visible cursor-pointer" id="switch" data-target="dz-switch" style="position:relative; width:80px; height:85px;">
                             <svg viewBox="0 0 80 100" class="w-full h-full overflow-visible">
                                 <defs>
                                   <linearGradient id="bkl2-sw" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -598,23 +629,26 @@
                                     <stop offset="100%" stop-color="#a16207"/>
                                   </radialGradient>
                                 </defs>
-                                <rect x="2" y="36" width="76" height="32" rx="16" fill="rgba(0,0,0,0.5)" filter="blur(4px)"/>
-                                <rect x="2" y="34" width="76" height="32" rx="16" fill="url(#bkl2-sw)" stroke="#334155" stroke-width="1.5"/>
-                                <rect x="4" y="36" width="72" height="28" rx="14" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                                <rect x="2" y="2" width="76" height="96" rx="16" fill="rgba(0,0,0,0.5)" filter="blur(4px)"/>
+                                <rect x="2" y="2" width="76" height="96" rx="16" fill="url(#bkl2-sw)" stroke="#334155" stroke-width="1.5"/>
+                                <rect x="4" y="4" width="72" height="92" rx="14" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
                                 
-                                <rect x="5" y="42" width="16" height="16" rx="2" fill="url(#brass2-sw)" stroke="#713f12" stroke-width="1"/>
-                                <circle cx="13" cy="48" r="3.5" fill="url(#screw2-sw)" stroke="#422006" stroke-width="0.5"/>
+                                <!-- Top Contact (Terminal 1) -->
+                                <rect x="32" y="5" width="16" height="16" rx="2" fill="url(#brass2-sw)" stroke="#713f12" stroke-width="1"/>
+                                <circle cx="40" cy="13" r="3.5" fill="url(#screw2-sw)" stroke="#422006" stroke-width="0.5"/>
                                 
-                                <rect x="57" y="42" width="18" height="16" rx="2" fill="url(#brass2-sw)" stroke="#713f12" stroke-width="1"/>
-                                <circle cx="66" cy="48" r="3.5" fill="url(#screw2-sw)" stroke="#422006" stroke-width="0.5"/>
+                                <!-- Bottom Pivot Contact (Terminal K) -->
+                                <rect x="32" y="79" width="16" height="16" rx="2" fill="url(#brass2-sw)" stroke="#713f12" stroke-width="1"/>
+                                <circle cx="40" cy="87" r="3.5" fill="url(#screw2-sw)" stroke="#422006" stroke-width="0.5"/>
                                 
-                                <text x="40" y="75" fill="#eab308" font-size="10" font-weight="900" font-family="Outfit" text-anchor="middle" letter-spacing="2">SW-1</text>
+                                <text x="18" y="52" fill="#eab308" font-size="9" font-weight="900" font-family="Outfit" text-anchor="middle" letter-spacing="1">SW-1</text>
                             </svg>
-                            <div class="switch-arm absolute" id="switch-arm" style="left: 20px; top: 38px; width: 48px; height: 9px; transform-origin: 46px 4.5px; transform: rotate(-30deg); background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 50%, #64748b 100%); border: 1px solid #334155; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.8); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
-                                <div class="absolute" style="left: -9px; top: -5px; width: 11px; height: 17px; background: radial-gradient(ellipse at 30% 30%, #eab308, #854d0e); border: 1.5px solid #713f12; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.7);"></div>
+                            <!-- The knife blade arm -->
+                            <div class="switch-arm absolute" id="switch-arm" style="left: 36px; top: 12px; width: 8px; height: 75px; transform-origin: 4px 75px; transform: rotate(-30deg); background: linear-gradient(90deg, #f1f5f9 0%, #cbd5e1 50%, #64748b 100%); border: 1px solid #334155; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.8); z-index: 10; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);">
+                                <div class="absolute" style="left: -4px; top: -8px; width: 16px; height: 12px; background: radial-gradient(ellipse at 30% 30%, #eab308, #854d0e); border: 1.5px solid #713f12; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.7);"></div>
                             </div>
-                            <div class="terminal-node" id="switch-1" style="left: 16%; top: 48%;"></div>
-                            <div class="terminal-node" id="switch-k" style="left: 83%; top: 48%;"></div>
+                            <div class="terminal-node" id="switch-1" style="left: 50%; top: 4%;"></div>
+                            <div class="terminal-node" id="switch-k" style="left: 50%; top: 96%;"></div>
                         </div>
                     </div>
                 </div>
@@ -622,12 +656,12 @@
             </div>
 
             <!-- Toolbox Bottom Action Buttons -->
-            <div class="p-2.5 flex flex-col gap-2 border-t border-cyan-500/20">
-                <button id="reset-btn" class="w-full bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 font-bold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 text-xs">
+            <div class="p-2.5 flex flex-col gap-2 border-t border-purple-500/20">
+                <button id="reset-btn" class="w-full bg-purple-900/40 border border-purple-500/30 hover:bg-purple-800/40 text-purple-200 font-bold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 text-xs">
                     <i class="fa-solid fa-rotate-left text-xs"></i>
                     <span>إعادة الضبط</span>
                 </button>
-                <button id="formulas-btn" class="w-full bg-cyan-950/40 border border-cyan-700/50 hover:bg-cyan-900/40 text-cyan-400 font-bold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 text-xs">
+                <button id="formulas-btn" class="w-full bg-purple-950/60 border border-purple-500/50 hover:bg-purple-900/60 text-purple-300 font-bold py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 text-xs">
                     <i class="fa-solid fa-scale-balanced text-xs"></i>
                     <span>المقارنة والقوانين</span>
                 </button>
@@ -656,10 +690,10 @@
         </div>
 
         <!-- 3. LEFT PANEL: Graph & Live Measurements -->
-        <div class="bg-cyber-panel border border-cyber-border rounded-xl flex flex-col shadow-2xl" id="graph-panel" style="width: 240px; flex-shrink: 0; z-index: 50;">
-            <div class="bg-gradient-to-r from-cyan-950/50 to-transparent border-b border-cyan-500/20 px-4 py-2.5 text-xs font-bold text-cyan-400 flex items-center justify-between">
+        <div class="border rounded-xl flex flex-col shadow-2xl" id="graph-panel" style="width: 240px; flex-shrink: 0; z-index: 50; background: #120b2e; border: 1px solid rgba(117, 82, 255, 0.25);">
+            <div class="border-b px-4 py-2.5 text-xs font-bold flex items-center justify-between" style="background: rgba(117, 82, 255, 0.12); border-color: rgba(117, 82, 255, 0.25); color: #c4b5fd;">
                 <span class="flex items-center gap-2">
-                    <i class="fa-solid fa-chart-line"></i>
+                    <i class="fa-solid fa-chart-line text-purple-400"></i>
                     <span>منحنى التيار مع الزمن I(t)</span>
                 </span>
                 <span id="graph-figure-badge" class="text-[10px] text-amber-400 font-mono">الشكل (1)</span>
@@ -675,16 +709,16 @@
                 </div>
 
                 <!-- Current Reading Box -->
-                <div id="current-info-card" style="background:rgba(255, 159, 67, 0.08); border:1px solid rgba(255, 159, 67, 0.3); border-radius:10px; padding:10px; text-align:center;">
-                    <p id="current-type-title" style="font-size:0.75rem; color:#fb923c; margin-bottom:4px; font-weight:bold;">التيار المستمر (I<sub>dc</sub>)</p>
+                <div id="current-info-card" style="background:rgba(255, 126, 103, 0.08); border:1px solid rgba(255, 126, 103, 0.3); border-radius:10px; padding:10px; text-align:center;">
+                    <p id="current-type-title" style="font-size:0.75rem; color:#ff7e67; margin-bottom:4px; font-weight:bold;">التيار المستمر (I<sub>dc</sub>)</p>
                     <p style="font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:900; color:#fed7aa;" dir="ltr">
-                        I = <span id="current-val-text" class="text-orange-400">0.00</span> A
+                        I = <span id="current-val-text" class="text-amber-400">0.00</span> A
                     </p>
                     <p id="current-formula-sub" style="font-size:0.68rem; color:#fdba74; margin-top:4px;" dir="ltr">I = V / R</p>
                 </div>
 
                 <!-- Mode Physics Description Box -->
-                <div id="mode-desc-card" style="background:rgba(0, 210, 255, 0.05); border:1px solid rgba(0, 210, 255, 0.2); border-radius:10px; padding:10px; text-align:center;">
+                <div id="mode-desc-card" style="background:rgba(117, 82, 255, 0.08); border:1px solid rgba(117, 82, 255, 0.25); border-radius:10px; padding:10px; text-align:center;">
                     <p id="mode-desc-text" style="font-size:0.72rem; color:#e0f2fe; line-height:1.5; font-weight:600;">
                         التيار المستمر (DC): تيار ثابت المقدار والاتجاه مع مرور الزمن، ينساب باتجاه واحد من القطب الموجب إلى السالب.
                     </p>
@@ -696,11 +730,11 @@
     </div>
 
     <!-- Bottom Footer Console -->
-    <footer class="footer-console">
+    <footer class="footer-console" style="background: #120b2e; border-top: 1px solid rgba(117, 82, 255, 0.25);">
         <!-- Status Text (Right side in RTL) -->
         <div class="flex items-center gap-2 max-w-sm truncate">
-            <i class="fa-solid fa-circle-info text-cyan-400 text-sm"></i>
-            <span id="status-text" class="text-xs font-bold text-cyber-orange truncate">
+            <i class="fa-solid fa-circle-info text-purple-400 text-sm"></i>
+            <span id="status-text" class="text-xs font-bold text-amber-400 truncate">
                 يرجى سحب المكونات من صندوق الأدوات أو اضغط "الربط التلقائي"
             </span>
         </div>
@@ -708,22 +742,22 @@
         <!-- Sliders (Center) -->
         <div class="flex items-center gap-5">
             <!-- Voltage Slider -->
-            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-cyan-500/30 shadow-inner">
-                <label id="volt-slider-lbl" class="text-xs font-bold text-cyan-400">فولتية المصدر V</label>
-                <input type="range" id="volt-slider" min="2" max="24" value="12" step="1" class="w-28 accent-cyan-400 cursor-pointer">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-purple-500/30 shadow-inner" style="background: #1a103c;">
+                <label id="volt-slider-lbl" class="text-xs font-bold text-purple-300">فولتية المصدر V</label>
+                <input type="range" id="volt-slider" min="2" max="24" value="12" step="1" class="w-28 accent-purple-500 cursor-pointer">
                 <span id="volt-val" class="text-xs text-white font-bold w-12 text-left font-mono" dir="ltr">12 V</span>
             </div>
 
             <!-- Resistance Slider -->
-            <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-orange-500/30 shadow-inner">
-                <label class="text-xs font-bold text-orange-400">المقاومة R</label>
-                <input type="range" id="res-slider" min="2" max="50" value="10" step="1" class="w-28 accent-orange-400 cursor-pointer">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-purple-500/30 shadow-inner" style="background: #1a103c;">
+                <label class="text-xs font-bold text-amber-400">المقاومة R</label>
+                <input type="range" id="res-slider" min="2" max="50" value="10" step="1" class="w-28 accent-amber-400 cursor-pointer">
                 <span id="res-val" class="text-xs text-white font-bold w-12 text-left font-mono" dir="ltr">10 Ω</span>
             </div>
 
             <!-- Frequency Slider (Only active and visible in AC) -->
-            <div id="freq-ctrl-box" class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-purple-500/30 shadow-inner" style="display: none;">
-                <label class="text-xs font-bold text-purple-400">التردد f</label>
+            <div id="freq-ctrl-box" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-purple-500/30 shadow-inner" style="background: #1a103c; display: none;">
+                <label class="text-xs font-bold text-purple-300">التردد f</label>
                 <input type="range" id="freq-slider" min="10" max="60" value="50" step="1" class="w-24 accent-purple-400 cursor-pointer">
                 <span id="freq-val" class="text-xs text-white font-bold w-12 text-left font-mono" dir="ltr">50 Hz</span>
             </div>
@@ -731,7 +765,7 @@
 
         <!-- Auto Connect Button (Left in RTL) -->
         <div>
-            <button id="auto-connect-btn" class="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-5 py-2 rounded-full font-bold shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 text-xs">
+            <button id="auto-connect-btn" class="text-white px-5 py-2 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 text-xs" style="background: linear-gradient(135deg, #7552FF, #5A46DA); box-shadow: 0 0 15px rgba(117, 82, 255, 0.4);">
                 <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
                 <span>الربط التلقائي</span>
             </button>
@@ -740,10 +774,10 @@
 
     <!-- Formulas & Comparison Modal -->
     <div class="formulas-overlay" id="formulas-overlay">
-        <div class="formulas-modal">
+        <div class="formulas-modal" style="background:#120b2e; border: 1px solid rgba(117, 82, 255, 0.35);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <h2 style="font-size:1.05rem; font-weight:900; color:#38bdf8; display:flex; align-items:center; gap:8px;">
-                    <i class="fa-solid fa-scale-balanced text-cyan-400"></i>
+                <h2 style="font-size:1.05rem; font-weight:900; color:#c4b5fd; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-scale-balanced text-purple-400"></i>
                     مقارنة تفصيلية: التيار المستمر (DC) مقابل التيار المتناوب (AC)
                 </h2>
                 <button id="close-modal-btn" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:4px 8px; color:#94a3b8; cursor:pointer;">
@@ -751,57 +785,49 @@
                 </button>
             </div>
 
-            <!-- Comparison Table -->
-            <div class="overflow-x-auto mb-4">
-                <table class="w-full text-xs text-right border-collapse" style="font-family:'Tajawal',sans-serif;">
-                    <thead>
-                        <tr class="border-b border-white/10 text-cyan-300">
-                            <th class="py-2 px-3 bg-white/5">وجه المقارنة</th>
-                            <th class="py-2 px-3 bg-orange-950/30 text-orange-400">التيار المستمر (DC)</th>
-                            <th class="py-2 px-3 bg-cyan-950/30 text-cyan-400">التيار المتناوب (AC)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5 text-slate-300">
-                        <tr>
-                            <td class="py-2 px-3 font-bold text-slate-400">التعريف والمقدار</td>
-                            <td class="py-2 px-3">ثابت المقدار والاتجاه بمرور الزمن</td>
-                            <td class="py-2 px-3">يتغير دورياً مع الزمن (جيبي الموجة)</td>
-                        </tr>
-                        <tr>
-                            <td class="py-2 px-3 font-bold text-slate-400">الاتجاه</td>
-                            <td class="py-2 px-3">يسري باتجاه واحد دائمًا</td>
-                            <td class="py-2 px-3">ينعكس اتجاهه مرتين في كل دورة كاملة</td>
-                        </tr>
-                        <tr>
-                            <td class="py-2 px-3 font-bold text-slate-400">المصادر</td>
-                            <td class="py-2 px-3">البطاريات، مولدات التيار المستمر</td>
-                            <td class="py-2 px-3">مولدات التيار المتناوب الضخمة في المحطات</td>
-                        </tr>
-                        <tr>
-                            <td class="py-2 px-3 font-bold text-slate-400">التردد (f)</td>
-                            <td class="py-2 px-3" dir="ltr">f = 0 Hz</td>
-                            <td class="py-2 px-3" dir="ltr">f = 50 Hz (أو 60 Hz)</td>
-                        </tr>
-                        <tr>
-                            <td class="py-2 px-3 font-bold text-slate-400">النقل لمسافات بعيدة</td>
-                            <td class="py-2 px-3">صعب ومكلف لضياع الطاقة حرارياً</td>
-                            <td class="py-2 px-3 text-green-400">سهل وبأقل خسائر باستخدام المحولات الرافعة والخافضة</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>وجه المقارنة</th>
+                        <th>التيار المستمر (DC)</th>
+                        <th>التيار المتناوب (AC)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-bold text-white">التعريف</td>
+                        <td>تيار ثابت المقدار والاتجاه مع مرور الزمن ينساب باتجاه واحد.</td>
+                        <td>تيار يتغير دورياً مع الزمن وينعكس اتجاهه مرتين في الدورة الواحدة.</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-white">المصدر</td>
+                        <td>البطاريات، المولدات ذات التيار المستمر (DC Generators).</td>
+                        <td>مولدات التيار المتناوب (AC Alternators) في محطات القدرة.</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-white">التردد (f)</td>
+                        <td>f = 0 Hz (ثابت بدون تردد).</td>
+                        <td>50 Hz أو 60 Hz حسب النظام الكهربائي للدولة.</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-white">نقل الطاقة</td>
+                        <td>صعب ومكلف عبر المسافات الطويلة لخسائر القدرة العالية (I²R).</td>
+                        <td>سهل واقتصادي جداً باستخدام المحولات الكهربائية (رفع وخفض).</td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-white">العلاقة الرياضية</td>
+                        <td>I = V / R (ثابت لا يتغير مع الزمن)</td>
+                        <td>i(t) = I<sub>m</sub> · sin(ωt) = I<sub>m</sub> · sin(2πft)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background:rgba(117, 82, 255, 0.08); border:1px solid rgba(117, 82, 255, 0.25); border-radius:10px; padding:12px; margin-top:14px;">
+                <p class="text-purple-300 font-bold">معادلة التيار المتناوب الجيبي الآني:</p>
+                <div class="formula-eq" dir="ltr" style="color:#c4b5fd;">i(t) = I<sub>m</sub> · sin(ωt) = I<sub>m</sub> · sin(2πft)</div>
             </div>
 
-            <div class="formula-box" style="background:rgba(249, 115, 22, 0.08); border:1px solid rgba(249, 115, 22, 0.3);">
-                <p class="text-orange-300 font-bold">قانون التيار المستمر (قانون أوم):</p>
-                <div class="formula-eq" dir="ltr" style="color:#fed7aa;">I = V / R</div>
-            </div>
-
-            <div class="formula-box" style="background:rgba(0, 210, 255, 0.08); border:1px solid rgba(0, 210, 255, 0.3);">
-                <p class="text-cyan-300 font-bold">معادلة التيار المتناوب الجيبي الآني:</p>
-                <div class="formula-eq" dir="ltr" style="color:#7dd3fc;">i(t) = I<sub>m</sub> · sin(ωt) = I<sub>m</sub> · sin(2πft)</div>
-            </div>
-
-            <div style="background:rgba(0, 210, 255, 0.06); border:1px solid rgba(0, 210, 255, 0.2); border-radius:10px; padding:12px; text-align:center; margin-top:10px;">
+            <div style="background:rgba(117, 82, 255, 0.06); border:1px solid rgba(117, 82, 255, 0.2); border-radius:10px; padding:12px; text-align:center; margin-top:10px;">
                 <p style="color:#e0f2fe; font-weight:700; font-size:0.8rem; line-height:1.6;">
                     تُفضّل الطاقة الكهربائية بالتيار المتناوب لسهولة نقلها إلى مسافات بعيدة عبر شبكات التوزيع بفولطية عالية وتيار واطئ، مما يقلل من خسائر القدرة (I²R).
                 </p>
@@ -822,7 +848,6 @@
         let wires = [];
         let isDrawingWire = false;
         let drawingStartTerminal = null;
-        let draggableInstances = [];
         let animTime = 0;
         let cachedWsRect = null;
         let cachedGraphRect = null;
@@ -835,26 +860,30 @@
         // 4 Orthogonal Circuit Component Positions
         const config = {
             components: [
-                { id: 'resistor', name: 'مقاومة (R)', w: 95, h: 50, gx: 0.0, gy: -0.30 },
-                { id: 'source', name: 'مصدر الطاقة', w: 80, h: 65, gx: 0.0, gy: 0.30 },
-                { id: 'ammeter', name: 'أميتر (A)', w: 95, h: 80, gx: -0.32, gy: 0.0 },
-                { id: 'switch', name: 'مفتاح كهربائي (K)', w: 75, h: 75, gx: 0.32, gy: 0.0 }
+                { id: 'resistor', name: 'مقاومة الحمل (R)', w: 95, h: 60, gx: 0.0, gy: -0.30 },
+                { id: 'source', name: 'مصدر الطاقة', w: 80, h: 60, gx: 0.0, gy: 0.30 },
+                { id: 'ammeter', name: 'أميتر (A)', w: 100, h: 85, gx: -0.32, gy: 0.0 },
+                { id: 'switch', name: 'مفتاح كهربائي (K)', w: 80, h: 85, gx: 0.32, gy: 0.0 }
             ]
         };
 
-        // Expected orthogonal loop terminal pairs
+        function getActiveSourceId() {
+            return currentMode === 'dc' ? 'battery' : 'ac-source';
+        }
+
+        // Expected orthogonal loop terminal pairs (Perfect Rectangular Circuit)
         function getExpectedPairs() {
             const srcLeft = currentMode === 'dc' ? 'battery-neg' : 'ac-source-left';
             const srcRight = currentMode === 'dc' ? 'battery-pos' : 'ac-source-right';
 
             return [
-                // Source Left <-> Ammeter Pos
-                `${srcLeft}-ammeter-pos`, `ammeter-pos-${srcLeft}`,
-                // Ammeter Neg <-> Resistor Left
-                `ammeter-neg-resistor-left`, `resistor-left-ammeter-neg`,
-                // Resistor Right <-> Switch 1
+                // Source Left <-> Ammeter Neg (Bottom)
+                `${srcLeft}-ammeter-neg`, `ammeter-neg-${srcLeft}`,
+                // Ammeter Pos (Top) <-> Resistor Left
+                `ammeter-pos-resistor-left`, `resistor-left-ammeter-pos`,
+                // Resistor Right <-> Switch 1 (Top)
                 `resistor-right-switch-1`, `switch-1-resistor-right`,
-                // Switch K <-> Source Right
+                // Switch K (Bottom) <-> Source Right
                 `switch-k-${srcRight}`, `${srcRight}-switch-k`
             ];
         }
@@ -907,11 +936,6 @@
         // DUAL-MODE TOGGLE (DC / AC)
         // =====================================================
         function updateToolboxVisibility() {
-            const sourceTitle = document.getElementById('source-title');
-            if (sourceTitle) {
-                sourceTitle.textContent = currentMode === 'dc' ? 'بطارية (DC)' : 'مصدر متناوب (AC)';
-            }
-
             const allComps = ['resistor', 'battery', 'ac-source', 'ammeter', 'switch'];
 
             allComps.forEach(id => {
@@ -919,23 +943,19 @@
                 const el = document.getElementById(id);
                 if (!wrapper || !el) return;
 
-                // Check if this component belongs to the current mode
                 const isCompatibleWithMode = (currentMode === 'dc' && id !== 'ac-source') ||
                                              (currentMode === 'ac' && id !== 'battery');
 
                 if (!isCompatibleWithMode) {
-                    // Completely hide incompatible source
                     wrapper.style.display = 'none';
                     el.style.display = 'none';
                     const d = Draggable.get(el);
                     if (d) d.disable();
                 } else {
-                    // If placed in workspace, hide wrapper. If in toolbox, show wrapper & element!
                     const isPlaced = !!state.components[id];
                     wrapper.style.display = isPlaced ? 'none' : 'flex';
                     el.style.display = 'block';
 
-                    // If in toolbox, ensure it's appended to wrapper and enable draggable
                     if (!isPlaced) {
                         if (el.parentElement !== wrapper) {
                             wrapper.appendChild(el);
@@ -955,7 +975,6 @@
                         const d = Draggable.get(el);
                         if (d) {
                             d.enable();
-                            d.update();
                         }
                     }
                 }
@@ -963,7 +982,7 @@
         }
 
         function setExperimentMode(mode) {
-            if (currentMode === mode) return;
+            if (mode === currentMode) return;
             currentMode = mode;
 
             const tabDc = document.getElementById('tab-dc');
@@ -976,7 +995,6 @@
             const freqCtrlBox = document.getElementById('freq-ctrl-box');
             const currentInfoCard = document.getElementById('current-info-card');
 
-            // Reset current workspace cleanly
             resetExperiment(false);
 
             if (mode === 'dc') {
@@ -989,10 +1007,10 @@
 
                 graphFigureBadge.textContent = 'الشكل (1)';
                 currentTypeTitle.textContent = 'التيار المستمر (Idc)';
-                currentTypeTitle.style.color = '#fb923c';
+                currentTypeTitle.style.color = '#ff7e67';
                 currentFormulaSub.textContent = 'I = V / R';
-                currentInfoCard.style.background = 'rgba(255, 159, 67, 0.08)';
-                currentInfoCard.style.borderColor = 'rgba(255, 159, 67, 0.3)';
+                currentInfoCard.style.background = 'rgba(255, 126, 103, 0.08)';
+                currentInfoCard.style.borderColor = 'rgba(255, 126, 103, 0.3)';
 
                 modeDescText.textContent = 'التيار المستمر (DC): تيار ثابت المقدار والاتجاه مع مرور الزمن، ينساب باتجاه واحد من القطب الموجب إلى السالب.';
 
@@ -1024,7 +1042,7 @@
         }
 
         // =====================================================
-        // DROPZONES CREATION (Invisible hit-test targets only)
+        // DROPZONES CREATION
         // =====================================================
         function buildDropzones() {
             dropzonesContainer.innerHTML = '';
@@ -1038,143 +1056,120 @@
                 dz.className = 'dropzone';
                 dz.id = `dz-${comp.id}`;
                 dz.dataset.accepts = comp.id;
-                dz.style.width = `${comp.w + 16}px`;
-                dz.style.height = `${comp.h + 16}px`;
-                dz.style.left = `${absX}px`;
-                dz.style.top = `${absY}px`;
-                dz.innerHTML = '';
+                dz.style.width = comp.w + 'px';
+                dz.style.height = comp.h + 'px';
+                dz.style.left = absX + 'px';
+                dz.style.top = absY + 'px';
+
                 dropzonesContainer.appendChild(dz);
             });
         }
 
         // =====================================================
-        // DRAGGABLE LOGIC (GSAP WITH PRECISE OFFSET FIXES)
+        // DRAGGABLE ENGINE
         // =====================================================
-        function getActiveSourceId() {
-            return currentMode === 'dc' ? 'battery' : 'ac-source';
-        }
-
         function initDraggables() {
-            draggableInstances.forEach(d => d.kill());
-            draggableInstances = [];
+            const allComps = ['resistor', 'battery', 'ac-source', 'ammeter', 'switch'];
 
-            const activeIds = ['resistor', getActiveSourceId(), 'ammeter', 'switch'];
-
-            activeIds.forEach(id => {
+            allComps.forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
 
-                const compConfig = config.components.find(c => c.id === (id === 'battery' || id === 'ac-source' ? 'source' : id));
-                const compW = compConfig ? compConfig.w : 80;
-                const compH = compConfig ? compConfig.h : 80;
+                const existingDraggable = Draggable.get(el);
+                if (existingDraggable) existingDraggable.kill();
 
-                el.dataset.locked = 'false';
-                el.style.width = compW + 'px';
-                el.style.height = compH + 'px';
-                el.style.position = 'relative';
-
-                const d = Draggable.create(el, {
+                Draggable.create(el, {
                     type: 'x,y',
-                    zIndexBoost: true,
-                    onPress: function(e) {
-                        if (this.target.dataset.locked === 'true') return;
-                        gsap.to(this.target, { scale: 1.05, boxShadow: '0 10px 20px rgba(0,0,0,0.5)', duration: 0.15 });
-
-                        const wsRect = workspaceEl.getBoundingClientRect();
-                        const pointerEvent = e || window.event;
-                        const clientX = pointerEvent.clientX || (pointerEvent.touches && pointerEvent.touches[0] ? pointerEvent.touches[0].clientX : 0);
-                        const clientY = pointerEvent.clientY || (pointerEvent.touches && pointerEvent.touches[0] ? pointerEvent.touches[0].clientY : 0);
-
-                        workspaceEl.appendChild(this.target);
-
-                        // Calculate exact offset so component centers precisely on cursor
-                        const startX = clientX - wsRect.left - (compW / 2);
-                        const startY = clientY - wsRect.top - (compH / 2);
-
-                        gsap.set(this.target, {
-                            position: 'absolute',
-                            left: startX,
-                            top: startY,
-                            x: 0,
-                            y: 0,
-                            width: compW + 'px',
-                            height: compH + 'px',
-                            margin: 0,
-                            zIndex: 100
-                        });
-                        this.update();
+                    zIndexBoost: false,
+                    onPress: function() {
+                        if (el.dataset.locked === 'true') return;
+                        gsap.set(el, { zIndex: 100 });
+                        highlightMatchingDropzone(id, true);
                     },
                     onDrag: function() {
-                        const targetDropzoneId = (this.target.id === 'battery' || this.target.id === 'ac-source') ? 'dz-source' : `dz-${this.target.id}`;
-                        const dz = document.getElementById(targetDropzoneId);
-                        if (dz && !dz.classList.contains('occupied')) {
-                            if (this.hitTest(dz, '40%')) dz.classList.add('highlight');
-                            else dz.classList.remove('highlight');
-                        }
+                        highlightMatchingDropzone(id, true);
                     },
                     onRelease: function() {
-                        if (this.target.dataset.locked === 'true') return;
-                        gsap.to(this.target, { scale: 1, boxShadow: 'none', duration: 0.15 });
-
-                        const targetDropzoneId = (this.target.id === 'battery' || this.target.id === 'ac-source') ? 'dz-source' : `dz-${this.target.id}`;
-                        const dz = document.getElementById(targetDropzoneId);
-                        const isHit = dz && !dz.classList.contains('occupied') && this.hitTest(dz, '40%');
-
-                        if (dz) dz.classList.remove('highlight');
-
-                        if (isHit) {
-                            const wsRect = workspaceEl.getBoundingClientRect();
-                            const absX = wsRect.width / 2 + compConfig.gx * wsRect.width;
-                            const absY = wsRect.height / 2 + compConfig.gy * wsRect.height;
-                            const targetX = absX - compW / 2;
-                            const targetY = absY - compH / 2;
-
-                            workspaceEl.appendChild(this.target);
-
-                            gsap.set(this.target, {
-                                zIndex: 20,
-                                position: 'absolute',
-                                width: compW + 'px',
-                                height: compH + 'px',
-                                margin: 0
-                            });
-
-                            gsap.to(this.target, {
-                                left: targetX,
-                                top: targetY,
-                                x: 0,
-                                y: 0,
-                                duration: 0.2,
-                                ease: 'power2.out',
-                                onComplete: () => {
-                                    this.target.dataset.locked = 'true';
-                                    dz.classList.add('occupied');
-                                    state.components[this.target.id] = true;
-
-                                    const wrapper = document.getElementById(`wrapper-${this.target.id}`);
-                                    if (wrapper) wrapper.style.display = 'none';
-
-                                    repositionWires();
-                                    checkCircuitState();
-                                }
-                            });
-                            this.disable();
-                        } else {
-                            returnToToolbox(this.target.id);
-                        }
+                        highlightMatchingDropzone(id, false);
+                        if (el.dataset.locked === 'true') return;
+                        checkDrop(this, el, id);
                     }
-                })[0];
-
-                draggableInstances.push(d);
+                });
             });
         }
 
-        function returnToToolbox(id) {
-            delete state.components[id];
+        function highlightMatchingDropzone(compId, highlight) {
+            const targetDropzoneId = (compId === 'battery' || compId === 'ac-source') ? 'dz-source' : `dz-${compId}`;
+            const dz = document.getElementById(targetDropzoneId);
+            if (dz) {
+                if (highlight) dz.classList.add('highlight');
+                else dz.classList.remove('highlight');
+            }
+        }
 
+        function checkDrop(draggable, el, id) {
             const targetDropzoneId = (id === 'battery' || id === 'ac-source') ? 'dz-source' : `dz-${id}`;
             const dz = document.getElementById(targetDropzoneId);
-            if (dz) dz.classList.remove('occupied', 'highlight');
+            if (!dz) return;
+
+            const dzRect = dz.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+
+            const elCenterX = elRect.left + elRect.width / 2;
+            const elCenterY = elRect.top + elRect.height / 2;
+            const dzCenterX = dzRect.left + dzRect.width / 2;
+            const dzCenterY = dzRect.top + dzRect.height / 2;
+
+            const dist = Math.hypot(elCenterX - dzCenterX, elCenterY - dzCenterY);
+
+            if (dist < 85) {
+                snapToDropzone(el, dz, id);
+            } else {
+                gsap.to(el, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.3,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        gsap.set(el, { zIndex: 20 });
+                    }
+                });
+            }
+        }
+
+        function snapToDropzone(el, dz, id) {
+            const wsRect = workspaceEl.getBoundingClientRect();
+            const dzRect = dz.getBoundingClientRect();
+
+            workspaceEl.appendChild(el);
+
+            const compConfig = config.components.find(c => c.id === (id === 'battery' || id === 'ac-source' ? 'source' : id));
+            const targetW = compConfig ? compConfig.w : dzRect.width;
+            const targetH = compConfig ? compConfig.h : dzRect.height;
+
+            const targetX = (dzRect.left - wsRect.left) + (dzRect.width - targetW) / 2;
+            const targetY = (dzRect.top - wsRect.top) + (dzRect.height - targetH) / 2;
+
+            gsap.set(el, {
+                position: 'absolute',
+                left: targetX,
+                top: targetY,
+                x: 0,
+                y: 0,
+                width: targetW + 'px',
+                height: targetH + 'px',
+                margin: 0,
+                zIndex: 20
+            });
+
+            el.dataset.locked = 'true';
+            dz.classList.add('occupied');
+            dz.classList.remove('highlight');
+
+            state.components[id] = true;
+
+            const draggable = Draggable.get(el);
+            if (draggable) draggable.disable();
 
             updateToolboxVisibility();
             repositionWires();
@@ -1182,7 +1177,7 @@
         }
 
         // =====================================================
-        // WIRE DRAWING (CLEAN 90-DEGREE BOX SHAPE PATHS)
+        // WIRE DRAWING (100% PIXEL-PERFECT 90-DEGREE BOX ROUTING)
         // =====================================================
         function getTerminalCenter(termEl) {
             const rect = termEl.getBoundingClientRect();
@@ -1193,39 +1188,42 @@
             };
         }
 
-        // Clean 90-degree orthogonal circuit wiring (Perfect rectangular box corners)
+        // Clean 90-degree orthogonal circuit wiring laying exactly on the dashed circuit skeleton
         function createOrthogonalPath(x1, y1, x2, y2) {
             const wsRect = workspaceEl.getBoundingClientRect();
             const cx = wsRect.width / 2;
             const cy = wsRect.height / 2;
+            const leftX = cx - 0.32 * wsRect.width;
+            const rightX = cx + 0.32 * wsRect.width;
+            const topY = cy - 0.30 * wsRect.height;
+            const bottomY = cy + 0.30 * wsRect.height;
 
-            const distX1 = Math.abs(x1 - cx);
-            const distX2 = Math.abs(x2 - cx);
-            const distY1 = Math.abs(y1 - cy);
-            const distY2 = Math.abs(y2 - cy);
-
-            let cornerX, cornerY;
-
-            // Route via bounding box corner between horizontal & vertical stations
-            if (distX1 > distX2 && distY2 > distY1) {
-                cornerX = x1;
-                cornerY = y2;
-            } else if (distX2 > distX1 && distY1 > distY2) {
-                cornerX = x2;
-                cornerY = y1;
-            } else {
-                const dx = Math.abs(x2 - x1);
-                const dy = Math.abs(y2 - y1);
-                if (dx > dy) {
-                    cornerX = x2;
-                    cornerY = y1;
-                } else {
-                    cornerX = x1;
-                    cornerY = y2;
-                }
+            // Quadrant Corner Routing:
+            // Top-Right Wire (Resistor Right <-> Switch 1):
+            if (x1 > cx - 60 && x2 > cx - 60 && y1 < cy + 60 && y2 < cy + 60) {
+                return `M ${x1} ${y1} L ${rightX} ${topY} L ${x2} ${y2}`;
+            }
+            // Bottom-Right Wire (Switch K <-> Source Right):
+            if (x1 > cx - 60 && x2 > cx - 60 && y1 > cy - 60 && y2 > cy - 60) {
+                return `M ${x1} ${y1} L ${rightX} ${bottomY} L ${x2} ${y2}`;
+            }
+            // Bottom-Left Wire (Source Left <-> Ammeter Neg):
+            if (x1 < cx + 60 && x2 < cx + 60 && y1 > cy - 60 && y2 > cy - 60) {
+                return `M ${x1} ${y1} L ${leftX} ${bottomY} L ${x2} ${y2}`;
+            }
+            // Top-Left Wire (Ammeter Pos <-> Resistor Left):
+            if (x1 < cx + 60 && x2 < cx + 60 && y1 < cy + 60 && y2 < cy + 60) {
+                return `M ${x1} ${y1} L ${leftX} ${topY} L ${x2} ${y2}`;
             }
 
-            return `M ${x1} ${y1} L ${cornerX} ${cornerY} L ${x2} ${y2}`;
+            // Fallback for live interactive drawing
+            const dx = Math.abs(x2 - x1);
+            const dy = Math.abs(y2 - y1);
+            if (dx > dy) {
+                return `M ${x1} ${y1} L ${x2} ${y1} L ${x2} ${y2}`;
+            } else {
+                return `M ${x1} ${y1} L ${x1} ${y2} L ${x2} ${y2}`;
+            }
         }
 
         function initWireEvents() {
@@ -1239,13 +1237,9 @@
                     e.stopPropagation();
                     if (e.touches.length > 0) startWireDrawing(t);
                 };
-                t.onmouseenter = () => {
-                    if (isDrawingWire && drawingStartTerminal !== t) t.classList.add('target-glow');
-                };
-                t.onmouseleave = () => t.classList.remove('target-glow');
             });
 
-            workspaceEl.addEventListener('mousemove', (e) => {
+            window.addEventListener('mousemove', (e) => {
                 if (!isDrawingWire || !drawingStartTerminal) return;
                 const wsRect = workspaceEl.getBoundingClientRect();
                 const startPos = getTerminalCenter(drawingStartTerminal);
@@ -1254,33 +1248,15 @@
                 ghostWire.setAttribute('d', createOrthogonalPath(startPos.x, startPos.y, mouseX, mouseY));
             });
 
-            workspaceEl.addEventListener('touchmove', (e) => {
-                if (!isDrawingWire || !drawingStartTerminal) return;
-                const wsRect = workspaceEl.getBoundingClientRect();
-                const startPos = getTerminalCenter(drawingStartTerminal);
-                const mouseX = e.touches[0].clientX - wsRect.left;
-                const mouseY = e.touches[0].clientY - wsRect.top;
-                ghostWire.setAttribute('d', createOrthogonalPath(startPos.x, startPos.y, mouseX, mouseY));
-            }, { passive: true });
-
             window.addEventListener('mouseup', handleWireDrop);
-            window.addEventListener('touchend', handleWireDrop);
         }
 
         function startWireDrawing(term) {
             isDrawingWire = true;
             drawingStartTerminal = term;
             ghostWire.setAttribute('visibility', 'visible');
-            const validPairs = getExpectedPairs();
             document.querySelectorAll('.terminal-node').forEach(t => {
-                if (t === term || t.offsetParent === null) return;
-                const pair = `${term.id}-${t.id}`;
-                const rev = `${t.id}-${term.id}`;
-                const isExpected = validPairs.includes(pair) || validPairs.includes(rev);
-                const already = wires.some(w => (w.sourceId === term.id && w.targetId === t.id) || (w.sourceId === t.id && w.targetId === term.id));
-                if (isExpected && !already) {
-                    t.classList.add('target-glow');
-                }
+                if (t !== term) t.classList.add('target-glow');
             });
         }
 
@@ -1288,22 +1264,19 @@
             if (!isDrawingWire) return;
 
             document.querySelectorAll('.terminal-node').forEach(t => {
-                t.style.boxShadow = 'none';
                 t.classList.remove('target-glow');
             });
             ghostWire.setAttribute('visibility', 'hidden');
             ghostWire.setAttribute('d', '');
 
-            const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
-            const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+            const clientX = e.clientX;
+            const clientY = e.clientY;
 
             let snappedTerm = null;
-            let minDist = 35;
+            let minDist = 40;
 
             document.querySelectorAll('.terminal-node').forEach(t => {
-                if (t === drawingStartTerminal) return;
-                if (t.offsetParent === null) return;
-
+                if (t === drawingStartTerminal || t.offsetParent === null) return;
                 const tRect = t.getBoundingClientRect();
                 const tx = tRect.left + tRect.width / 2;
                 const ty = tRect.top + tRect.height / 2;
@@ -1315,17 +1288,7 @@
             });
 
             if (snappedTerm && drawingStartTerminal) {
-                const sid = drawingStartTerminal.id;
-                const tid = snappedTerm.id;
-                const pair = `${sid}-${tid}`;
-                const revPair = `${tid}-${sid}`;
-                const validPairs = getExpectedPairs();
-
-                if (validPairs.includes(pair) || validPairs.includes(revPair)) {
-                    drawPermanentWire(drawingStartTerminal, snappedTerm);
-                } else {
-                    setStatus('توصيل غير صحيح، وصّل المكونات على التوالي لإكمال الدائرة', '#ef4444');
-                }
+                drawPermanentWire(drawingStartTerminal, snappedTerm);
             }
 
             isDrawingWire = false;
@@ -1344,9 +1307,10 @@
             if (currentMode === 'dc') path.classList.add('dc-wire');
             wiresSVG.appendChild(path);
 
-            const btn = document.createElement('div');
+            const btn = document.createElement('button');
             btn.className = 'wire-del-btn';
-            btn.innerHTML = '✕';
+            btn.innerHTML = '&times;';
+            btn.title = 'حذف السلك';
             workspaceEl.appendChild(btn);
 
             const wireObj = {
@@ -1368,7 +1332,6 @@
                 wireObj.path.remove();
                 wireObj.btn.remove();
 
-                // Re-evaluate connected state on terminals
                 [sourceTerm, targetTerm].forEach(t => {
                     const hasWire = wires.some(w => w.sourceId === t.id || w.targetId === t.id);
                     if (!hasWire) t.classList.remove('connected');
@@ -1388,14 +1351,10 @@
             const p2 = getTerminalCenter(wire.targetEl);
             wire.path.setAttribute('d', createOrthogonalPath(p1.x, p1.y, p2.x, p2.y));
 
-            try {
-                const mid = wire.path.getPointAtLength(wire.path.getTotalLength() / 2);
-                wire.btn.style.left = `${mid.x}px`;
-                wire.btn.style.top = `${mid.y}px`;
-            } catch (_) {
-                wire.btn.style.left = `${(p1.x + p2.x) / 2}px`;
-                wire.btn.style.top = `${(p1.y + p2.y) / 2}px`;
-            }
+            const midX = (p1.x + p2.x) / 2;
+            const midY = (p1.y + p2.y) / 2;
+            wire.btn.style.left = `${midX}px`;
+            wire.btn.style.top = `${midY}px`;
         }
 
         function repositionWires() {
@@ -1407,50 +1366,33 @@
         // =====================================================
         function initSwitchEvents() {
             const sw = document.getElementById('switch');
-            if (sw) {
-                sw.addEventListener('click', () => {
-                    toggleSwitch();
-                });
-            }
+            if (sw) sw.addEventListener('click', () => toggleSwitch());
         }
 
         function toggleSwitch(forcedState) {
-            if (forcedState !== undefined) {
-                isSwitchClosed = forcedState;
-            } else {
-                isSwitchClosed = !isSwitchClosed;
-            }
-
+            isSwitchClosed = forcedState !== undefined ? forcedState : !isSwitchClosed;
             if (switchArm) {
-                gsap.to(switchArm, {
-                    rotation: isSwitchClosed ? 0 : -30,
-                    duration: 0.25,
-                    ease: 'power2.out'
-                });
+                gsap.to(switchArm, { rotation: isSwitchClosed ? 0 : -30, duration: 0.25, ease: 'power2.out' });
             }
-
             checkCircuitState();
         }
 
         function checkCircuitState() {
             const placedCount = Object.keys(state.components).length;
-            const requiredComps = 4;
-
-            if (placedCount < requiredComps) {
+            if (placedCount < 4) {
                 state.circuitValid = false;
-                setStatus(`تم وضع (${placedCount}/${requiredComps}) مكونات. اسحب باقي المكونات أو اضغط الربط التلقائي.`, '#ff9f43');
+                setStatus('تم وضع (' + placedCount + '/4) مكونات. اسحب باقي المكونات.', '#ff9f43');
                 updateMeasurements(0);
                 return;
             }
 
             if (wires.length < 4) {
                 state.circuitValid = false;
-                setStatus('قم بتوصيل الأسلاك بين أقطاب المكونات الأربعة لإكمال الدائرة', '#a78bfa');
+                setStatus('قم بتوصيل الأسلاك بين أقطاب المكونات الأربعة لإكمال الدائرة', '#c4b5fd');
                 updateMeasurements(0);
                 return;
             }
 
-            // All 4 components and 4 wires connected
             if (!isSwitchClosed) {
                 state.circuitValid = true;
                 setStatus('الدائرة مكتملة ولكن المفتاح مفتوح — اضغط على المفتاح لغلقه وتشغيل التيار', '#fbbf24');
@@ -1458,7 +1400,7 @@
             } else {
                 state.circuitValid = true;
                 const modeName = currentMode === 'dc' ? 'التيار المستمر (DC)' : 'التيار المتناوب (AC)';
-                setStatus(`الدائرة مغلقة وتعمل بنجاح — ينساب ${modeName} عبر المقاومة والأميتر`, '#2ecc71');
+                setStatus('الدائرة مغلقة وتعمل بنجاح — ينساب ' + modeName + ' عبر المقاومة والأميتر', '#2ecc71');
                 recomputeCircuit();
             }
         }
@@ -1474,7 +1416,7 @@
                     const acLbl = document.getElementById('ac-voltage-lbl');
                     if (batLbl) batLbl.textContent = `${voltSlider.value}V`;
                     if (acLbl) acLbl.textContent = `${voltSlider.value}V`;
-                    if (state.circuitValid && isSwitchClosed) recomputeCircuit();
+                    recomputeCircuit();
                 });
             }
 
@@ -1483,13 +1425,14 @@
                     if (resValText) resValText.textContent = `${resSlider.value} Ω`;
                     const resLbl = document.getElementById('resistor-lbl');
                     if (resLbl) resLbl.textContent = `R = ${resSlider.value} Ω`;
-                    if (state.circuitValid && isSwitchClosed) recomputeCircuit();
+                    recomputeCircuit();
                 });
             }
 
             if (freqSlider) {
                 freqSlider.addEventListener('input', () => {
                     if (freqValText) freqValText.textContent = `${freqSlider.value} Hz`;
+                    recomputeCircuit();
                 });
             }
 
@@ -1497,11 +1440,6 @@
             if (resetBtn) resetBtn.addEventListener('click', resetExperiment);
             if (formulasBtn) formulasBtn.addEventListener('click', () => formulasModal.classList.add('open'));
             if (closeModalBtn) closeModalBtn.addEventListener('click', () => formulasModal.classList.remove('open'));
-            if (formulasModal) {
-                formulasModal.addEventListener('click', (e) => {
-                    if (e.target === formulasModal) formulasModal.classList.remove('open');
-                });
-            }
         }
 
         function recomputeCircuit() {
@@ -1510,8 +1448,8 @@
                 return;
             }
 
-            const V = parseFloat(voltSlider.value);
-            const R = parseFloat(resSlider.value);
+            const V = parseFloat(voltSlider ? voltSlider.value : 12);
+            const R = parseFloat(resSlider ? resSlider.value : 10);
             const I = V / R;
 
             updateMeasurements(I);
@@ -1525,14 +1463,14 @@
                 if (currentValText) currentValText.textContent = currentAmp.toFixed(2);
 
                 if (aNeedle) {
-                    const rotI = Math.min(52.5, -60 + (currentAmp / 2.0) * 112.5);
-                    aNeedle.style.transform = `translateX(-50%) translateY(-2px) rotate(${rotI}deg)`;
+                    const rotI = -48 + (Math.min(currentAmp, 2.0) / 2.0) * 96;
+                    aNeedle.style.transform = `translateX(-50%) rotate(${rotI}deg)`;
                 }
                 if (aDigital) aDigital.textContent = `${currentAmp.toFixed(2)} A`;
             } else {
                 if (currentValText) currentValText.textContent = '0.00';
 
-                if (aNeedle) aNeedle.style.transform = `translateX(-50%) translateY(-2px) rotate(-60deg)`;
+                if (aNeedle) aNeedle.style.transform = `translateX(-50%) rotate(-48deg)`;
                 if (aDigital) aDigital.textContent = `0.00 A`;
             }
         }
@@ -1554,99 +1492,70 @@
                 if (!el) return;
 
                 workspaceEl.appendChild(el);
-
                 const compW = comp.w;
                 const compH = comp.h;
-
                 const absX = wsRect.width / 2 + comp.gx * wsRect.width;
                 const absY = wsRect.height / 2 + comp.gy * wsRect.height;
-                const targetX = absX - compW / 2;
-                const targetY = absY - compH / 2;
 
                 gsap.set(el, {
                     position: 'absolute',
-                    left: targetX,
-                    top: targetY,
+                    left: absX - compW / 2,
+                    top: absY - compH / 2,
                     x: 0,
                     y: 0,
                     width: compW + 'px',
                     height: compH + 'px',
-                    margin: 0,
                     zIndex: 20
                 });
 
-                el.style.width = compW + 'px';
-                el.style.height = compH + 'px';
                 el.dataset.locked = 'true';
                 if (wrapper) wrapper.style.display = 'none';
                 if (dz) dz.classList.add('occupied');
                 state.components[compId] = true;
 
-                const draggable = Draggable.get(el);
-                if (draggable) draggable.disable();
+                const dr = Draggable.get(el);
+                if (dr) dr.disable();
             });
 
-            // Draw clean 4-corner orthogonal closed circuit wires
             setTimeout(() => {
-                if (currentMode === 'dc') {
-                    drawPermanentWire(document.getElementById('battery-neg'), document.getElementById('ammeter-pos'));
-                    drawPermanentWire(document.getElementById('ammeter-neg'), document.getElementById('resistor-left'));
-                    drawPermanentWire(document.getElementById('resistor-right'), document.getElementById('switch-1'));
-                    drawPermanentWire(document.getElementById('switch-k'), document.getElementById('battery-pos'));
-                } else {
-                    drawPermanentWire(document.getElementById('ac-source-left'), document.getElementById('ammeter-pos'));
-                    drawPermanentWire(document.getElementById('ammeter-neg'), document.getElementById('resistor-left'));
-                    drawPermanentWire(document.getElementById('resistor-right'), document.getElementById('switch-1'));
-                    drawPermanentWire(document.getElementById('switch-k'), document.getElementById('ac-source-right'));
-                }
+                const srcNeg = currentMode === 'dc' ? document.getElementById('battery-neg') : document.getElementById('ac-source-left');
+                const srcPos = currentMode === 'dc' ? document.getElementById('battery-pos') : document.getElementById('ac-source-right');
+
+                drawPermanentWire(document.getElementById('resistor-left'), document.getElementById('ammeter-pos'));
+                drawPermanentWire(document.getElementById('ammeter-neg'), srcNeg);
+                drawPermanentWire(srcPos, document.getElementById('switch-k'));
+                drawPermanentWire(document.getElementById('switch-1'), document.getElementById('resistor-right'));
 
                 toggleSwitch(true);
             }, 100);
         }
 
         function resetExperiment(resetSliders = true) {
-            wires.forEach(w => {
-                w.path.remove();
-                w.btn.remove();
-            });
+            wires.forEach(w => { w.path.remove(); w.btn.remove(); });
             wires = [];
-
-            document.querySelectorAll('.terminal-node').forEach(t => {
-                t.classList.remove('connected', 'target-glow');
-            });
-
+            document.querySelectorAll('.terminal-node').forEach(t => t.classList.remove('connected'));
             state.components = {};
             state.circuitValid = false;
             toggleSwitch(false);
-
-            document.querySelectorAll('.dropzone').forEach(dz => {
-                dz.classList.remove('occupied', 'highlight');
-            });
-
+            document.querySelectorAll('.dropzone').forEach(dz => dz.classList.remove('occupied', 'highlight'));
             updateToolboxVisibility();
-
             if (resetSliders) {
                 if (voltSlider) voltSlider.value = 12;
                 if (resSlider) resSlider.value = 10;
-                if (freqSlider) freqSlider.value = 50;
                 if (voltValText) voltValText.textContent = '12 V';
                 if (resValText) resValText.textContent = '10 Ω';
-                if (freqValText) freqValText.textContent = '50 Hz';
             }
-
-            setStatus('يرجى سحب المكونات من صندوق الأدوات أو اضغط "الربط التلقائي"', '#ff9f43');
             updateMeasurements(0);
         }
 
         // =====================================================
-        // CANVAS RENDERING (WORKSPACES & GRAPH ANIMATION)
+        // CANVAS RENDERING
         // =====================================================
         function onResize() {
             const canvas1 = document.getElementById('workspace-canvas');
             const canvas2 = document.getElementById('current-graph');
             if (canvas1 && canvas1.parentElement) cachedWsRect = canvas1.parentElement.getBoundingClientRect();
             if (canvas2) cachedGraphRect = canvas2.getBoundingClientRect();
-
             buildDropzones();
             repositionWires();
             drawWorkspaceCanvas();
@@ -1660,7 +1569,6 @@
             requestAnimationFrame(animLoop);
         }
 
-        // 1. WORKSPACE CANVAS (4 DASHED SLOTS & ANIMATED CURRENT PARTICLES)
         function drawWorkspaceCanvas() {
             const canvas = document.getElementById('workspace-canvas');
             if (!canvas) return;
@@ -1674,14 +1582,12 @@
                 canvas.height = rect.height * dpr;
             }
 
-            // Clear full canvas without DPR distortion
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
             const W = rect.width;
             const H = rect.height;
-
             const centerX = W / 2;
             const centerY = H / 2;
             const leftX = centerX - 0.32 * W;
@@ -1689,123 +1595,75 @@
             const topY = centerY - 0.30 * H;
             const bottomY = centerY + 0.30 * H;
 
-            // 1. Circuit Wire Skeleton (Orthogonal dashed rectangle)
             ctx.setLineDash([6, 6]);
             ctx.strokeStyle = currentMode === 'dc' ? 'rgba(234, 88, 12, 0.35)' : 'rgba(117, 82, 255, 0.35)';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(leftX, topY);
-            ctx.lineTo(rightX, topY);
-            ctx.lineTo(rightX, bottomY);
-            ctx.lineTo(leftX, bottomY);
-            ctx.closePath();
+            ctx.moveTo(leftX, topY); ctx.lineTo(rightX, topY); ctx.lineTo(rightX, bottomY); ctx.lineTo(leftX, bottomY); ctx.closePath();
             ctx.stroke();
 
-            // 2. 4 HARDCODED VISIBLE DASHED DROP-ZONES
             ctx.setLineDash([5, 5]);
             ctx.lineWidth = 1.5;
 
             const sourceSlotName = currentMode === 'dc' ? 'بطارية (DC)' : 'مصدر متناوب (AC)';
             const slots = [
-                { id: 'resistor', name: 'مقاومة الحمل (R)', x: centerX, y: topY, w: 110, h: 65 },
-                { id: 'source', name: sourceSlotName, x: centerX, y: bottomY, w: 95, h: 80 },
-                { id: 'ammeter', name: 'أميتر (A)', x: leftX, y: centerY, w: 110, h: 90 },
-                { id: 'switch', name: 'مفتاح كهربائي (K)', x: rightX, y: centerY, w: 90, h: 85 }
+                { id: 'resistor', name: 'مقاومة الحمل (R)', x: centerX, y: topY, w: 105, h: 60 },
+                { id: 'source', name: sourceSlotName, x: centerX, y: bottomY, w: 90, h: 70 },
+                { id: 'ammeter', name: 'أميتر (A)', x: leftX, y: centerY, w: 110, h: 95 },
+                { id: 'switch', name: 'مفتاح كهربائي (K)', x: rightX, y: centerY, w: 90, h: 95 }
             ];
 
             slots.forEach(slot => {
                 const actualId = slot.id === 'source' ? getActiveSourceId() : slot.id;
                 const isOccupied = !!state.components[actualId];
-
-                const mainColor = currentMode === 'dc' ? '#ea580c' : '#7552FF';
                 ctx.fillStyle = isOccupied ? 'transparent' : (currentMode === 'dc' ? 'rgba(234, 88, 12, 0.05)' : 'rgba(117, 82, 255, 0.05)');
-                ctx.strokeStyle = isOccupied ? 'rgba(0, 0, 0, 0.12)' : mainColor;
-
+                ctx.strokeStyle = isOccupied ? 'rgba(0, 0, 0, 0.12)' : (currentMode === 'dc' ? '#ea580c' : '#7552FF');
                 ctx.strokeRect(slot.x - slot.w / 2, slot.y - slot.h / 2, slot.w, slot.h);
                 ctx.fillRect(slot.x - slot.w / 2, slot.y - slot.h / 2, slot.w, slot.h);
-
                 if (!isOccupied) {
                     ctx.fillStyle = currentMode === 'dc' ? '#c2410c' : '#5A46DA';
                     ctx.font = 'bold 11px Tajawal, sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
                     ctx.fillText(slot.name, slot.x, slot.y + slot.h / 2 + 12);
                 }
             });
 
-            ctx.setLineDash([]);
-
-            // 3. ANIMATED CURRENT FLOW PARTICLES
-            if (state.circuitValid && isSwitchClosed) {
-                drawCurrentFlowParticles(ctx, leftX, rightX, topY, bottomY);
-            }
+            if (state.circuitValid && isSwitchClosed) drawCurrentFlowParticles(ctx, leftX, rightX, topY, bottomY);
         }
 
         function drawCurrentFlowParticles(ctx, leftX, rightX, topY, bottomY) {
             const particleCount = 18;
-            const perimeter = 2 * ((rightX - leftX) + (bottomY - topY));
-
             if (currentMode === 'dc') {
-                // DC: Unidirectional constant flow (Clockwise)
-                ctx.fillStyle = '#ff9f43';
-                ctx.shadowColor = '#ff9f43';
+                ctx.fillStyle = '#ff7e67';
+                ctx.shadowColor = '#ff7e67';
                 ctx.shadowBlur = 8;
-
-                const speed = 1.2;
                 for (let i = 0; i < particleCount; i++) {
-                    const offset = (i / particleCount + (animTime * speed * 0.25) % 1) % 1;
+                    const offset = (i / particleCount + (animTime * 0.3) % 1) % 1;
                     const pos = getRectangularCoord(offset, leftX, rightX, topY, bottomY);
-
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(pos.x, pos.y, 3.5, 0, Math.PI * 2); ctx.fill();
                 }
             } else {
-                // AC: Bidirectional alternating harmonic oscillation
-                ctx.fillStyle = '#00f3ff';
-                ctx.shadowColor = '#00f3ff';
+                ctx.fillStyle = '#7552FF';
+                ctx.shadowColor = '#7552FF';
                 ctx.shadowBlur = 8;
-
                 const f = parseFloat(freqSlider.value || 50);
                 const oscillation = Math.sin(animTime * (f / 10));
-
                 for (let i = 0; i < particleCount; i++) {
-                    const baseT = i / particleCount;
-                    const displacedT = (baseT + oscillation * 0.08 + 1) % 1;
-                    const pos = getRectangularCoord(displacedT, leftX, rightX, topY, bottomY);
-
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, 3 + Math.abs(oscillation) * 1.5, 0, Math.PI * 2);
-                    ctx.fill();
+                    const pos = getRectangularCoord((i / particleCount + oscillation * 0.08 + 1) % 1, leftX, rightX, topY, bottomY);
+                    ctx.beginPath(); ctx.arc(pos.x, pos.y, 3 + Math.abs(oscillation) * 1.5, 0, Math.PI * 2); ctx.fill();
                 }
             }
-
-            ctx.shadowBlur = 0;
         }
 
         function getRectangularCoord(t, left, right, top, bottom) {
-            const w = right - left;
-            const h = bottom - top;
-            const total = 2 * (w + h);
-
+            const w = right - left, h = bottom - top, total = 2 * (w + h);
             let d = t * total;
-
-            if (d < w) {
-                return { x: left + d, y: top };
-            }
-            d -= w;
-            if (d < h) {
-                return { x: right, y: top + d };
-            }
-            d -= h;
-            if (d < w) {
-                return { x: right - d, y: bottom };
-            }
-            d -= w;
+            if (d < w) return { x: left + d, y: top }; d -= w;
+            if (d < h) return { x: right, y: top + d }; d -= h;
+            if (d < w) return { x: right - d, y: bottom }; d -= w;
             return { x: left, y: bottom - d };
         }
 
-        // 2. DYNAMIC GRAPH CANVAS (DC HORIZONTAL LINE vs AC SINE WAVE)
         function drawCurrentGraph() {
             const canvas = document.getElementById('current-graph');
             if (!canvas) return;
@@ -1813,135 +1671,42 @@
             const dpr = window.devicePixelRatio || 1;
             const rect = cachedGraphRect || canvas.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) return;
-
-            if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-                canvas.width = rect.width * dpr;
-                canvas.height = rect.height * dpr;
-            }
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-            const W = rect.width;
-            const H = rect.height;
+            const W = rect.width, H = rect.height, padL = 34, padR = 14, padT = 16, padB = 22;
+            const graphW = W - padL - padR, graphH = H - padT - padB, centerY = padT + graphH / 2;
 
-            const padL = 34;
-            const padR = 14;
-            const padT = 16;
-            const padB = 22;
-            const graphW = W - padL - padR;
-            const graphH = H - padT - padB;
-            const centerY = padT + graphH / 2;
-
-            // BACKGROUND GRID
             if (currentMode === 'dc') {
-                // Dark slate clean grid (الشكل 1)
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([2, 4]);
-
                 for (let i = 0; i <= 4; i++) {
-                    const y = padT + (graphH / 4) * i;
-                    ctx.beginPath();
-                    ctx.moveTo(padL, y);
-                    ctx.lineTo(padL + graphW, y);
-                    ctx.stroke();
-
-                    const x = padL + (graphW / 4) * i;
-                    ctx.beginPath();
-                    ctx.moveTo(x, padT);
-                    ctx.lineTo(x, padT + graphH);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(padL, padT + (graphH / 4) * i); ctx.lineTo(padL + graphW, padT + (graphH / 4) * i); ctx.stroke();
                 }
             } else {
-                // Green Oscilloscope Grid (Matching textbook Figure 2 الشكل 2)
-                ctx.fillStyle = 'rgba(6, 78, 59, 0.25)';
+                ctx.fillStyle = 'rgba(37, 23, 88, 0.4)';
                 ctx.fillRect(padL, padT, graphW, graphH);
-
-                ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
-                ctx.lineWidth = 0.8;
-                ctx.setLineDash([]);
-
-                // Detailed green grid lines
-                const gridStep = 14;
-                for (let x = padL; x <= padL + graphW; x += gridStep) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, padT);
-                    ctx.lineTo(x, padT + graphH);
-                    ctx.stroke();
-                }
-                for (let y = padT; y <= padT + graphH; y += gridStep) {
-                    ctx.beginPath();
-                    ctx.moveTo(padL, y);
-                    ctx.lineTo(padL + graphW, y);
-                    ctx.stroke();
-                }
+                ctx.strokeStyle = 'rgba(117, 82, 255, 0.3)';
+                for (let x = padL; x <= padL + graphW; x += 14) { ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + graphH); ctx.stroke(); }
             }
 
-            ctx.setLineDash([]);
-
-            // MAIN AXES
             ctx.strokeStyle = 'rgba(226, 232, 240, 0.85)';
-            ctx.lineWidth = 1.5;
-
             if (currentMode === 'dc') {
-                // DC: Y-axis at left, X-axis at bottom
-                ctx.beginPath();
-                ctx.moveTo(padL, padT - 4);
-                ctx.lineTo(padL, padT + graphH);
-                ctx.lineTo(padL + graphW + 4, padT + graphH);
-                ctx.stroke();
-
-                // Axis Arrows
-                drawArrowHead(ctx, padL, padT - 4, 0, -1);
-                drawArrowHead(ctx, padL + graphW + 4, padT + graphH, 1, 0);
-
-                // Axis ticks
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = 'bold 9px Outfit, sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText('0', padL - 4, padT + graphH + 3);
-                ctx.fillText('1.0 A', padL - 4, padT + graphH / 2 + 3);
-                ctx.fillText('2.0 A', padL - 4, padT + 6);
+                ctx.beginPath(); ctx.moveTo(padL, padT - 4); ctx.lineTo(padL, padT + graphH); ctx.lineTo(padL + graphW + 4, padT + graphH); ctx.stroke();
             } else {
-                // AC: Y-axis at left with arrows at top & bottom, X-axis (t) in center
-                ctx.strokeStyle = '#ef4444'; // Red center line matching Figure 2
-                ctx.beginPath();
-                ctx.moveTo(padL, centerY);
-                ctx.lineTo(padL + graphW + 6, centerY);
-                ctx.stroke();
-                drawArrowHead(ctx, padL + graphW + 6, centerY, 1, 0, '#ef4444');
-
-                // Vertical Y-axis
                 ctx.strokeStyle = '#ef4444';
-                ctx.beginPath();
-                ctx.moveTo(padL, padT - 4);
-                ctx.lineTo(padL, padT + graphH + 4);
-                ctx.stroke();
-                drawArrowHead(ctx, padL, padT - 4, 0, -1, '#ef4444');
-                drawArrowHead(ctx, padL, padT + graphH + 4, 0, 1, '#ef4444');
-
-                ctx.fillStyle = '#fca5a5';
-                ctx.font = 'bold 8.5px Outfit, sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText('+Im', padL - 4, padT + 8);
-                ctx.fillText('0', padL - 4, centerY + 3);
-                ctx.fillText('-Im', padL - 4, padT + graphH - 2);
+                ctx.beginPath(); ctx.moveTo(padL, centerY); ctx.lineTo(padL + graphW + 6, centerY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(padL, padT - 4); ctx.lineTo(padL, padT + graphH + 4); ctx.stroke();
             }
 
-            // WAVE / LINE RENDERING
-            const V = parseFloat(voltSlider.value || 12);
-            const R = parseFloat(resSlider.value || 10);
+            const V = parseFloat(voltSlider ? voltSlider.value : 12);
+            const R = parseFloat(resSlider ? resSlider.value : 10);
             const I_val = (state.circuitValid && isSwitchClosed) ? (V / R) : 0;
 
             if (currentMode === 'dc') {
-                // DC: Constant horizontal line at I_dc
                 const targetY = (state.circuitValid && isSwitchClosed) ? (padT + graphH - (Math.min(I_val, 2.0) / 2.0) * graphH) : (padT + graphH);
-
-                ctx.strokeStyle = '#ff9f43';
+                ctx.strokeStyle = '#ff7e67';
                 ctx.lineWidth = 3;
-                ctx.shadowColor = '#ff9f43';
+                ctx.shadowColor = '#ff7e67';
                 ctx.shadowBlur = 10;
                 ctx.beginPath();
                 ctx.moveTo(padL, targetY);
@@ -1949,7 +1714,6 @@
                 ctx.stroke();
                 ctx.shadowBlur = 0;
 
-                // Live moving pulse dot
                 if (state.circuitValid && isSwitchClosed) {
                     const dotX = padL + ((animTime * 60) % graphW);
                     ctx.fillStyle = '#ffffff';
@@ -1957,27 +1721,26 @@
                     ctx.arc(dotX, targetY, 4, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Text annotation matching Figure 1
                     ctx.fillStyle = '#fdba74';
                     ctx.font = 'bold 10px Tajawal, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.fillText('التيار المستمر (dc)', padL + graphW / 2, targetY - 10);
                 }
             } else {
-                // AC: Continuous Sine Wave
-                const f = parseFloat(freqSlider.value || 50);
+                const f = parseFloat(freqSlider ? freqSlider.value : 50);
+                const cycles = (f / 50) * 3.0;
+                const speed = (f / 50) * 4.0;
                 const amplitude = (state.circuitValid && isSwitchClosed) ? Math.min(graphH * 0.42, (I_val / 2.0) * (graphH * 0.42)) : 0;
 
-                ctx.strokeStyle = '#ffffff';
+                ctx.strokeStyle = '#c4b5fd';
                 ctx.lineWidth = 2.5;
-                ctx.shadowColor = '#00f3ff';
+                ctx.shadowColor = '#7552FF';
                 ctx.shadowBlur = 10;
 
                 ctx.beginPath();
                 for (let px = padL; px <= padL + graphW; px += 1.5) {
                     const t = (px - padL) / graphW;
-                    const cycles = 2.5;
-                    const py = centerY - Math.sin((t * cycles * 2 * Math.PI) - (animTime * 3)) * amplitude;
+                    const py = centerY - Math.sin((t * cycles * 2 * Math.PI) - (animTime * speed)) * amplitude;
 
                     if (px === padL) ctx.moveTo(px, py);
                     else ctx.lineTo(px, py);
@@ -1986,11 +1749,10 @@
                 ctx.shadowBlur = 0;
 
                 if (state.circuitValid && isSwitchClosed) {
-                    // Title label matching Figure 2
-                    ctx.fillStyle = '#e0f2fe';
+                    ctx.fillStyle = '#c4b5fd';
                     ctx.font = 'bold 10px Tajawal, sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText('التيار المتناوب (ac)', padL + graphW / 2, padT + 12);
+                    ctx.fillText(`التيار المتناوب (ac) — ${f} Hz`, padL + graphW / 2, padT + 12);
                 }
             }
         }

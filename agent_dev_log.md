@@ -189,11 +189,26 @@
     - Synchronized all modified files to `dist/src/experiments/`.
 - **Verification**: Verified HTTP 200 OK responses on local endpoints.
 
-
-
-
-
-
-
-
-
+### Log Entry: 2026-09-01 (Chapter 3 Ammeter Redesign, 100% Wire Alignment, Dynamic Sliders, and Panel Unification)
+- **User Feedback**:
+  1. Fix Chapter 3 (`intro_dc_vs_ac.html`) Ammeter to look like Chapter 2 Ammeter/Galvanometer.
+  2. Unify panel coloring across Toolbox, Graph Panel, Footer, and Modals with the Raqeem purple design system.
+  3. Fix wire and skeleton alignment so the wire turns at the exact bounding box corners with 0 offset.
+  4. Fix AC frequency slider so changing frequency dynamically modifies the sine wave cycles and phase speed.
+  5. Fix voltage and resistance sliders so changing them immediately updates component labels, recalculates current $I = V / R$, moves the ammeter needle, and modifies graph amplitudes.
+- **Action Taken**:
+  - **Ammeter Redesign**:
+    - Replaced the digital/analog hybrid ammeter with the realistic vintage dark-cased meter from Chapter 2 (`EliteComponents.getGalvanometer` / ammeter style) with pale dial face, arc scale, red needle `#ammeter-needle` pivoting from -48deg to +48deg, and top/bottom brass terminals (`ammeter-pos` at top `2%`, `ammeter-neg` at bottom `98%`).
+  - **Switch & Wire Alignment**:
+    - Aligned vertical switch SW-1 terminals (`switch-1` top `4%`, `switch-k` bottom `96%`).
+    - Implemented quadrant-based routing in `createOrthogonalPath` that uses the exact circuit bounding box corners `(rightX, topY)`, `(rightX, bottomY)`, `(leftX, bottomY)`, `(leftX, topY)`.
+  - **Dynamic AC Frequency Scaling**:
+    - Updated `drawCurrentGraph()` so sine wave cycles scale with `(f / 50) * 3.0` and phase speed scales with `(f / 50) * 4.0`.
+    - Hooked `freqSlider` input event to trigger real-time canvas redraws and recomputation.
+  - **Live Voltage & Resistance Physics**:
+    - Linked `voltSlider` and `resSlider` to update text readouts, live component text badges (`#resistor-lbl`, `#bat-voltage-lbl`, `#ac-voltage-lbl`), calculate $I = V / R$, animate ammeter needle, and adjust DC line height and AC sine wave peak amplitude $I_m$.
+  - **Panel Theme Unification**:
+    - Harmonized all panels, headers, toolbox cards, footer console, buttons, and modals to the unified Raqeem purple palette (`#120b2e`, `#251758`, `#7552FF`, `#5A46DA`, `#c4b5fd`).
+  - **Synchronization**:
+    - Synchronized all files from `src/experiments/` to `dist/src/experiments/`.
+- **Verification**: Verified HTTP 200 OK responses on local endpoints.
